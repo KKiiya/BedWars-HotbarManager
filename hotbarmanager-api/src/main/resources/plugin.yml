@@ -1,0 +1,10 @@
+name: HotbarManager
+version: '${project.version}'
+main: me.kiiya.hotbarmanager.HotbarManager
+softdepend: [ PlaceholderAPI, BedWars1058, BedWars2023, BedWarsProxy, BWProxy2023 ]
+commands:
+  hb:
+    aliases: [ hotbar, hotbarmanager ]
+    description: Hotbar Manager gui command
+    usage: /hb
+    permission: hotbarmanager.command
