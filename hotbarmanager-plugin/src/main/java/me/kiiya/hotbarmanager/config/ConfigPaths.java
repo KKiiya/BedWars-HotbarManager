@@ -18,7 +18,7 @@ public class ConfigPaths {
     public static final String INVENTORY_ITEMS_RANGED_NAME = PATH + "inventory.items.ranged";
     public static final String INVENTORY_ITEMS_POTIONS_NAME = PATH + "inventory.items.potions";
     public static final String INVENTORY_ITEMS_SPECIALS_NAME = PATH +  "inventory.items.utility";
-    public static final String INVENTORY_ITEMS_COMPASS_NAME = PATH + "inventory.items.compass";
+    public static final String INVENTORY_ITEMS_COMPASS_NAME = PATH + "inventory.items.compass.name";
     public static final String INVENTORY_ITEMS_COMPASS_LORE = PATH + "inventory.items.compass.lore";
     public static final String INVENTORY_ITEMS_LORE = PATH + "inventory.items.all-items.un-used.lore";
     public static final String INVENTORY_ITEMS_USED_LORE = PATH + "inventory.items.all-items.in-use.lore";
@@ -35,9 +35,6 @@ public class ConfigPaths {
     public static final String MEANING_POTIONS = PATH + "meanings.potions";
     public static final String MEANING_SPECIALS = PATH +  "meanings.utility";
     public static final String MEANING_COMPASS = PATH + "meanings.compass";
-    public static final String REMOVED_FROM_HOTBAR = PATH + "hotbar.removed";
-    public static final String ADDED_TO_HOTBAR = PATH + "hotbar.added";
-    public static final String HOTBAR_RESET = PATH + "hotbar.reset";
     public static final String SEPARATOR_NAME = PATH + "separator.name";
     public static final String SEPARATOR_LORE = PATH + "separator.lore";
 }

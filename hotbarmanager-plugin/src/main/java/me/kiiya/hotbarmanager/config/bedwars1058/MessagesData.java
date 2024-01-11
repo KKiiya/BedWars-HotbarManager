@@ -25,10 +25,10 @@ public class MessagesData {
                     yml.addDefault(INVENTORY_ITEMS_RANGED_NAME, "&aRanged");
                     yml.addDefault(INVENTORY_ITEMS_POTIONS_NAME, "&aPotions");
                     yml.addDefault(INVENTORY_ITEMS_SPECIALS_NAME, "&aUtility");
-                    yml.addDefault(INVENTORY_ITEMS_LORE, Arrays.asList("&7Drag this to a hotbar slot below", "&7to favor that slot when", "&7purchasing an item in this", "&7category or on spawn.", "", "&eClick to drag!"));
-                    yml.addDefault(INVENTORY_ITEMS_USED_LORE, Arrays.asList("&7{category} &7items will prioritize this", "&7slot!", "", "&eClick to remove!"));
                     yml.addDefault(INVENTORY_ITEMS_COMPASS_NAME, "&aCompass");
                     yml.addDefault(INVENTORY_ITEMS_COMPASS_LORE, Arrays.asList("&7Drag this to the slot your", "&7compass will be set on spawn.", "", "&cIf no slot has a compass, you", "&cwill not be given one.", "", "&eClick to drag!"));
+                    yml.addDefault(INVENTORY_ITEMS_LORE, Arrays.asList("&7Drag this to a hotbar slot below", "&7to favor that slot when", "&7purchasing an item in this", "&7category or on spawn.", "", "&eClick to drag!"));
+                    yml.addDefault(INVENTORY_ITEMS_USED_LORE, Arrays.asList("&7{category} &7items will prioritize this", "&7slot!", "", "&eClick to remove!"));
                     yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_NAME, "&aGo Back");
                     yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_LORE, Arrays.asList("&7To Play BedWars"));
                     yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_NAME, "&aGo Back");

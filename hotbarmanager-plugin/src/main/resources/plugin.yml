@@ -7,4 +7,3 @@ commands:
     aliases: [ hbmanager, hotbarmanager ]
     description: Hotbar Manager gui command
     permission: hotbarmanager.menu
-    usage: /hbm

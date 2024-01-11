@@ -51,19 +51,32 @@ public class Utility {
     }
 
     public static ItemStack formatItemStack(ItemStack item, Object t) {
-        if (item.getType() != Material.WOOL) return item;
+        Material type = item.getType();
+
+        if (type != Material.WOOL
+                && type != Material.STAINED_GLASS
+                && type != Material.GLASS
+                && type != Material.STAINED_GLASS_PANE
+                && type != Material.HARD_CLAY) return item;
+
         if (HotbarManager.getSupport() == Support.BEDWARS1058) {
             ITeam team = (ITeam) t;
             if (team == null) return item;
+
+            if (item.getType() == Material.HARD_CLAY) item = new ItemStack(Material.STAINED_CLAY, item.getAmount());
+            else if (item.getType() == Material.GLASS) item = new ItemStack(Material.STAINED_GLASS, item.getAmount());
+
             byte color = team.getColor().itemByte();
-            if (team.getColor() == TeamColor.AQUA) color = 9;
             item.setDurability(color);
         }
         else if (HotbarManager.getSupport() == Support.BEDWARS2023) {
             com.tomkeuper.bedwars.api.arena.team.ITeam team = (com.tomkeuper.bedwars.api.arena.team.ITeam) t;
             if (team == null) return item;
+
+            if (item.getType() == Material.HARD_CLAY) item = new ItemStack(Material.STAINED_CLAY, item.getAmount());
+            else if (item.getType() == Material.GLASS) item = new ItemStack(Material.STAINED_GLASS, item.getAmount());
+
             byte color = team.getColor().itemByte();
-            if (team.getColor() == com.tomkeuper.bedwars.api.arena.team.TeamColor.AQUA) color = 9;
             item.setDurability(color);
         }
         return item;
@@ -75,7 +88,7 @@ public class Utility {
 
     public static Category getItemCategory(ItemStack item) {
         Material type = item.getType();
-        if (type == Material.TNT) return Category.UTILITY;
+        if (type == Material.TNT || type == Material.SPONGE) return Category.UTILITY;
         else if (type == Material.POTION) return Category.POTIONS;
         else if (type == Material.COMPASS) return Category.COMPASS;
         else {

@@ -39,11 +39,10 @@ public class ShopBuy implements Listener {
         IContentTier content = e.getCategoryContent().getContentTiers().get(0);
         ShopCache cache = ShopCache.getInstance().getShopCache(p.getUniqueId());
         ICachedItem cachedItem = cache.getCachedItem(identifier);
-        IContentTier tier = e.getCategoryContent().getContentTiers().size() > 1 ? e.getCategoryContent().getContentTiers().get(1) : null;
-        Material currency = CategoryContent.getCurrency(CategoryContent.getCurrencyMsgPath(content));
+        IContentTier tier = cachedItem == null ? e.getCategoryContent().getContentTiers().get(0) : e.getCategoryContent().getContentTiers().get(cachedItem.getTier());
+        Material currency = tier.getCurrency();
         int price = content.getPrice();
-        int amount = content.getBuyItemsList().get(0).getItemStack().getAmount();
-        ItemStack item = Utility.formatItemStack(new ItemStack(e.getCategoryContent().getItemStack(p).getType(), amount), e.getArena().getTeam(p));
+        ItemStack item = Utility.formatItemStack(content.getBuyItemsList().get(0).getItemStack(), e.getArena().getTeam(p));
         YamlConfiguration sounds = YamlConfiguration.loadConfiguration(new File(BedWars.plugin.getDataFolder(), "sounds.yml"));
 
         // SOUNDS
@@ -62,12 +61,17 @@ public class ShopBuy implements Listener {
         }
         for (int i = 0; i < 9; i++) {
             if (hotbar.get(i) == cat) {
-                Utility.info("Found category " + cat + " at slot " + i);
-                CategoryContent.takeMoney(p, currency, price);
                 Utility.info("Took " + price + " " + currency + " from " + p.getName());
                 if (p.getInventory().getItem(i) != null) {
                     if (item.getType() == p.getInventory().getItem(i).getType() && item.getDurability() == p.getInventory().getItem(i).getDurability()) {
-                        if (p.getInventory().getItem(i).getAmount() >= p.getInventory().getItem(i).getType().getMaxStackSize()) continue;
+                        if (p.getInventory().getItem(i).getAmount() >= p.getInventory().getItem(i).getType().getMaxStackSize()) {
+                            if (Utility.getItemCategory(p.getInventory().getItem(i)) == Category.TOOLS) {
+                                cachedItem = cache.getCachedItem(identifier);
+                                p.getInventory().setItem(i, item);
+                            } else {
+                                continue;
+                            }
+                        }
                         else {
                             if (p.getInventory().getItem(i).getAmount() + item.getAmount() > p.getInventory().getItem(i).getType().getMaxStackSize()) {
                                 int finalI = i;
@@ -88,6 +92,10 @@ public class ShopBuy implements Listener {
                         Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().addItem(addedItem), 2L);
                     }
                 } else {
+                    if (Utility.getItemCategory(item) == Category.TOOLS) {
+                        ShopCache.getInstance().getShopCache(p.getUniqueId()).upgradeCachedItem(e.getCategoryContent(), i);
+                        cachedItem = cache.getCachedItem(identifier);
+                    }
                     p.getInventory().setItem(i, item);
                 }
                 Utility.playSound(p, buySound, buySoundVolume, buySoundPitch);
@@ -96,7 +104,8 @@ public class ShopBuy implements Listener {
                         .replace("%bw_lang_prefix%", Utility.getMsg(p, "prefix"))
                         .replace("%bw_item%", Utility.getMsg(p, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
                         .replace("%bw_color%", "")
-                        .replace("%bw_tier%", tier == null ? "" : CategoryContent.getRomanNumber(cachedItem.getTier())));
+                        .replace("%bw_tier%", cachedItem == null ? "" : CategoryContent.getRomanNumber(cachedItem.getTier())));
+                CategoryContent.takeMoney(p, currency, price);
                 e.setCancelled(true);
                 break;
             }
