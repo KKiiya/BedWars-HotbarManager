@@ -28,8 +28,8 @@ public class ConfigManager {
                         plugin.getLogger().info("&cCould not create " + this.config.getPath());
                         return;
                     }
-                } catch (IOException var6) {
-                    var6.printStackTrace();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 }
             }
 

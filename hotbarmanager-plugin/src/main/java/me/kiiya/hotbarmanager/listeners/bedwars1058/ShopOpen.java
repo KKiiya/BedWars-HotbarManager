@@ -22,7 +22,7 @@ public class ShopOpen implements Listener {
         if (HotbarManager.getSupport() != Support.BEDWARS2023) return;
 
         Player player = (Player) e.getPlayer();
-        if (!HotbarManager.getBW2023Api().getArenaUtil().isPlaying(player)) return;
+        if (!HotbarManager.getBW1058Api().getArenaUtil().isPlaying(player)) return;
 
         if (e.getView().getTitle().equals(Utility.getMsg(player, "shop-items-messages.inventory-name"))) {
             ItemStack hotbarManagerItem = new ItemStack(Material.valueOf(HotbarManager.getMainConfig().getString(ITEM_TYPE)));

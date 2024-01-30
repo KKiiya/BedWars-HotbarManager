@@ -3,6 +3,8 @@ package me.kiiya.hotbarmanager.config.bedwars1058;
 import com.andrei1058.bedwars.api.language.Language;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.util.Arrays;
+import java.util.Collections;
+
 import static me.kiiya.hotbarmanager.config.ConfigPaths.*;
 
 public class MessagesData {
@@ -30,9 +32,9 @@ public class MessagesData {
                     yml.addDefault(INVENTORY_ITEMS_LORE, Arrays.asList("&7Drag this to a hotbar slot below", "&7to favor that slot when", "&7purchasing an item in this", "&7category or on spawn.", "", "&eClick to drag!"));
                     yml.addDefault(INVENTORY_ITEMS_USED_LORE, Arrays.asList("&7{category} &7items will prioritize this", "&7slot!", "", "&eClick to remove!"));
                     yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_NAME, "&aGo Back");
-                    yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_LORE, Arrays.asList("&7To Play BedWars"));
+                    yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_LORE, Collections.singletonList("&7To Play BedWars"));
                     yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_NAME, "&aGo Back");
-                    yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_LORE, Arrays.asList("&7To Quick Buy."));
+                    yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_LORE, Collections.singletonList("&7To Quick Buy."));
                     yml.addDefault(INVENTORY_ITEMS_RESET_NAME, "&cReset to Default");
                     yml.addDefault(INVENTORY_ITEMS_RESET_LORE, Arrays.asList("&7Reset your hotbar to the", "&7default."));
                     yml.addDefault(MEANING_BLOCKS, "&7Blocks");
@@ -43,7 +45,7 @@ public class MessagesData {
                     yml.addDefault(MEANING_SPECIALS, "&7Specials");
                     yml.addDefault(MEANING_COMPASS, "&7Compass");
                     yml.addDefault(SEPARATOR_NAME, "&7↑ Categories");
-                    yml.addDefault(SEPARATOR_LORE, Arrays.asList("&7↓ Hotbar"));
+                    yml.addDefault(SEPARATOR_LORE, Collections.singletonList("&7↓ Hotbar"));
                     break;
             }
             yml.options().copyDefaults(true);

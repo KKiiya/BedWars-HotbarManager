@@ -6,7 +6,6 @@ import me.kiiya.hotbarmanager.api.events.PlayerHotbarResetEvent;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
 import me.kiiya.hotbarmanager.utils.Support;
-import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

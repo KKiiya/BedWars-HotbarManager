@@ -34,7 +34,8 @@ public class SQLite implements Database {
             ResultSet rs = ps.executeQuery();
             String player = null;
             if (rs.next()) player = rs.getString("player");
-            if (player != null) return;
+            if (player != null) {
+            }
             else {
                 connection = getConnection();
                 ps = connection.prepareStatement("INSERT INTO bedwars_hotbar_manager(player, slot0, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8) VALUES (?,?,?,?,?,?,?,?,?,?)");

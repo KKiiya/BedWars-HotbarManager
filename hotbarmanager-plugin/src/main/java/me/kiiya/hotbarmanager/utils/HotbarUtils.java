@@ -6,7 +6,7 @@ import org.bukkit.Material;
 public class HotbarUtils {
     public static Category getCategoryFromString(String path) {
         String category =  ((path.split("\\.")[0]).split("-")[0]).toUpperCase();
-        if (!Category.getCategoriesAsString().contains(category)) return Category.NONE;
+        if (!Category.getCategoriesAsStringList().contains(category)) return Category.NONE;
         return Category.getFromString(category);
     }
 

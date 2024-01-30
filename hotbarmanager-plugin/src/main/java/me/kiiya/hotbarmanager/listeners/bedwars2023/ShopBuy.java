@@ -1,9 +1,9 @@
 package me.kiiya.hotbarmanager.listeners.bedwars2023;
 
 import com.tomkeuper.bedwars.BedWars;
+import com.tomkeuper.bedwars.api.arena.shop.ICategoryContent;
 import com.tomkeuper.bedwars.api.arena.shop.IContentTier;
 import com.tomkeuper.bedwars.api.events.shop.ShopBuyEvent;
-import com.tomkeuper.bedwars.api.shop.ICachedItem;
 import com.tomkeuper.bedwars.shop.ShopCache;
 import com.tomkeuper.bedwars.shop.main.CategoryContent;
 import me.kiiya.hotbarmanager.HotbarManager;
@@ -35,11 +35,12 @@ public class ShopBuy implements Listener {
         if (cat == null || cat == Category.NONE) return;
 
         // ITEM BOUGHT VARIABLES
-        String identifier = e.getCategoryContent().getIdentifier();
-        IContentTier content = e.getCategoryContent().getContentTiers().get(0);
+        ICategoryContent cc = e.getCategoryContent();
+        String identifier = cc.getIdentifier();
+        IContentTier content = cc.getContentTiers().get(0);
         ShopCache cache = ShopCache.getInstance().getShopCache(p.getUniqueId());
-        ICachedItem cachedItem = cache.getCachedItem(identifier);
-        IContentTier tier = cachedItem == null ? e.getCategoryContent().getContentTiers().get(0) : e.getCategoryContent().getContentTiers().get(cachedItem.getTier());
+        ShopCache.CachedItem cachedItem = (ShopCache.CachedItem) cache.getCachedItem(identifier);
+        IContentTier tier = cachedItem == null ? cc.getContentTiers().get(0) : e.getCategoryContent().getContentTiers().get(cachedItem.getTier()-1);
         Material currency = tier.getCurrency();
         int price = content.getPrice();
         ItemStack item = Utility.formatItemStack(content.getBuyItemsList().get(0).getItemStack(), e.getArena().getTeam(p));
@@ -59,56 +60,70 @@ public class ShopBuy implements Listener {
                     .replace("%bw_lang_prefix%", Utility.getMsg(p, "prefix")));
             return;
         }
-        for (int i = 0; i < 9; i++) {
-            if (hotbar.get(i) == cat) {
-                Utility.info("Took " + price + " " + currency + " from " + p.getName());
-                if (p.getInventory().getItem(i) != null) {
-                    if (item.getType() == p.getInventory().getItem(i).getType() && item.getDurability() == p.getInventory().getItem(i).getDurability()) {
-                        if (p.getInventory().getItem(i).getAmount() >= p.getInventory().getItem(i).getType().getMaxStackSize()) {
-                            if (Utility.getItemCategory(p.getInventory().getItem(i)) == Category.TOOLS) {
-                                cachedItem = cache.getCachedItem(identifier);
-                                p.getInventory().setItem(i, item);
+
+        try {
+            for (int i = 0; i < 9; i++) {
+                if (hotbar.get(i) == cat) {
+                    if (p.getInventory().getItem(i) != null) {
+                        if (HotbarManager.getBW2023Api().getVersionSupport().getTag(p.getInventory().getItem(i), "identifier") != null && HotbarManager.getBW2023Api().getVersionSupport().getTag(p.getInventory().getItem(i), "identifier").equals(identifier)) {
+                            cache.upgradeCachedItem(cc, cc.getSlot());
+                            cachedItem = (ShopCache.CachedItem) cache.getCachedItem(identifier);
+                            item = cc.getContentTiers().get(cachedItem.getTier()-1).getBuyItemsList().get(0).getItemStack();
+                            item = Utility.formatItemStack(item, e.getArena().getTeam(p));
+                            p.getInventory().setItem(i, HotbarManager.getBW2023Api().getVersionSupport().setTag(item, "identifier", identifier));
+                        } else {
+                            if (item.getType() == p.getInventory().getItem(i).getType() && item.getDurability() == p.getInventory().getItem(i).getDurability()) {
+                                if (p.getInventory().getItem(i).getAmount() >= p.getInventory().getItem(i).getType().getMaxStackSize())
+                                    continue;
+                                else {
+                                    if (p.getInventory().getItem(i).getAmount() + item.getAmount() > p.getInventory().getItem(i).getType().getMaxStackSize()) {
+                                        int finalI = i;
+                                        int restAmount = p.getInventory().getItem(i).getAmount() - p.getInventory().getItem(i).getType().getMaxStackSize() + item.getAmount();
+                                        ItemStack finalItem = item;
+                                        Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> {
+                                            p.getInventory().getItem(finalI).setAmount(p.getInventory().getItem(finalI).getType().getMaxStackSize());
+                                            p.getInventory().addItem(new ItemStack(finalItem.getType(), restAmount));
+                                        }, 1L);
+                                    } else {
+                                        p.getInventory().getItem(i).setAmount(p.getInventory().getItem(i).getAmount() + item.getAmount());
+                                    }
+                                }
                             } else {
-                                continue;
-                            }
-                        }
-                        else {
-                            if (p.getInventory().getItem(i).getAmount() + item.getAmount() > p.getInventory().getItem(i).getType().getMaxStackSize()) {
+                                if (Utility.getItemCategory(p.getInventory().getItem(i)) == cat) continue;
+                                ItemStack addedItem = p.getInventory().getItem(i);
                                 int finalI = i;
-                                int restAmount = p.getInventory().getItem(i).getAmount() - p.getInventory().getItem(i).getType().getMaxStackSize() + item.getAmount();
-                                Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () ->{
-                                    p.getInventory().getItem(finalI).setAmount(p.getInventory().getItem(finalI).getType().getMaxStackSize());
-                                    p.getInventory().addItem(new ItemStack(item.getType(), restAmount));
-                                }, 1L);
-                            } else {
-                                p.getInventory().getItem(i).setAmount(p.getInventory().getItem(i).getAmount() + item.getAmount());
+                                ItemStack finalItem1 = item;
+                                Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().setItem(finalI, finalItem1), 1L);
+                                Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().addItem(addedItem), 2L);
                             }
                         }
                     } else {
-                        if (Utility.getItemCategory(p.getInventory().getItem(i)) == cat) continue;
-                        ItemStack addedItem = p.getInventory().getItem(i);
-                        int finalI = i;
-                        Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().setItem(finalI, item), 1L);
-                        Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().addItem(addedItem), 2L);
+                        if (cc.isPermanent()) {
+                            cache.upgradeCachedItem(cc, cc.getSlot());
+                            cachedItem = (ShopCache.CachedItem) cache.getCachedItem(identifier);
+                            item = cc.getContentTiers().get(cachedItem.getTier()-1).getBuyItemsList().get(0).getItemStack();
+                            item = Utility.formatItemStack(item, e.getArena().getTeam(p));
+                            p.getInventory().setItem(i, HotbarManager.getBW2023Api().getVersionSupport().setTag(item, "identifier", identifier));
+                        } else {
+                            p.getInventory().setItem(i, item);
+                        }
+
                     }
-                } else {
-                    if (Utility.getItemCategory(item) == Category.TOOLS) {
-                        ShopCache.getInstance().getShopCache(p.getUniqueId()).upgradeCachedItem(e.getCategoryContent(), i);
-                        cachedItem = cache.getCachedItem(identifier);
-                    }
-                    p.getInventory().setItem(i, item);
+
+                    Utility.playSound(p, buySound, buySoundVolume, buySoundPitch);
+                    p.sendMessage(Utility.getMsg(p, "shop-new-purchase")
+                            .replace("%bw_prefix%", Utility.getMsg(p, "prefix"))
+                            .replace("%bw_lang_prefix%", Utility.getMsg(p, "prefix"))
+                            .replace("%bw_item%", Utility.getMsg(p, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
+                            .replace("%bw_color%", "")
+                            .replace("%bw_tier%", cachedItem == null ? "" : CategoryContent.getRomanNumber(cachedItem.getTier())));
+                    CategoryContent.takeMoney(p, currency, price);
+                    e.setCancelled(true);
+                    break;
                 }
-                Utility.playSound(p, buySound, buySoundVolume, buySoundPitch);
-                p.sendMessage(Utility.getMsg(p, "shop-new-purchase")
-                        .replace("%bw_prefix%", Utility.getMsg(p, "prefix"))
-                        .replace("%bw_lang_prefix%", Utility.getMsg(p, "prefix"))
-                        .replace("%bw_item%", Utility.getMsg(p, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
-                        .replace("%bw_color%", "")
-                        .replace("%bw_tier%", cachedItem == null ? "" : CategoryContent.getRomanNumber(cachedItem.getTier())));
-                CategoryContent.takeMoney(p, currency, price);
-                e.setCancelled(true);
-                break;
             }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 }

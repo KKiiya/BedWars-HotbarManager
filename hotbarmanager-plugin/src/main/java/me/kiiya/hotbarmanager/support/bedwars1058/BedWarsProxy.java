@@ -1,6 +1,5 @@
 package me.kiiya.hotbarmanager.support.bedwars1058;
 
-import com.tomkeuper.bedwars.api.BedWars;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.config.proxy.ProxyMessagesData;
@@ -18,7 +17,6 @@ public class BedWarsProxy {
 
     public void start() {
         support = Support.BEDWARSPROXY;
-        bw2023Api = Bukkit.getServicesManager().getRegistration(BedWars.class).getProvider();
 
         connectDatabase();
         loadConfig();

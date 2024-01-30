@@ -1,20 +1,16 @@
 package me.kiiya.hotbarmanager.utils;
 
 import com.andrei1058.bedwars.api.arena.team.ITeam;
-import com.andrei1058.bedwars.api.arena.team.TeamColor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
-import net.minecraft.server.v1_8_R3.PacketPlayOutNamedSoundEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +43,7 @@ public class Utility {
         else if (HotbarManager.getSupport() == Support.BEDWARS2023) return HotbarManager.getBW2023Api().getPlayerLanguage(player).getList(path).stream().map(s -> p(player, s)).collect(Collectors.toList());
         else if (HotbarManager.getSupport() == Support.BEDWARSPROXY) return HotbarManager.getBWProxyApi().getLanguageUtil().getList(player, path).stream().map(s -> p(player, s)).collect(Collectors.toList());
         else if (HotbarManager.getSupport() == Support.BEDWARSPROXY2023) return HotbarManager.getBWProxy2023Api().getLanguageUtil().getList(player, path).stream().map(s -> p(player, s)).collect(Collectors.toList());
-        else return Arrays.asList(c("&cMISSING"));
+        else return Collections.singletonList(c("&cMISSING"));
     }
 
     public static ItemStack formatItemStack(ItemStack item, Object t) {
@@ -67,6 +63,7 @@ public class Utility {
             else if (item.getType() == Material.GLASS) item = new ItemStack(Material.STAINED_GLASS, item.getAmount());
 
             byte color = team.getColor().itemByte();
+            item.setItemMeta(null);
             item.setDurability(color);
         }
         else if (HotbarManager.getSupport() == Support.BEDWARS2023) {
@@ -77,6 +74,7 @@ public class Utility {
             else if (item.getType() == Material.GLASS) item = new ItemStack(Material.STAINED_GLASS, item.getAmount());
 
             byte color = team.getColor().itemByte();
+            item.setItemMeta(null);
             item.setDurability(color);
         }
         return item;
@@ -88,7 +86,7 @@ public class Utility {
 
     public static Category getItemCategory(ItemStack item) {
         Material type = item.getType();
-        if (type == Material.TNT || type == Material.SPONGE) return Category.UTILITY;
+        if (type == Material.TNT || type == Material.SPONGE || type == Material.CHEST) return Category.UTILITY;
         else if (type == Material.POTION) return Category.POTIONS;
         else if (type == Material.COMPASS) return Category.COMPASS;
         else {
@@ -96,6 +94,7 @@ public class Utility {
             else if (type.isEdible()) return Category.UTILITY;
             else if (type.toString().contains("_SWORD") || type.toString().contains("STICK")) return Category.MELEE;
             else if (type.toString().contains("_AXE") || type.toString().contains("_PICKAXE") || type.toString().contains("SHEARS")) return Category.TOOLS;
+            else if (type.toString().contains("EGG")) return Category.UTILITY;
         }
         return Category.NONE;
     }

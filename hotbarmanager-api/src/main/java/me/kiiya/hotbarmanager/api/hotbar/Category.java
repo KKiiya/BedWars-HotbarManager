@@ -7,10 +7,12 @@ import java.util.stream.Stream;
 
 public enum Category {
     NONE, BLOCKS, MELEE, TOOLS, RANGED, POTIONS, UTILITY, COMPASS;
+
     public static List<Category> getCategories() {
         return Arrays.asList(BLOCKS, MELEE, TOOLS, RANGED, POTIONS, UTILITY, COMPASS);
     }
-    public static List<String> getCategoriesAsString() {
+
+    public static List<String> getCategoriesAsStringList() {
         return Stream.of(BLOCKS, MELEE, TOOLS, RANGED, POTIONS, UTILITY, COMPASS).map(Enum::toString).collect(Collectors.toList());
     }
 

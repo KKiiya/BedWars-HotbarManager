@@ -1,6 +1,6 @@
 package me.kiiya.hotbarmanager.support.bedwars1058;
 
-import com.tomkeuper.bedwars.api.BedWars;
+import com.andrei1058.bedwars.api.BedWars;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.config.bedwars1058.MessagesData;
@@ -13,7 +13,9 @@ import me.kiiya.hotbarmanager.listeners.bedwars1058.ShopOpen;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
+
 import java.io.File;
+
 import static me.kiiya.hotbarmanager.HotbarManager.*;
 
 public class BedWars1058 {
@@ -23,7 +25,7 @@ public class BedWars1058 {
 
     public void start() {
         support = Support.BEDWARS1058;
-        bw2023Api = Bukkit.getServicesManager().getRegistration(BedWars.class).getProvider();
+        bw1058Api = Bukkit.getServicesManager().getRegistration(BedWars.class).getProvider();
 
         if (Bukkit.getPluginManager().getPlugin("BedWars1058-Compass") != null) {
             compassAddon = true;

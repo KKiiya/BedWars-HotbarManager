@@ -1,5 +1,6 @@
 package me.kiiya.hotbarmanager.config;
 
+import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.config.ConfigManager;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -9,7 +10,7 @@ public class MainConfig extends ConfigManager {
     public MainConfig(Plugin plugin, String name, String dir) {
         super(plugin, name, dir);
         YamlConfiguration yml = getYml();
-        yml.options().header("BedWars-HotBarManager v1.0 By Kiiya.\nDiscord: https://discord.gg/n5yNavRvrP");
+        yml.options().header("BedWars-HotBarManager v" + HotbarManager.getPlugins().getDescription().getVersion() + " By Kiiya.\nDiscord: https://discord.gg/n5yNavRvrP");
         yml.addDefault(ITEM_TYPE, "BLAZE_POWDER");
         yml.addDefault(ITEM_POSITION, 54);
         yml.addDefault("enable-compass-support", true);

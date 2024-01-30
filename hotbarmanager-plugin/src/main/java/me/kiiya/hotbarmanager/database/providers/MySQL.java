@@ -27,25 +27,25 @@ public class MySQL implements Database {
             this.database = HotbarManager.getBW1058Api().getConfigs().getMainConfig().getString("database.database");
             this.user = HotbarManager.getBW1058Api().getConfigs().getMainConfig().getString("database.user");
             this.pass = HotbarManager.getBW1058Api().getConfigs().getMainConfig().getString("database.pass");
-            this.port = HotbarManager.getBW1058Api().getConfigs().getMainConfig().getInt("database.port");;
+            this.port = HotbarManager.getBW1058Api().getConfigs().getMainConfig().getInt("database.port");
         } else if (HotbarManager.getSupport() == Support.BEDWARS2023) {
             this.host = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.host");
             this.database = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.database");
             this.user = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.user");
             this.pass = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.pass");
-            this.port = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getInt("database.port");;
+            this.port = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getInt("database.port");
         } else if (HotbarManager.getSupport() == Support.BEDWARSPROXY2023) {
             this.host = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getString("database.host");
             this.database = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getString("database.database");
             this.user = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getString("database.user");
             this.pass = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getString("database.pass");
-            this.port = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getInt("database.port");;
+            this.port = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getInt("database.port");
         } else {
             this.host = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getString("database.host");
             this.database = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getString("database.database");
             this.user = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getString("database.user");
             this.pass = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getString("database.pass");
-            this.port = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getInt("database.port");;
+            this.port = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getInt("database.port");
         }
 
         connect();
