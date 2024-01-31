@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ShopBuy implements Listener {
     @EventHandler
@@ -39,8 +40,8 @@ public class ShopBuy implements Listener {
         String identifier = cc.getIdentifier();
         IContentTier content = cc.getContentTiers().get(0);
         ShopCache cache = ShopCache.getInstance().getShopCache(p.getUniqueId());
-        ShopCache.CachedItem cachedItem = (ShopCache.CachedItem) cache.getCachedItem(identifier);
-        IContentTier tier = cachedItem == null ? cc.getContentTiers().get(0) : e.getCategoryContent().getContentTiers().get(cachedItem.getTier()-1);
+        AtomicReference<ShopCache.CachedItem> cachedItem = new AtomicReference<>((ShopCache.CachedItem) cache.getCachedItem(identifier));
+        IContentTier tier = cachedItem.get() == null ? cc.getContentTiers().get(0) : e.getCategoryContent().getContentTiers().get(cachedItem.get().getTier()-1);
         Material currency = tier.getCurrency();
         int price = content.getPrice();
         ItemStack item = Utility.formatItemStack(content.getBuyItemsList().get(0).getItemStack(), e.getArena().getTeam(p));
@@ -56,7 +57,6 @@ public class ShopBuy implements Listener {
 
         if (p.getInventory().firstEmpty() == -1) {
             p.sendMessage(Utility.getMsg(p, "upgrades-lore-insuff-space")
-                    .replace("%bw_prefix%", Utility.getMsg(p, "prefix"))
                     .replace("%bw_lang_prefix%", Utility.getMsg(p, "prefix")));
             return;
         }
@@ -65,12 +65,12 @@ public class ShopBuy implements Listener {
             for (int i = 0; i < 9; i++) {
                 if (hotbar.get(i) == cat) {
                     if (p.getInventory().getItem(i) != null) {
-                        if (HotbarManager.getBW2023Api().getVersionSupport().getTag(p.getInventory().getItem(i), "identifier") != null && HotbarManager.getBW2023Api().getVersionSupport().getTag(p.getInventory().getItem(i), "identifier").equals(identifier)) {
+                        if (HotbarManager.getBW2023Api().getVersionSupport().getShopUpgradeIdentifier(item) != null && HotbarManager.getBW2023Api().getVersionSupport().getShopUpgradeIdentifier(item).equals(identifier)) {
                             cache.upgradeCachedItem(cc, cc.getSlot());
-                            cachedItem = (ShopCache.CachedItem) cache.getCachedItem(identifier);
-                            item = cc.getContentTiers().get(cachedItem.getTier()-1).getBuyItemsList().get(0).getItemStack();
+                            cachedItem.set((ShopCache.CachedItem) cache.getCachedItem(identifier));
+                            item = cc.getContentTiers().get(cachedItem.get().getTier()-1).getBuyItemsList().get(0).getItemStack();
                             item = Utility.formatItemStack(item, e.getArena().getTeam(p));
-                            p.getInventory().setItem(i, HotbarManager.getBW2023Api().getVersionSupport().setTag(item, "identifier", identifier));
+                            p.getInventory().setItem(i, HotbarManager.getBW2023Api().getVersionSupport().setShopUpgradeIdentifier(item, identifier));
                         } else {
                             if (item.getType() == p.getInventory().getItem(i).getType() && item.getDurability() == p.getInventory().getItem(i).getDurability()) {
                                 if (p.getInventory().getItem(i).getAmount() >= p.getInventory().getItem(i).getType().getMaxStackSize())
@@ -92,18 +92,28 @@ public class ShopBuy implements Listener {
                                 if (Utility.getItemCategory(p.getInventory().getItem(i)) == cat) continue;
                                 ItemStack addedItem = p.getInventory().getItem(i);
                                 int finalI = i;
-                                ItemStack finalItem1 = item;
-                                Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().setItem(finalI, finalItem1), 1L);
+                                AtomicReference<ItemStack> finalItem1 = new AtomicReference<>(item);
+                                Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> {
+                                    if (cc.isPermanent()) {
+                                        cache.upgradeCachedItem(cc, cc.getSlot());
+                                        cachedItem.set((ShopCache.CachedItem) cache.getCachedItem(identifier));
+                                        finalItem1.set(cc.getContentTiers().get(cachedItem.get().getTier() - 1).getBuyItemsList().get(0).getItemStack());
+                                        finalItem1.set(Utility.formatItemStack(finalItem1.get(), e.getArena().getTeam(p)));
+                                        p.getInventory().setItem(finalI, HotbarManager.getBW1058Api().getVersionSupport().setShopUpgradeIdentifier(finalItem1.get(), identifier));
+                                    } else {
+                                        p.getInventory().setItem(finalI, finalItem1.get());
+                                    }
+                                }, 1L);
                                 Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().addItem(addedItem), 2L);
                             }
                         }
                     } else {
                         if (cc.isPermanent()) {
                             cache.upgradeCachedItem(cc, cc.getSlot());
-                            cachedItem = (ShopCache.CachedItem) cache.getCachedItem(identifier);
-                            item = cc.getContentTiers().get(cachedItem.getTier()-1).getBuyItemsList().get(0).getItemStack();
+                            cachedItem.set((ShopCache.CachedItem) cache.getCachedItem(identifier));
+                            item = cc.getContentTiers().get(cachedItem.get().getTier()-1).getBuyItemsList().get(0).getItemStack();
                             item = Utility.formatItemStack(item, e.getArena().getTeam(p));
-                            p.getInventory().setItem(i, HotbarManager.getBW2023Api().getVersionSupport().setTag(item, "identifier", identifier));
+                            p.getInventory().setItem(i, HotbarManager.getBW2023Api().getVersionSupport().setShopUpgradeIdentifier(item, identifier));
                         } else {
                             p.getInventory().setItem(i, item);
                         }
@@ -116,7 +126,7 @@ public class ShopBuy implements Listener {
                             .replace("%bw_lang_prefix%", Utility.getMsg(p, "prefix"))
                             .replace("%bw_item%", Utility.getMsg(p, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
                             .replace("%bw_color%", "")
-                            .replace("%bw_tier%", cachedItem == null ? "" : CategoryContent.getRomanNumber(cachedItem.getTier())));
+                            .replace("%bw_tier%", cachedItem.get() == null ? "" : CategoryContent.getRomanNumber(cachedItem.get().getTier())));
                     CategoryContent.takeMoney(p, currency, price);
                     e.setCancelled(true);
                     break;
