@@ -29,9 +29,13 @@ public class HotbarManagerMenu implements GUIHolder {
 
     public HotbarManagerMenu(Player player) {
         this.player = player;
-        createInventory();
-        addContents();
-        player.openInventory(getInventory());
+        try {
+            createInventory();
+            addContents();
+            player.openInventory(getInventory());
+        } catch (Exception e) {
+            throw new RuntimeException("Error while opening the hotbar manager menu", e);
+        }
     }
 
     @Override
@@ -250,12 +254,12 @@ public class HotbarManagerMenu implements GUIHolder {
         compass_meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         compass.setItemMeta(compass_meta);
 
-        inventory.setItem(10, blocks);
-        inventory.setItem(11, melee);
-        inventory.setItem(12, tools);
-        inventory.setItem(13, ranged);
-        inventory.setItem(14, potions);
-        inventory.setItem(15, utility);
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_BLOCKS_CATEGORY)) inventory.setItem(10, blocks);
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_MELEE_CATEGORY)) inventory.setItem(11, melee);
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_TOOLS_CATEGORY)) inventory.setItem(12, tools);
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_RANGED_CATEGORY)) inventory.setItem(13, ranged);
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_POTIONS_CATEGORY)) inventory.setItem(14, potions);
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_SPECIALS_CATEGORY))inventory.setItem(15, utility);
         switch (HotbarManager.getSupport()) {
             case BEDWARS1058:
             case BEDWARS2023:

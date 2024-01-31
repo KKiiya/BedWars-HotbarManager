@@ -38,7 +38,7 @@ public class BedWarsProxy {
 
     public void loadConfig() {
         Utility.info("&eLoading config...");
-        mainConfig = new MainConfig(HotbarManager.getPlugins(), "config", Bukkit.getWorldContainer().getPath() + "/plugins/BWProxy2023/Addons/HotbarManager");
+        mainConfig = new MainConfig(HotbarManager.getPlugins(), "config", Bukkit.getWorldContainer().getPath() + "/plugins/BedWarsProxy/Addons/HotbarManager");
         Utility.info("&aConfig loaded!");
     }
 

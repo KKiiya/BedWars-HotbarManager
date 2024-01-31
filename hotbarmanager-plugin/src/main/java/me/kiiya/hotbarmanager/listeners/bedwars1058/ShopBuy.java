@@ -55,8 +55,7 @@ public class ShopBuy implements Listener {
         if (!hotbar.contains(cat)) return;
 
         if (p.getInventory().firstEmpty() == -1) {
-            p.sendMessage(Utility.getMsg(p, "upgrades-lore-insuff-space")
-                    .replace("{prefix}", Utility.getMsg(p, "prefix")));
+            e.setCancelled(true);
             return;
         }
 

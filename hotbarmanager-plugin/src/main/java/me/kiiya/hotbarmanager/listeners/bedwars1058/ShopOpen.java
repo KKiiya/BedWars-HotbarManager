@@ -19,7 +19,7 @@ import static me.kiiya.hotbarmanager.config.ConfigPaths.ITEM_POSITION;
 public class ShopOpen implements Listener {
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent e) {
-        if (HotbarManager.getSupport() != Support.BEDWARS2023) return;
+        if (HotbarManager.getSupport() != Support.BEDWARS1058) return;
 
         Player player = (Player) e.getPlayer();
         if (!HotbarManager.getBW1058Api().getArenaUtil().isPlaying(player)) return;

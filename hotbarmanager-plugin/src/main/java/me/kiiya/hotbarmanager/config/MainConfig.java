@@ -13,6 +13,12 @@ public class MainConfig extends ConfigManager {
         yml.options().header("BedWars-HotBarManager v" + HotbarManager.getPlugins().getDescription().getVersion() + " By Kiiya.\nDiscord: https://discord.gg/n5yNavRvrP");
         yml.addDefault(ITEM_TYPE, "BLAZE_POWDER");
         yml.addDefault(ITEM_POSITION, 54);
+        yml.addDefault(ENABLE_BLOCKS_CATEGORY, true);
+        yml.addDefault(ENABLE_MELEE_CATEGORY, true);
+        yml.addDefault(ENABLE_TOOLS_CATEGORY, true);
+        yml.addDefault(ENABLE_RANGED_CATEGORY, true);
+        yml.addDefault(ENABLE_POTIONS_CATEGORY, true);
+        yml.addDefault(ENABLE_SPECIALS_CATEGORY, true);
         yml.addDefault("enable-compass-support", true);
         yml.addDefault(BACK_COMMAND, "your-command");
         yml.options().copyDefaults(true);

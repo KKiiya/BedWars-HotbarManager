@@ -5,6 +5,12 @@ public class ConfigPaths {
     public static final String ITEM_POSITION = "item.position";
     public static final String ITEM_TYPE = "item.type";
     public static final String BACK_COMMAND = "back-command";
+    public static final String ENABLE_BLOCKS_CATEGORY = "enable-blocks-category";
+    public static final String ENABLE_MELEE_CATEGORY = "enable-melee-category";
+    public static final String ENABLE_TOOLS_CATEGORY = "enable-tools-category";
+    public static final String ENABLE_RANGED_CATEGORY = "enable-ranged-category";
+    public static final String ENABLE_POTIONS_CATEGORY = "enable-potions-category";
+    public static final String ENABLE_SPECIALS_CATEGORY = "enable-specials-category";
 
     // MESSAGES
     public static final String PATH = "addons.hotbar-manager.";
