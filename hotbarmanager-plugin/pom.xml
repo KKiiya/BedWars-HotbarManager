@@ -55,6 +55,13 @@
             <version>3.0.2</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>me.cubecrafter</groupId>
+            <artifactId>HypixelMigrator</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/BedWars1058-HypixelMigrator-1.0.0.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>

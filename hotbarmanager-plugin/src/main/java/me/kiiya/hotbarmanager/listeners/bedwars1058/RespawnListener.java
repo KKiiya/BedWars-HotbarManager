@@ -76,7 +76,7 @@ public class RespawnListener implements Listener {
                 if (tool2 != null && tool2.getType() != Material.AIR) {
                     for (Category cat : hotbar) {
                         if (cat == Category.TOOLS) {
-                            if (ap.getInventory().getItem(slot1) == null && ap.getInventory().getItem(slot1).getType() == Material.AIR) {
+                            if (ap.getInventory().getItem(slot1) == null || ap.getInventory().getItem(slot1).getType() == Material.AIR) {
                                 ap.getInventory().setItem(2, new ItemStack(Material.AIR));
                                 ap.getInventory().setItem(slot1, tool2);
                             } else continue;
@@ -90,7 +90,7 @@ public class RespawnListener implements Listener {
                 if (tool3 != null && tool3.getType() != Material.AIR) {
                     for (Category cat : hotbar) {
                         if (cat == Category.TOOLS) {
-                            if (ap.getInventory().getItem(slot2) == null && ap.getInventory().getItem(slot2).getType() == Material.AIR) {
+                            if (ap.getInventory().getItem(slot2) == null || ap.getInventory().getItem(slot2).getType() == Material.AIR) {
                                 ap.getInventory().setItem(3, new ItemStack(Material.AIR));
                                 ap.getInventory().setItem(slot2, tool3);
                             } else continue;
@@ -164,7 +164,7 @@ public class RespawnListener implements Listener {
                     if (tool2 != null && tool2.getType() != Material.AIR) {
                         for (Category cat : hotbar) {
                             if (cat == Category.TOOLS) {
-                                if (ap.getInventory().getItem(slot1) == null && ap.getInventory().getItem(slot1).getType() == Material.AIR) {
+                                if (ap.getInventory().getItem(slot1) == null || ap.getInventory().getItem(slot1).getType() == Material.AIR) {
                                     ap.getInventory().setItem(2, new ItemStack(Material.AIR));
                                     ap.getInventory().setItem(slot1, tool2);
                                 } else continue;
@@ -178,7 +178,7 @@ public class RespawnListener implements Listener {
                     if (tool3 != null && tool3.getType() != Material.AIR) {
                         for (Category cat : hotbar) {
                             if (cat == Category.TOOLS) {
-                                if (ap.getInventory().getItem(slot2) == null && ap.getInventory().getItem(slot2).getType() == Material.AIR) {
+                                if (ap.getInventory().getItem(slot2) == null || ap.getInventory().getItem(slot2).getType() == Material.AIR) {
                                     ap.getInventory().setItem(3, new ItemStack(Material.AIR));
                                     ap.getInventory().setItem(slot2, tool3);
                                 } else continue;

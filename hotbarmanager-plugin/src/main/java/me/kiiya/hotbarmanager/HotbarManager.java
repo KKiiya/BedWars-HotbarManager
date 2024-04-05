@@ -4,7 +4,7 @@ import me.kiiya.hotbarmanager.api.database.Database;
 import me.kiiya.hotbarmanager.commands.MenuCommand;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.listeners.mainlisteners.InventoryListener;
-import me.kiiya.hotbarmanager.listeners.mainlisteners.JoinEvent;
+import me.kiiya.hotbarmanager.listeners.mainlisteners.JoinLeaveListener;
 import me.kiiya.hotbarmanager.support.bedwars1058.BedWars1058;
 import me.kiiya.hotbarmanager.support.bedwars1058.BedWarsProxy;
 import me.kiiya.hotbarmanager.support.bedwars2023.BedWars2023;
@@ -55,7 +55,7 @@ public final class HotbarManager extends JavaPlugin {
 
     private void loadMainListeners() {
         Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
-        Bukkit.getPluginManager().registerEvents(new JoinEvent(), this);
+        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), this);
     }
 
     public static MainConfig getMainConfig() {

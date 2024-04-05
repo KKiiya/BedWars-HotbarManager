@@ -1,5 +1,6 @@
 package me.kiiya.hotbarmanager.utils;
 
+import com.andrei1058.bedwars.BedWars;
 import com.andrei1058.bedwars.api.arena.team.ITeam;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.kiiya.hotbarmanager.HotbarManager;
@@ -7,7 +8,6 @@ import me.kiiya.hotbarmanager.api.hotbar.Category;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import java.util.Collections;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class Utility {
     public static void info(String text) {
-        HotbarManager.getPlugins().getLogger().info(c(text));
+        Bukkit.getConsoleSender().sendMessage("[" + HotbarManager.getPlugins().getName() + "] " + c(text));
     }
     public static void warn(String text) {
         HotbarManager.getPlugins().getLogger().warning(c(text));
@@ -47,54 +47,48 @@ public class Utility {
     }
 
     public static ItemStack formatItemStack(ItemStack item, Object t) {
-        Material type = item.getType();
-
-        if (type != Material.WOOL
-                && type != Material.STAINED_GLASS
-                && type != Material.GLASS
-                && type != Material.STAINED_GLASS_PANE
-                && type != Material.HARD_CLAY) return item;
-
+        ItemStack cloneItem = item.clone();
         if (HotbarManager.getSupport() == Support.BEDWARS1058) {
             ITeam team = (ITeam) t;
-            if (team == null) return item;
-
-            if (item.getType() == Material.HARD_CLAY) item = new ItemStack(Material.STAINED_CLAY, item.getAmount());
-            else if (item.getType() == Material.GLASS) item = new ItemStack(Material.STAINED_GLASS, item.getAmount());
-
-            byte color = team.getColor().itemByte();
-            item.setItemMeta(null);
-            item.setDurability(color);
-        }
-        else if (HotbarManager.getSupport() == Support.BEDWARS2023) {
+            cloneItem = BedWars.nms.colourItem(cloneItem, team);
+        } else if (HotbarManager.getSupport() == Support.BEDWARS2023) {
             com.tomkeuper.bedwars.api.arena.team.ITeam team = (com.tomkeuper.bedwars.api.arena.team.ITeam) t;
-            if (team == null) return item;
-
-            if (item.getType() == Material.HARD_CLAY) item = new ItemStack(Material.STAINED_CLAY, item.getAmount());
-            else if (item.getType() == Material.GLASS) item = new ItemStack(Material.STAINED_GLASS, item.getAmount());
-
-            byte color = team.getColor().itemByte();
-            item.setItemMeta(null);
-            item.setDurability(color);
+            cloneItem = com.tomkeuper.bedwars.BedWars.nms.colourItem(cloneItem, team);
         }
-        return item;
-    }
-
-    public static void playSound(Player p, String sound, float volume, float pitch) {
-       p.playSound(p.getLocation(), Sound.valueOf(sound), volume, pitch);
+        return cloneItem;
     }
 
     public static Category getItemCategory(ItemStack item) {
         Material type = item.getType();
-        if (type == Material.TNT || type == Material.SPONGE || type == Material.CHEST) return Category.UTILITY;
-        else if (type == Material.POTION) return Category.POTIONS;
-        else if (type == Material.COMPASS) return Category.COMPASS;
-        else {
-            if (type.isBlock()) return Category.BLOCKS;
-            else if (type.isEdible()) return Category.UTILITY;
-            else if (type.toString().contains("_SWORD") || type.toString().contains("STICK")) return Category.MELEE;
-            else if (type.toString().contains("_AXE") || type.toString().contains("_PICKAXE") || type.toString().contains("SHEARS")) return Category.TOOLS;
-            else if (type.toString().contains("EGG")) return Category.UTILITY;
+        switch (HotbarManager.getSupport()) {
+            case BEDWARS1058:
+                if (BedWars.nms.isTool(item)) return Category.TOOLS;
+                if (BedWars.nms.isBow(item)) return Category.RANGED;
+                if (BedWars.nms.isSword(item) || type == Material.STICK) return Category.MELEE;
+
+                if (type == BedWars.nms.materialSnowball()) return Category.UTILITY;
+                if (type == BedWars.nms.materialFireball()) return Category.UTILITY;
+                if (type == Material.TNT) return Category.UTILITY;
+                if (type == Material.ENDER_PEARL) return Category.UTILITY;
+                if (type == Material.EGG) return Category.UTILITY;
+                if (type.toString().contains("SPONGE")) return Category.UTILITY;
+
+                if (item.getType().isBlock()) return Category.BLOCKS;
+                break;
+            case BEDWARS2023:
+                if (com.tomkeuper.bedwars.BedWars.nms.isTool(item)) return Category.TOOLS;
+                if (com.tomkeuper.bedwars.BedWars.nms.isBow(item)) return Category.RANGED;
+                if (com.tomkeuper.bedwars.BedWars.nms.isSword(item) || type == Material.STICK) return Category.MELEE;
+
+                if (type == com.tomkeuper.bedwars.BedWars.nms.materialSnowball()) return Category.UTILITY;
+                if (type == com.tomkeuper.bedwars.BedWars.nms.materialFireball()) return Category.UTILITY;
+                if (type == Material.TNT) return Category.UTILITY;
+                if (type == Material.ENDER_PEARL) return Category.UTILITY;
+                if (type == Material.EGG) return Category.UTILITY;
+                if (type.toString().contains("SPONGE")) return Category.UTILITY;
+
+                if (item.getType().isBlock()) return Category.BLOCKS;
+                break;
         }
         return Category.NONE;
     }

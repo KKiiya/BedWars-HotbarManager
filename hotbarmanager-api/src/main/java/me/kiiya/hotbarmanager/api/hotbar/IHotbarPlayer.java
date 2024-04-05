@@ -38,4 +38,14 @@ public interface IHotbarPlayer {
      * Reset the hotbar of the player
      */
     void resetHotbar();
+
+    /**
+     * Save the hotbar of the player (this will save the hotbar in the database)
+     */
+    void saveHotbar();
+
+    /**
+     * Destroy the hotbar player
+     */
+    void destroy();
 }

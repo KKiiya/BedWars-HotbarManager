@@ -11,12 +11,12 @@ import java.util.UUID;
 public class API implements HotbarManager {
     @Override
     public IHotbarPlayer getHotbarPlayer(Player player) {
-        return new HotbarPlayer(player);
+        return HotbarPlayer.getHotbarPlayer(player);
     }
 
     @Override
     public IHotbarPlayer getHotbarPlayer(UUID uuid) {
-        return new HotbarPlayer(uuid);
+        return HotbarPlayer.getHotbarPlayer(uuid);
     }
 
     @Override

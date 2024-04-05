@@ -51,11 +51,18 @@ public class HotbarManagerMenu implements GUIHolder {
     public void onInventoryClick(InventoryClickEvent e) {
         IHotbarPlayer p = HotbarManager.getAPI().getHotbarPlayer(player);
 
+        if (e.getInventory() != e.getClickedInventory() || e.getClickedInventory() == player.getInventory()){
+            e.getCursor().setType(Material.AIR);
+            e.setCancelled(true);
+            return;
+        }
+
         if (e.getAction() == InventoryAction.DROP_ALL_CURSOR
             || e.getAction() == InventoryAction.DROP_ALL_SLOT
             || e.getAction() == InventoryAction.DROP_ONE_CURSOR
             || e.getAction() == InventoryAction.DROP_ONE_SLOT
             || e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+            e.getCursor().setType(Material.AIR);
             e.setCancelled(true);
             return;
         }
