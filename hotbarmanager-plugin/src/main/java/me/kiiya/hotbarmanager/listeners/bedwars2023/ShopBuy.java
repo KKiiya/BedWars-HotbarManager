@@ -105,7 +105,7 @@ public class ShopBuy implements Listener {
                                         cache.upgradeCachedItem(cc, cc.getSlot());
                                         cachedItem.set((ShopCache.CachedItem) cache.getCachedItem(identifier));
                                         finalItem1.set(cc.getContentTiers().get(cachedItem.get().getTier() - 1).getBuyItemsList().get(0).getItemStack());
-                                        finalItem1.set(Utility.formatItemStack(finalItem1.get(), t));
+                                        finalItem1.set(BedWars.nms.addCustomData(Utility.formatItemStack(finalItem1.get(), t), ""));
                                         p.getInventory().setItem(finalI, HotbarManager.getBW2023Api().getVersionSupport().setShopUpgradeIdentifier(finalItem1.get(), identifier));
                                     } else {
                                         p.getInventory().setItem(finalI, finalItem1.get());
