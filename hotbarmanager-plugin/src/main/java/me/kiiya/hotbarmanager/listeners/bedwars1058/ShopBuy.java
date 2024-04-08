@@ -88,7 +88,7 @@ public class ShopBuy implements Listener {
                                         ItemStack finalItem = item;
                                         Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> {
                                             p.getInventory().getItem(finalI).setAmount(p.getInventory().getItem(finalI).getType().getMaxStackSize());
-                                            p.getInventory().addItem(Utility.formatItemStack(new ItemStack(finalItem.getType(), restAmount), t));
+                                            p.getInventory().addItem(BedWars.nms.addCustomData(Utility.formatItemStack(new ItemStack(finalItem.getType(), restAmount), t), ""));
                                         }, 1L);
                                     } else {
                                         p.getInventory().getItem(i).setAmount(p.getInventory().getItem(i).getAmount() + item.getAmount());
