@@ -18,6 +18,7 @@ public class Utility {
     public static void info(String text) {
         Bukkit.getConsoleSender().sendMessage("[" + HotbarManager.getPlugins().getName() + "] " + c(text));
     }
+
     public static void warn(String text) {
         HotbarManager.getPlugins().getLogger().warning(c(text));
     }
@@ -25,6 +26,7 @@ public class Utility {
     public static String c(String text) {
         return ChatColor.translateAlternateColorCodes('&', text);
     }
+
     public static String p(Player player, String text) {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) return c(text);
         return c(PlaceholderAPI.setPlaceholders(player, text));

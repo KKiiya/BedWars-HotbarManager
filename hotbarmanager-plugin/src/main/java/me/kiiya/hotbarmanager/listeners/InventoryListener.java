@@ -1,4 +1,4 @@
-package me.kiiya.hotbarmanager.listeners.mainlisteners;
+package me.kiiya.hotbarmanager.listeners;
 
 import me.kiiya.hotbarmanager.menu.GUIHolder;
 import org.bukkit.Material;

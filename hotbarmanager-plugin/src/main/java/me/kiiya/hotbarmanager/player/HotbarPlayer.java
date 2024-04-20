@@ -13,23 +13,18 @@ import java.util.*;
 
 public class HotbarPlayer implements IHotbarPlayer {
     private static final Map<UUID, HotbarPlayer> hotbarPlayers = new HashMap<>();
+    private HashMap<Integer, Category> hotbar;
     private Player player;
     private Database db;
-    private HashMap<Integer, Category> hotbar = new HashMap<>();
 
     public HotbarPlayer(Player player) {
         db = HotbarManager.getDB();
         this.player = player;
+        this.hotbar = new HashMap<>();
         Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getPlugins(), () -> {
-            hotbar.put(0, Category.getFromString(db.getData(player, "slot0")));
-            hotbar.put(1, Category.getFromString(db.getData(player, "slot1")));
-            hotbar.put(2, Category.getFromString(db.getData(player, "slot2")));
-            hotbar.put(3, Category.getFromString(db.getData(player, "slot3")));
-            hotbar.put(4, Category.getFromString(db.getData(player, "slot4")));
-            hotbar.put(5, Category.getFromString(db.getData(player, "slot5")));
-            hotbar.put(6, Category.getFromString(db.getData(player, "slot6")));
-            hotbar.put(7, Category.getFromString(db.getData(player, "slot7")));
-            hotbar.put(8, Category.getFromString(db.getData(player, "slot8")));
+            for (int i = 0; i < 9; i++) {
+                hotbar.put(i, Category.getFromString(db.getData(player, "slot" + i)));
+            }
         });
         hotbarPlayers.put(player.getUniqueId(), this);
     }
@@ -37,16 +32,11 @@ public class HotbarPlayer implements IHotbarPlayer {
     public HotbarPlayer(UUID uuid) {
         db = HotbarManager.getDB();
         this.player = Bukkit.getServer().getPlayer(uuid);
+        this.hotbar = new HashMap<>();
         Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getPlugins(), () -> {
-            hotbar.put(0, Category.getFromString(db.getData(player, "slot0")));
-            hotbar.put(1, Category.getFromString(db.getData(player, "slot1")));
-            hotbar.put(2, Category.getFromString(db.getData(player, "slot2")));
-            hotbar.put(3, Category.getFromString(db.getData(player, "slot3")));
-            hotbar.put(4, Category.getFromString(db.getData(player, "slot4")));
-            hotbar.put(5, Category.getFromString(db.getData(player, "slot5")));
-            hotbar.put(6, Category.getFromString(db.getData(player, "slot6")));
-            hotbar.put(7, Category.getFromString(db.getData(player, "slot7")));
-            hotbar.put(8, Category.getFromString(db.getData(player, "slot8")));
+            for (int i = 0; i < 9; i++) {
+                hotbar.put(i, Category.getFromString(db.getData(player, "slot" + i)));
+            }
         });
         hotbarPlayers.put(uuid, this);
     }
@@ -106,16 +96,16 @@ public class HotbarPlayer implements IHotbarPlayer {
     }
 
     public void saveHotbar() {
-        for (int i = 0; i < 9; i++) {
-            int finalI = i;
-            Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getPlugins(), () -> {
-                db.setData(player, "slot" + finalI, hotbar.get(finalI).toString());
-            });
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getPlugins(), () -> {
+            for (int i = 0; i < 9; i++) {
+                db.setData(player, "slot" + i, hotbar.get(i).toString());
+            }
+        });
     }
 
     @Override
     public void destroy() {
+        saveHotbar();
         hotbarPlayers.remove(player.getUniqueId());
         hotbar = null;
         player = null;

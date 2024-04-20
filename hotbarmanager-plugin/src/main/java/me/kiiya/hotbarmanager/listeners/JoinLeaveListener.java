@@ -1,4 +1,4 @@
-package me.kiiya.hotbarmanager.listeners.mainlisteners;
+package me.kiiya.hotbarmanager.listeners;
 
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
