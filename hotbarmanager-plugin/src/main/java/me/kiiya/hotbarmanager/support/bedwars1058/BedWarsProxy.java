@@ -28,7 +28,7 @@ public class BedWarsProxy {
     public void connectDatabase() {
         Utility.info("&eConnecting to database...");
         if (Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getBoolean("database.enable")) {
-            db = new MySQL();
+            HotbarManager.db = new MySQL();
         } else {
             Utility.info("&cYou need MySQL to use this plugin with BedWarsProxy! Disabling...");
             Bukkit.getPluginManager().disablePlugin(HotbarManager.getPlugins());

@@ -93,6 +93,7 @@ public final class HotbarManager extends JavaPlugin {
     public static Database getDB() {
         return db;
     }
+
     public static boolean isCompassAddon() {
         return compassAddon;
     }

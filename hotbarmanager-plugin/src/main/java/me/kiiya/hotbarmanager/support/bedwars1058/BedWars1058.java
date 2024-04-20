@@ -41,9 +41,9 @@ public class BedWars1058 {
     public void connectDatabase() {
         Utility.info("&eConnecting to database...");
         if (HotbarManager.getBW1058Api().getConfigs().getMainConfig().getBoolean("database.enable")) {
-            db = new MySQL();
+            HotbarManager.db = new MySQL();
         } else {
-            db = new SQLite();
+            HotbarManager.db = new SQLite();
         }
         Utility.info("&aDatabase connected!");
     }

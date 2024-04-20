@@ -62,9 +62,9 @@ public class BedWarsAddon extends Addon {
     public void connectDatabase() {
         Utility.info("&eConnecting to database...");
         if (HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.type").equalsIgnoreCase("mysql")) {
-            db = new MySQL();
+            HotbarManager.db = new MySQL();
         } else {
-            db = new SQLite();
+            HotbarManager.db = new SQLite();
         }
         Utility.info("&aDatabase connected!");
     }
