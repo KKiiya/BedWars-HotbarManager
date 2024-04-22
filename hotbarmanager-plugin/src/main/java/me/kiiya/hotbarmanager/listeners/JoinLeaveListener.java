@@ -13,7 +13,7 @@ public class JoinLeaveListener implements Listener {
     private final Database db;
 
     public JoinLeaveListener() {
-        this.db = HotbarManager.getDB();
+        this.db = HotbarManager.getPlugins().getDB();
     }
 
     @EventHandler

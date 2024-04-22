@@ -2,10 +2,13 @@ package me.kiiya.hotbarmanager.support.bedwars2023;
 
 import com.tomkeuper.bedwars.api.addon.Addon;
 import me.kiiya.hotbarmanager.HotbarManager;
+import me.kiiya.hotbarmanager.api.database.Database;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.config.bedwars2023.MessagesData;
 import me.kiiya.hotbarmanager.database.providers.MySQL;
 import me.kiiya.hotbarmanager.database.providers.SQLite;
+import me.kiiya.hotbarmanager.listeners.InventoryListener;
+import me.kiiya.hotbarmanager.listeners.JoinLeaveListener;
 import me.kiiya.hotbarmanager.listeners.bedwars2023.*;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
@@ -43,6 +46,7 @@ public class BedWarsAddon extends Addon {
 
     @Override
     public void load() {
+        Utility.info("LOADING BEDWARS2023 SUPPORT");
         if (Bukkit.getPluginManager().getPlugin("BedWars1058-Compass") != null) {
             compassAddon = true;
         }
@@ -61,11 +65,13 @@ public class BedWarsAddon extends Addon {
 
     public void connectDatabase() {
         Utility.info("&eConnecting to database...");
+        Database db;
         if (HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.type").equalsIgnoreCase("mysql")) {
-            HotbarManager.db = new MySQL();
+            db = new MySQL();
         } else {
-            HotbarManager.db = new SQLite();
+            db = new SQLite();
         }
+        HotbarManager.getPlugins().setDB(db);
         Utility.info("&aDatabase connected!");
     }
 
@@ -92,6 +98,8 @@ public class BedWarsAddon extends Addon {
         Bukkit.getPluginManager().registerEvents(new ShopOpen(), getPlugin());
         Bukkit.getPluginManager().registerEvents(new PlayerKill(), getPlugin());
         Bukkit.getPluginManager().registerEvents(new RespawnListener(), getPlugin());
+        Bukkit.getPluginManager().registerEvents(new InventoryListener(), getPlugins());
+        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), getPlugins());
         Utility.info("&aListeners loaded!");
     }
 }

@@ -4,6 +4,8 @@ import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.config.proxy.ProxyMessagesData;
 import me.kiiya.hotbarmanager.database.providers.MySQL;
+import me.kiiya.hotbarmanager.listeners.InventoryListener;
+import me.kiiya.hotbarmanager.listeners.JoinLeaveListener;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
@@ -28,7 +30,7 @@ public class BedWarsProxy {
     public void connectDatabase() {
         Utility.info("&eConnecting to database...");
         if (Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getBoolean("database.enable")) {
-            HotbarManager.db = new MySQL();
+            HotbarManager.getPlugins().setDB(new MySQL());
         } else {
             Utility.info("&cYou need MySQL to use this plugin with BedWarsProxy! Disabling...");
             Bukkit.getPluginManager().disablePlugin(HotbarManager.getPlugins());
@@ -55,6 +57,8 @@ public class BedWarsProxy {
 
     public void loadListeners() {
         Utility.info("&eLoading listeners...");
+        Bukkit.getPluginManager().registerEvents(new InventoryListener(), getPlugins());
+        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), getPlugins());
         Utility.info("&aListeners loaded!");
     }
 }

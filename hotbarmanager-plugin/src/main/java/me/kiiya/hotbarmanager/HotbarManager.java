@@ -10,6 +10,7 @@ import me.kiiya.hotbarmanager.support.bedwars1058.BedWarsProxy;
 import me.kiiya.hotbarmanager.support.bedwars2023.BedWars2023;
 import me.kiiya.hotbarmanager.support.bedwars2023.BedWarsProxy2023;
 import me.kiiya.hotbarmanager.utils.Support;
+import me.kiiya.hotbarmanager.utils.Utility;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
@@ -17,18 +18,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class HotbarManager extends JavaPlugin {
 
+    public static boolean compassAddon = false;
+
     public static me.kiiya.hotbarmanager.api.HotbarManager api;
-    public static Support support;
     public static com.andrei1058.bedwars.api.BedWars bw1058Api;
     public static com.tomkeuper.bedwars.api.BedWars bw2023Api;
     public static MainConfig mainConfig;
-    public static Database db;
-    public static boolean compassAddon = false;
+    public static Support support;
+    private Database db;
 
     @Override
     public void onEnable() {
         loadSupport();
-        loadMainListeners();
         new Metrics(this, 20334);
         api = new API();
 
@@ -51,11 +52,6 @@ public final class HotbarManager extends JavaPlugin {
         } else if (Bukkit.getPluginManager().getPlugin("BWProxy2023") != null) {
             new BedWarsProxy2023();
         }
-    }
-
-    private void loadMainListeners() {
-        Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
-        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), this);
     }
 
     public static MainConfig getMainConfig() {
@@ -90,7 +86,11 @@ public final class HotbarManager extends JavaPlugin {
         return com.andrei1058.bedwars.proxy.BedWarsProxy.getAPI();
     }
 
-    public static Database getDB() {
+    public void setDB(Database db) {
+        this.db = db;
+    }
+
+    public Database getDB() {
         return db;
     }
 

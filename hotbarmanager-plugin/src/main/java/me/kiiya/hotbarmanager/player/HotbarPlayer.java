@@ -18,24 +18,24 @@ public class HotbarPlayer implements IHotbarPlayer {
     private Database db;
 
     public HotbarPlayer(Player player) {
-        db = HotbarManager.getDB();
+        this.db = HotbarManager.getPlugins().getDB();
         this.player = player;
         this.hotbar = new HashMap<>();
         Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getPlugins(), () -> {
             for (int i = 0; i < 9; i++) {
-                hotbar.put(i, Category.getFromString(db.getData(player, "slot" + i)));
+                hotbar.put(i, Category.getFromString(this.db.getData(player, "slot" + i)));
             }
         });
         hotbarPlayers.put(player.getUniqueId(), this);
     }
 
     public HotbarPlayer(UUID uuid) {
-        db = HotbarManager.getDB();
+        this.db = HotbarManager.getPlugins().getDB();
         this.player = Bukkit.getServer().getPlayer(uuid);
         this.hotbar = new HashMap<>();
         Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getPlugins(), () -> {
             for (int i = 0; i < 9; i++) {
-                hotbar.put(i, Category.getFromString(db.getData(player, "slot" + i)));
+                hotbar.put(i, Category.getFromString(this.db.getData(player, "slot" + i)));
             }
         });
         hotbarPlayers.put(uuid, this);
@@ -98,7 +98,7 @@ public class HotbarPlayer implements IHotbarPlayer {
     public void saveHotbar() {
         Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getPlugins(), () -> {
             for (int i = 0; i < 9; i++) {
-                db.setData(player, "slot" + i, hotbar.get(i).toString());
+                this.db.setData(player, "slot" + i, hotbar.get(i).toString());
             }
         });
     }
@@ -109,7 +109,7 @@ public class HotbarPlayer implements IHotbarPlayer {
         hotbarPlayers.remove(player.getUniqueId());
         hotbar = null;
         player = null;
-        db = null;
+        this.db = null;
     }
 
     public static HotbarPlayer getHotbarPlayer(Player player) {

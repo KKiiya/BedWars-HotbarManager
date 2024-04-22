@@ -6,6 +6,8 @@ import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.config.bedwars1058.MessagesData;
 import me.kiiya.hotbarmanager.database.providers.MySQL;
 import me.kiiya.hotbarmanager.database.providers.SQLite;
+import me.kiiya.hotbarmanager.listeners.InventoryListener;
+import me.kiiya.hotbarmanager.listeners.JoinLeaveListener;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.PlayerKill;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.RespawnListener;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.ShopBuy;
@@ -41,9 +43,9 @@ public class BedWars1058 {
     public void connectDatabase() {
         Utility.info("&eConnecting to database...");
         if (HotbarManager.getBW1058Api().getConfigs().getMainConfig().getBoolean("database.enable")) {
-            HotbarManager.db = new MySQL();
+            HotbarManager.getPlugins().setDB(new MySQL());
         } else {
-            HotbarManager.db = new SQLite();
+            HotbarManager.getPlugins().setDB(new SQLite());
         }
         Utility.info("&aDatabase connected!");
     }
@@ -71,6 +73,8 @@ public class BedWars1058 {
         Bukkit.getPluginManager().registerEvents(new ShopOpen(), getPlugins());
         Bukkit.getPluginManager().registerEvents(new PlayerKill(), getPlugins());
         Bukkit.getPluginManager().registerEvents(new RespawnListener(), getPlugins());
+        Bukkit.getPluginManager().registerEvents(new InventoryListener(), getPlugins());
+        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), getPlugins());
         Utility.info("&aListeners loaded!");
     }
 }
