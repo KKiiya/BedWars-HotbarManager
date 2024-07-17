@@ -47,7 +47,6 @@ public class ShopBuy implements Listener {
         Material currency = tier.getCurrency();
         int price = content.getPrice();
         ItemStack item = Utility.formatItemStack(content.getBuyItemsList().get(0).getItemStack(), t);
-        item = BedWars.nms.addCustomData(item, "");
         if (BedWars.nms.isSword(item)) {
             p.getInventory().remove(Material.getMaterial(BedWars.getForCurrentVersion("WOOD_SWORD", "WOOD_SWORD", "WOODEN_SWORD")));
         }
@@ -107,7 +106,7 @@ public class ShopBuy implements Listener {
                                         finalItem1.set(BedWars.nms.addCustomData(Utility.formatItemStack(finalItem1.get(), t), ""));
                                         p.getInventory().setItem(finalI, HotbarManager.getBW1058Api().getVersionSupport().setShopUpgradeIdentifier(finalItem1.get(), identifier));
                                     } else {
-                                        p.getInventory().setItem(finalI, finalItem1.get());
+                                        p.getInventory().setItem(finalI, BedWars.nms.addCustomData(finalItem1.get(), ""));
                                     }
                                 }, 1L);
                                 Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().addItem(addedItem), 2L);

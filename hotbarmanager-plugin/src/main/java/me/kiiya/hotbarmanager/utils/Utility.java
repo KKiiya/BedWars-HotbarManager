@@ -94,4 +94,30 @@ public class Utility {
         }
         return Category.NONE;
     }
+
+    public static ItemStack setItemTag(ItemStack item, String tag, String value) {
+        switch (HotbarManager.getSupport()) {
+            case BEDWARS2023:
+                return HotbarManager.getBW2023Api().getVersionSupport().setTag(item, tag, value);
+            case BEDWARS1058:
+                return HotbarManager.getBW1058Api().getVersionSupport().setTag(item, tag, value);
+            case BEDWARSPROXY2023:
+            case BEDWARSPROXY:
+            default:
+                return item;
+        }
+    }
+
+    public static String getTag(ItemStack item, String tag) {
+        switch (HotbarManager.getSupport()) {
+            case BEDWARS2023:
+                return HotbarManager.getBW2023Api().getVersionSupport().getTag(item, tag);
+            case BEDWARS1058:
+                return HotbarManager.getBW1058Api().getVersionSupport().getTag(item, tag);
+            case BEDWARSPROXY2023:
+            case BEDWARSPROXY:
+            default:
+                return null;
+        }
+    }
 }

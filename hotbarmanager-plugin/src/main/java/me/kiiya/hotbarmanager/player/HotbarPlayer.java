@@ -115,10 +115,10 @@ public class HotbarPlayer implements IHotbarPlayer {
     }
 
     public static HotbarPlayer getHotbarPlayer(Player player) {
-        return hotbarPlayers.computeIfAbsent(player.getUniqueId().toString(), k -> new HotbarPlayer(player));
+        return hotbarPlayers.get(player.getUniqueId().toString());
     }
 
     public static HotbarPlayer getHotbarPlayer(UUID uuid) {
-        return hotbarPlayers.computeIfAbsent(uuid.toString(), k -> new HotbarPlayer(uuid));
+        return hotbarPlayers.get(uuid.toString());
     }
 }

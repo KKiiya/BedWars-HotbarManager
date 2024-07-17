@@ -108,7 +108,7 @@ public class ShopBuy implements Listener {
                                         finalItem1.set(BedWars.nms.addCustomData(Utility.formatItemStack(finalItem1.get(), t), ""));
                                         p.getInventory().setItem(finalI, HotbarManager.getBW2023Api().getVersionSupport().setShopUpgradeIdentifier(finalItem1.get(), identifier));
                                     } else {
-                                        p.getInventory().setItem(finalI, finalItem1.get());
+                                        p.getInventory().setItem(finalI, BedWars.nms.addCustomData(finalItem1.get(), ""));
                                     }
                                 }, 1L);
                                 Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().addItem(addedItem), 2L);

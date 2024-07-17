@@ -14,7 +14,7 @@ import static me.kiiya.hotbarmanager.config.ConfigPaths.NO_PERMISSION;
 public class MenuCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
-        if (commandSender instanceof ConsoleCommandSender) {
+        if (!(commandSender instanceof Player)) {
             commandSender.sendMessage("§cYou can't use this command from console.");
             return false;
         }

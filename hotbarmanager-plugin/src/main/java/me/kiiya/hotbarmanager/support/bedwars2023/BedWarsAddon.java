@@ -8,6 +8,7 @@ import me.kiiya.hotbarmanager.config.bedwars2023.MessagesData;
 import me.kiiya.hotbarmanager.database.providers.MySQL;
 import me.kiiya.hotbarmanager.database.providers.SQLite;
 import me.kiiya.hotbarmanager.listeners.InventoryListener;
+import me.kiiya.hotbarmanager.listeners.CustomItemSecurity;
 import me.kiiya.hotbarmanager.listeners.JoinLeaveListener;
 import me.kiiya.hotbarmanager.listeners.bedwars2023.*;
 import me.kiiya.hotbarmanager.utils.Utility;
@@ -100,6 +101,11 @@ public class BedWarsAddon extends Addon {
         Bukkit.getPluginManager().registerEvents(new RespawnListener(), getPlugin());
         Bukkit.getPluginManager().registerEvents(new InventoryListener(), getPlugins());
         Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), getPlugins());
+        if (bw2023Api.getVersionSupport().getVersion() == 0) {
+            Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.Legacy(), getPlugins());
+        } else {
+            Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.New(), getPlugins());
+        }
         Utility.info("&aListeners loaded!");
     }
 }

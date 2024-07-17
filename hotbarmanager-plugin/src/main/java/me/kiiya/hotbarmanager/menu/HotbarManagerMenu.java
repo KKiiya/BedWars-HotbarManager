@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -24,8 +25,8 @@ import java.util.stream.Collectors;
 import static me.kiiya.hotbarmanager.config.ConfigPaths.*;
 
 public class HotbarManagerMenu implements GUIHolder {
-    private Inventory inventory;
     private final Player player;
+    private Inventory inventory;
 
     public HotbarManagerMenu(Player player) {
         this.player = player;
@@ -52,17 +53,17 @@ public class HotbarManagerMenu implements GUIHolder {
         IHotbarPlayer p = HotbarManager.getAPI().getHotbarPlayer(player);
 
         if (e.getInventory() != e.getClickedInventory() || e.getClickedInventory() == player.getInventory()){
+            e.setCursor(new ItemStack(Material.AIR));
             e.getCursor().setType(Material.AIR);
             e.setCancelled(true);
             return;
         }
 
-        if (e.getAction() == InventoryAction.DROP_ALL_CURSOR
-            || e.getAction() == InventoryAction.DROP_ALL_SLOT
-            || e.getAction() == InventoryAction.DROP_ONE_CURSOR
-            || e.getAction() == InventoryAction.DROP_ONE_SLOT
-            || e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-            e.getCursor().setType(Material.AIR);
+        if (e.getAction() != InventoryAction.PICKUP_ALL
+            && e.getAction() != InventoryAction.PICKUP_ONE
+            && e.getAction() != InventoryAction.PLACE_ALL
+            && e.getAction() != InventoryAction.PLACE_ONE) {
+            e.setCursor(new ItemStack(Material.AIR));
             e.setCancelled(true);
             return;
         }
@@ -148,6 +149,11 @@ public class HotbarManagerMenu implements GUIHolder {
                 e.setCancelled(true);
                 break;
         }
+    }
+
+    @Override
+    public void onInventoryDrop(PlayerDropItemEvent event) {
+        event.setCancelled(true);
     }
 
     private void addContents() {
@@ -261,22 +267,22 @@ public class HotbarManagerMenu implements GUIHolder {
         compass_meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         compass.setItemMeta(compass_meta);
 
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_BLOCKS_CATEGORY)) inventory.setItem(10, blocks);
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_MELEE_CATEGORY)) inventory.setItem(11, melee);
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_TOOLS_CATEGORY)) inventory.setItem(12, tools);
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_RANGED_CATEGORY)) inventory.setItem(13, ranged);
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_POTIONS_CATEGORY)) inventory.setItem(14, potions);
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_SPECIALS_CATEGORY))inventory.setItem(15, utility);
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_BLOCKS_CATEGORY)) inventory.setItem(10, Utility.setItemTag(blocks, "hbm", "blocks"));
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_MELEE_CATEGORY)) inventory.setItem(11, Utility.setItemTag(melee, "hbm", "melee"));
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_TOOLS_CATEGORY)) inventory.setItem(12, Utility.setItemTag(tools, "hbm", "tools"));
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_RANGED_CATEGORY)) inventory.setItem(13, Utility.setItemTag(ranged, "hbm", "ranged"));
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_POTIONS_CATEGORY)) inventory.setItem(14, Utility.setItemTag(potions, "hbm", "potions"));
+        if (HotbarManager.getMainConfig().getBoolean(ENABLE_SPECIALS_CATEGORY))inventory.setItem(15, Utility.setItemTag(utility, "hbm", "utility"));
         switch (HotbarManager.getSupport()) {
             case BEDWARS1058:
             case BEDWARS2023:
                 if (HotbarManager.isCompassAddon() && HotbarManager.mainConfig.getBoolean("enable-compass-support"))
-                    inventory.setItem(16, compass);
+                    inventory.setItem(16, Utility.setItemTag(compass, "hbm", "compass"));
                 break;
             case BEDWARSPROXY:
             case BEDWARSPROXY2023:
                 if (HotbarManager.mainConfig.getBoolean("enable-compass-support"))
-                    inventory.setItem(16, compass);
+                    inventory.setItem(16, Utility.setItemTag(compass, "hbm", "compass"));
                 break;
         }
         // -------------------------------------------------------------------------- //

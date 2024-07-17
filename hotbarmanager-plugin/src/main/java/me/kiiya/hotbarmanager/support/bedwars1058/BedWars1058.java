@@ -7,6 +7,7 @@ import me.kiiya.hotbarmanager.config.bedwars1058.MessagesData;
 import me.kiiya.hotbarmanager.database.providers.MySQL;
 import me.kiiya.hotbarmanager.database.providers.SQLite;
 import me.kiiya.hotbarmanager.listeners.InventoryListener;
+import me.kiiya.hotbarmanager.listeners.CustomItemSecurity;
 import me.kiiya.hotbarmanager.listeners.JoinLeaveListener;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.PlayerKill;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.RespawnListener;
@@ -75,6 +76,11 @@ public class BedWars1058 {
         Bukkit.getPluginManager().registerEvents(new RespawnListener(), getPlugins());
         Bukkit.getPluginManager().registerEvents(new InventoryListener(), getPlugins());
         Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), getPlugins());
+        if (bw1058Api.getVersionSupport().getVersion() == 0) {
+            Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.Legacy(), getPlugins());
+        } else {
+            Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.New(), getPlugins());
+        }
         Utility.info("&aListeners loaded!");
     }
 }
