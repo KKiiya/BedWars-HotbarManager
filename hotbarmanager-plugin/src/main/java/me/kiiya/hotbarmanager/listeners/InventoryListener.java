@@ -25,6 +25,7 @@ public class InventoryListener implements Listener {
         if (e.getInventory() == null) return;
         if (e.getClickedInventory() == null) return;
         if (e.getInventory().getHolder() == null) return;
+        if (!(e.getInventory().getHolder() instanceof GUIHolder)) return;
 
         if (e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
             e.setCancelled(true);
@@ -34,16 +35,14 @@ public class InventoryListener implements Listener {
             return;
         }
 
-        if (e.getInventory().getHolder() instanceof GUIHolder) {
-            if (e.getInventory() != e.getClickedInventory() || e.getClickedInventory() == p.getInventory()) {
-                e.getCursor().setType(Material.AIR);
-                e.setCancelled(true);
-                return;
-            }
-
+        if (e.getInventory() != e.getClickedInventory() || e.getClickedInventory() == p.getInventory()) {
+            e.getCursor().setType(Material.AIR);
             e.setCancelled(true);
-            ((GUIHolder) e.getInventory().getHolder()).onInventoryClick(e);
+            return;
         }
+
+        e.setCancelled(true);
+        ((GUIHolder) e.getInventory().getHolder()).onInventoryClick(e);
     }
 
     @EventHandler
