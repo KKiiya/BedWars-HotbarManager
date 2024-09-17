@@ -48,6 +48,28 @@ public class Utility {
         else return Collections.singletonList(c("&cMISSING"));
     }
 
+    public static boolean isItemHigherTier(ItemStack item1, ItemStack item2) {
+        return isMaterialHigherTier(item1.getType(), item2.getType());
+    }
+
+    public static boolean isMaterialHigherTier(Material material1, Material material2) {
+        String[] materialTiers = {"WOOD", "STONE", "IRON", "GOLD", "DIAMOND", "NETHERITE"};
+
+        String mineral1 = material1.toString().split("_")[0];
+        String mineral2 = material2.toString().split("_")[0];
+
+        int tier1 = -1, tier2 = -1;
+
+        for (int i = 0; i < materialTiers.length; i++) {
+            if (mineral1.contains(materialTiers[i])) tier1 = i;
+            if (mineral2.contains(materialTiers[i])) tier2 = i;
+        }
+
+        if (tier1 == -1 || tier2 == -1) return false;
+        return tier1 > tier2;
+    }
+
+
     public static ItemStack formatItemStack(ItemStack item, Object t) {
         ItemStack cloneItem = item.clone();
         if (HotbarManager.getSupport() == Support.BEDWARS1058) {

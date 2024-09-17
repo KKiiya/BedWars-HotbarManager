@@ -5,6 +5,7 @@ import com.andrei1058.bedwars.api.arena.shop.ICategoryContent;
 import com.andrei1058.bedwars.api.arena.shop.IContentTier;
 import com.andrei1058.bedwars.api.arena.team.ITeam;
 import com.andrei1058.bedwars.api.events.shop.ShopBuyEvent;
+import com.andrei1058.bedwars.api.server.VersionSupport;
 import com.andrei1058.bedwars.configuration.Sounds;
 import com.andrei1058.bedwars.shop.ShopCache;
 import com.andrei1058.bedwars.shop.main.CategoryContent;
@@ -37,6 +38,7 @@ public class ShopBuy implements Listener {
         if (cat == null || cat == Category.NONE) return;
 
         // ITEM BOUGHT VARIABLES
+        VersionSupport vs = HotbarManager.getBW1058Api().getVersionSupport();
         ITeam t = e.getArena().getTeam(p);
         ICategoryContent cc = e.getCategoryContent();
         String identifier = cc.getIdentifier();
@@ -59,7 +61,6 @@ public class ShopBuy implements Listener {
         // SOUNDS
         String buySound = "shop-bought";
 
-
         if (!hotbar.contains(cat)) return;
 
         if (p.getInventory().firstEmpty() == -1) {
@@ -69,74 +70,74 @@ public class ShopBuy implements Listener {
 
         try {
             for (int i = 0; i < 9; i++) {
-                if (hotbar.get(i) == cat) {
-                    if (p.getInventory().getItem(i) != null) {
-                        if (HotbarManager.getBW1058Api().getVersionSupport().getShopUpgradeIdentifier(item) != null && HotbarManager.getBW1058Api().getVersionSupport().getShopUpgradeIdentifier(item).equals(identifier)) {
-                            cache.upgradeCachedItem((CategoryContent) cc, cc.getSlot());
-                            cachedItem.set(cache.getCachedItem(identifier));
-                            item = cc.getContentTiers().get(cachedItem.get().getTier()-1).getBuyItemsList().get(0).getItemStack();
-                            p.getInventory().setItem(i-1, HotbarManager.getBW1058Api().getVersionSupport().setShopUpgradeIdentifier(item, identifier));
+                ItemStack itemSlot = p.getInventory().getItem(i);
+                if (hotbar.get(i) != cat) continue;
+
+                e.setCancelled(true);
+
+                if (itemSlot != null) {
+                    if (vs.getShopUpgradeIdentifier(item) != null && vs.getShopUpgradeIdentifier(item).equals(identifier)) {
+                        cache.upgradeCachedItem((CategoryContent) cc, cc.getSlot());
+                        cachedItem.set(cache.getCachedItem(identifier));
+                        item = cc.getContentTiers().get(cachedItem.get().getTier() - 1).getBuyItemsList().get(0).getItemStack();
+                        p.getInventory().setItem(i, vs.setShopUpgradeIdentifier(item, identifier));
+                        CategoryContent.takeMoney(p, currency, price);
+                    } else if (item.getType() == itemSlot.getType() && item.getDurability() == itemSlot.getDurability()) {
+                        if (itemSlot.getAmount() + item.getAmount() > itemSlot.getType().getMaxStackSize()) {
+                            int restAmount = itemSlot.getAmount() + item.getAmount() - itemSlot.getType().getMaxStackSize();
+                            ItemStack finalItem = new ItemStack(item.getType(), restAmount);
+                            Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> {
+                                itemSlot.setAmount(itemSlot.getType().getMaxStackSize());
+                                p.getInventory().addItem(BedWars.nms.addCustomData(Utility.formatItemStack(finalItem, t), ""));
+                                CategoryContent.takeMoney(p, currency, price);
+                            }, 1L);
                         } else {
-                            if (item.getType() == p.getInventory().getItem(i).getType() && item.getDurability() == p.getInventory().getItem(i).getDurability()) {
-                                if (p.getInventory().getItem(i).getAmount() >= p.getInventory().getItem(i).getType().getMaxStackSize())
-                                    continue;
-                                else {
-                                    if (p.getInventory().getItem(i).getAmount() + item.getAmount() > p.getInventory().getItem(i).getType().getMaxStackSize()) {
-                                        int finalI = i;
-                                        int restAmount = p.getInventory().getItem(i).getAmount() - p.getInventory().getItem(i).getType().getMaxStackSize() + item.getAmount();
-                                        ItemStack finalItem = item;
-                                        Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> {
-                                            p.getInventory().getItem(finalI).setAmount(p.getInventory().getItem(finalI).getType().getMaxStackSize());
-                                            p.getInventory().addItem(BedWars.nms.addCustomData(Utility.formatItemStack(new ItemStack(finalItem.getType(), restAmount), t), ""));
-                                        }, 1L);
-                                    } else {
-                                        p.getInventory().getItem(i).setAmount(p.getInventory().getItem(i).getAmount() + item.getAmount());
-                                    }
-                                }
-                            } else {
-                                if (Utility.getItemCategory(p.getInventory().getItem(i)) == cat) continue;
-                                ItemStack addedItem = p.getInventory().getItem(i);
-                                int finalI = i;
-                                AtomicReference<ItemStack> finalItem1 = new AtomicReference<>(item);
-                                Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> {
-                                    if (cc.isPermanent()) {
-                                        cache.upgradeCachedItem((CategoryContent) cc, cc.getSlot());
-                                        cachedItem.set(cache.getCachedItem(identifier));
-                                        finalItem1.set(cc.getContentTiers().get(cachedItem.get().getTier() - 1).getBuyItemsList().get(0).getItemStack());
-                                        finalItem1.set(BedWars.nms.addCustomData(Utility.formatItemStack(finalItem1.get(), t), ""));
-                                        p.getInventory().setItem(finalI, HotbarManager.getBW1058Api().getVersionSupport().setShopUpgradeIdentifier(finalItem1.get(), identifier));
-                                    } else {
-                                        p.getInventory().setItem(finalI, BedWars.nms.addCustomData(finalItem1.get(), ""));
-                                    }
-                                }, 1L);
-                                Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().addItem(addedItem), 2L);
-                            }
+                            itemSlot.setAmount(itemSlot.getAmount() + item.getAmount());
+                            CategoryContent.takeMoney(p, currency, price);
                         }
                     } else {
-                        if (cc.isPermanent()) {
-                            cache.upgradeCachedItem((CategoryContent) cc, cc.getSlot());
-                            cachedItem.set(cache.getCachedItem(identifier));
-                            item = cc.getContentTiers().get(cachedItem.get().getTier()-1).getBuyItemsList().get(0).getItemStack();
-                            Utility.formatItemStack(item, t);
-                            ItemMeta meta = item.getItemMeta();
-                            BedWars.nms.setUnbreakable(meta);
-                            item.setItemMeta(meta);
-                            p.getInventory().setItem(i, HotbarManager.getBW1058Api().getVersionSupport().setShopUpgradeIdentifier(item, identifier));
-                        } else {
-                            p.getInventory().setItem(i, item);
-                        }
-                    }
+                        if (Utility.getItemCategory(itemSlot) == cat) continue;
 
-                    Sounds.playSound(buySound, p);
-                    p.sendMessage(Utility.getMsg(p, "shop-new-purchase")
-                            .replace("{prefix}", Utility.getMsg(p, "prefix"))
-                            .replace("{item}", Utility.getMsg(p, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
-                            .replace("{color}", "")
-                            .replace("{tier}", cachedItem.get() == null ? "" : CategoryContent.getRomanNumber(cachedItem.get().getTier())));
-                    CategoryContent.takeMoney(p, currency, price);
-                    e.setCancelled(true);
-                    break;
+                        int finalI = i;
+                        AtomicReference<ItemStack> finalItem = new AtomicReference<>(item);
+                        Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> {
+                            if (cc.isPermanent()) {
+                                cache.upgradeCachedItem((CategoryContent) cc, cc.getSlot());
+                                cachedItem.set(cache.getCachedItem(identifier));
+                                finalItem.set(cc.getContentTiers().get(cachedItem.get().getTier() - 1).getBuyItemsList().get(0).getItemStack());
+                                finalItem.set(BedWars.nms.addCustomData(Utility.formatItemStack(finalItem.get(), t), ""));
+                                p.getInventory().setItem(finalI, vs.setShopUpgradeIdentifier(finalItem.get(), identifier));
+                            } else {
+                                p.getInventory().setItem(finalI, BedWars.nms.addCustomData(finalItem.get(), ""));
+                            }
+                            CategoryContent.takeMoney(p, currency, price);
+                        }, 1L);
+                        Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> p.getInventory().addItem(itemSlot), 2L);
+                    }
+                } else {
+                    if (cc.isPermanent()) {
+                        cache.upgradeCachedItem((CategoryContent) cc, cc.getSlot());
+                        cachedItem.set(cache.getCachedItem(identifier));
+                        item = cc.getContentTiers().get(cachedItem.get().getTier() - 1).getBuyItemsList().get(0).getItemStack();
+                        item = Utility.formatItemStack(item, t);
+                        ItemMeta meta = item.getItemMeta();
+                        BedWars.nms.setUnbreakable(meta);
+                        item.setItemMeta(meta);
+                        p.getInventory().setItem(i, vs.setShopUpgradeIdentifier(item, identifier));
+                        CategoryContent.takeMoney(p, currency, price);
+                    } else {
+                        p.getInventory().setItem(i, item);
+                        CategoryContent.takeMoney(p, currency, price);
+                    }
                 }
+
+                Sounds.playSound(buySound, p);
+                p.sendMessage(Utility.getMsg(p, "shop-new-purchase")
+                        .replace("{prefix}", Utility.getMsg(p, "prefix"))
+                        .replace("{item}", Utility.getMsg(p, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
+                        .replace("{color}", "")
+                        .replace("{tier}", cachedItem.get() == null ? "" : CategoryContent.getRomanNumber(cachedItem.get().getTier())));
+                break;
             }
         } catch (Exception ex) {
             throw new RuntimeException(ex);
