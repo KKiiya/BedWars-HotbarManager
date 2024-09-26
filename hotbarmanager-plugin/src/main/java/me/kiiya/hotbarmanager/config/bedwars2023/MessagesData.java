@@ -16,6 +16,7 @@ public class MessagesData {
         for (Language l : Language.getLanguages()) {
             YamlConfiguration yml = l.getYml();
             switch (l.getIso()) {
+                // Brazilian portuguese. Special thanks to zypj.
                 case "pt":
                     yml.addDefault(NO_PERMISSION, "&cVocê não tem permissão para isso!");
                     yml.addDefault(INVENTORY_NAME, "HotBar Manager");
