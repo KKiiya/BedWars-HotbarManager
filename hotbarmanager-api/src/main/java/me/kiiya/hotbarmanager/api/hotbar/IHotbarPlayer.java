@@ -18,7 +18,17 @@ public interface IHotbarPlayer {
      * @param category - the category you want the player to have
      * @param slot - the slot you want the category to be in
      */
+    @Deprecated
     void setSlotCategory(int slot, Category category);
+
+    /**
+     * Set a category for a specified slot
+     *
+     * @param category - the category you want the player to have
+     * @param slot - the slot you want the category to be in
+     * @param callEvent - whether to call the event
+     */
+    void setSlotCategory(int slot, Category category, boolean callEvent);
 
     /**
      * Get the category in a specific slot

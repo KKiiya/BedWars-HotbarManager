@@ -3,6 +3,7 @@ package me.kiiya.hotbarmanager.player;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.database.Database;
 import me.kiiya.hotbarmanager.api.events.PlayerHotbarResetEvent;
+import me.kiiya.hotbarmanager.api.events.PlayerHotbarUpdateEvent;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
 import me.kiiya.hotbarmanager.utils.Support;
@@ -33,6 +34,7 @@ public class HotbarPlayer implements IHotbarPlayer {
         this.db = HotbarManager.getPlugins().getDB();
         this.player = Bukkit.getServer().getPlayer(uuid);
         this.hotbar = new HashMap<>();
+        for (int i = 0; i < 9; i++) hotbar.put(i, Category.NONE);
         Bukkit.getScheduler().runTask(HotbarManager.getPlugins(), () -> {
             for (int i = 0; i < 9; i++) {
                 hotbar.put(i, Category.getFromString(this.db.getData(player, "slot" + i)));
@@ -48,7 +50,18 @@ public class HotbarPlayer implements IHotbarPlayer {
 
     @Override
     public void setSlotCategory(int slot, Category category) {
-        hotbar.put(slot, category);
+        setSlotCategory(slot, category, true);
+    }
+
+    @Override
+    public void setSlotCategory(int slot, Category newCategory, boolean callEvent) {
+        Category oldCategory = hotbar.get(slot);
+        if (oldCategory == newCategory) return;
+        PlayerHotbarUpdateEvent event = new PlayerHotbarUpdateEvent(this, slot, oldCategory, newCategory);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
+
+        hotbar.put(slot, newCategory);
     }
 
     @Override

@@ -123,23 +123,23 @@ public class HotbarManagerMenu implements GUIHolder {
             case 35:
                 int slot = HotbarUtils.getPosForSlot(e.getSlot());
                 if (e.getCursor().getType() == Material.AIR || e.getCursor().getType() == null) {
-                    p.setSlotCategory(slot, Category.NONE);
+                    p.setSlotCategory(slot, Category.NONE, true);
                 }
                 if (e.getAction() == InventoryAction.PLACE_ALL || e.getAction() == InventoryAction.PLACE_ONE || e.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
                     if (e.getCursor().getType() == Material.HARD_CLAY) {
-                        p.setSlotCategory(slot, Category.BLOCKS);
+                        p.setSlotCategory(slot, Category.BLOCKS, true);
                     } else if (e.getCursor().getType() == Material.GOLD_SWORD) {
-                        p.setSlotCategory(slot, Category.MELEE);
+                        p.setSlotCategory(slot, Category.MELEE, true);
                     } else if (e.getCursor().getType() == Material.IRON_PICKAXE) {
-                        p.setSlotCategory(slot, Category.TOOLS);
+                        p.setSlotCategory(slot, Category.TOOLS, true);
                     } else if (e.getCursor().getType() == Material.BOW) {
-                        p.setSlotCategory(slot, Category.RANGED);
+                        p.setSlotCategory(slot, Category.RANGED, true);
                     } else if (e.getCursor().getType() == Material.BREWING_STAND_ITEM) {
-                        p.setSlotCategory(slot, Category.POTIONS);
+                        p.setSlotCategory(slot, Category.POTIONS, true);
                     } else if (e.getCursor().getType() == Material.TNT) {
-                        p.setSlotCategory(slot, Category.UTILITY);
+                        p.setSlotCategory(slot, Category.UTILITY, true);
                     } else if (e.getCursor().getType() == Material.COMPASS) {
-                        p.setSlotCategory(slot, Category.COMPASS);
+                        p.setSlotCategory(slot, Category.COMPASS, true);
                     }
                 }
                 e.setCursor(new ItemStack(Material.AIR));
