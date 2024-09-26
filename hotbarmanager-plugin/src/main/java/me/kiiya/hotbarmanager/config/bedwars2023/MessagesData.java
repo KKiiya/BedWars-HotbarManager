@@ -16,6 +16,37 @@ public class MessagesData {
         for (Language l : Language.getLanguages()) {
             YamlConfiguration yml = l.getYml();
             switch (l.getIso()) {
+                // Brazilian portuguese. Special thanks to zypj.
+                case "pt":
+                    yml.addDefault(NO_PERMISSION, "&cVocê não tem permissão para isso!");
+                    yml.addDefault(INVENTORY_NAME, "HotBar Manager");
+                    yml.addDefault(INVENTORY_ITEM_NAME, "&aHotbar Manager");
+                    yml.addDefault(INVENTORY_ITEM_LORE, Arrays.asList("&7Editar a preferência de slots", "&7de qualquer item da loja.", "", "&eClique para Editar!"));
+                    yml.addDefault(INVENTORY_ITEMS_BLOCKS_NAME, "&aBlocos");
+                    yml.addDefault(INVENTORY_ITEMS_MELEE_NAME, "&aCombate");
+                    yml.addDefault(INVENTORY_ITEMS_TOOLS_NAME, "&aFerramentas");
+                    yml.addDefault(INVENTORY_ITEMS_RANGED_NAME, "&aDistância");
+                    yml.addDefault(INVENTORY_ITEMS_POTIONS_NAME, "&aPoções");
+                    yml.addDefault(INVENTORY_ITEMS_SPECIALS_NAME, "&aUtilitários");
+                    yml.addDefault(INVENTORY_ITEMS_COMPASS_NAME, "&aBússola");
+                    yml.addDefault(INVENTORY_ITEMS_COMPASS_LORE, Arrays.asList("&7Coloque esse item onde você", "&7deseja que ela apareça quando você nascer.", "", "&cSe você não deixar esse item", "&cem nenhum lugar, ela não nascerá com você.", "", "&eClique para alterar!"));
+                    yml.addDefault(INVENTORY_ITEMS_LORE, Arrays.asList("&7Arraste isso para sua hotbar", "&7para sempre que você comprar", "&7qualquer item dessa categoria", "&7venha automaticamente para esse slot.", "", "&eClique para alterar!"));
+                    yml.addDefault(INVENTORY_ITEMS_USED_LORE, Arrays.asList("&7{category} &7items will prioritize this", "&7slot!", "", "&eClique para Remover!"));
+                    yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_NAME, "&aVoltar");
+                    yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_LORE, Collections.singletonList("&7Para Jogar Bed Wars"));
+                    yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_NAME, "&aVoltar");
+                    yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_LORE, Collections.singletonList("&7Para Compra Rápida."));
+                    yml.addDefault(INVENTORY_ITEMS_RESET_NAME, "&cVoltar ao Padrão");
+                    yml.addDefault(INVENTORY_ITEMS_RESET_LORE, Arrays.asList("&7Voltar sua hotbar ao", "&7padrão."));
+                    yml.addDefault(MEANING_BLOCKS, "&7Blocos");
+                    yml.addDefault(MEANING_MELEE, "&7Combate");
+                    yml.addDefault(MEANING_TOOLS, "&7Ferramentas");
+                    yml.addDefault(MEANING_RANGED, "&7Distância");
+                    yml.addDefault(MEANING_POTIONS, "&7Poções");
+                    yml.addDefault(MEANING_SPECIALS, "&7Utilitários");
+                    yml.addDefault(MEANING_COMPASS, "&7Bússola");
+                    yml.addDefault(SEPARATOR_NAME, "&7↑ Categoria");
+                    yml.addDefault(SEPARATOR_LORE, Collections.singletonList("&7↓ Hotbar"));
                 default:
                     yml.addDefault(NO_PERMISSION, "&cYou do not have permission to use this command!");
                     yml.addDefault(INVENTORY_NAME, "HotBar Manager");
