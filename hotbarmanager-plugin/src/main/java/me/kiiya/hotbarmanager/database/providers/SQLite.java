@@ -2,6 +2,7 @@ package me.kiiya.hotbarmanager.database.providers;
 
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.database.Database;
+import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.util.List;
 
 public class SQLite implements Database {
     private Connection connection;
@@ -24,7 +26,7 @@ public class SQLite implements Database {
     }
 
     @Override
-    public void createPlayerData(Player p) {
+    public void createPlayerData(Player p, List<Category> defaultSlots) {
         Connection connection = null;
         PreparedStatement ps = null;
         String path = p.getUniqueId().toString();
@@ -40,15 +42,11 @@ public class SQLite implements Database {
                 connection = getConnection();
                 ps = connection.prepareStatement("INSERT INTO bedwars_hotbar_manager(player, slot0, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8) VALUES (?,?,?,?,?,?,?,?,?,?)");
                 ps.setString(1, path);
-                ps.setString(2, "MELEE");
-                ps.setString(3, "NONE");
-                ps.setString(4, "NONE");
-                ps.setString(5, "NONE");
-                ps.setString(6, "NONE");
-                ps.setString(7, "NONE");
-                ps.setString(8, "NONE");
-                ps.setString(9, "NONE");
-                ps.setString(10, "COMPASS");
+                for (int i = 2; i <= 10; i++) {
+                    Category slot = defaultSlots.get(i-2);
+                    if (slot == null) slot = Category.NONE;
+                    ps.setString(i, slot.toString());
+                }
                 ps.executeUpdate();
             }
         } catch(SQLException e){
@@ -128,16 +126,6 @@ public class SQLite implements Database {
         }
     }
 
-    public void close(PreparedStatement ps, ResultSet rs) {
-        try {
-            if (ps != null)
-                ps.close();
-            if (rs != null)
-                rs.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
     public Connection getConnection() {
         String path;
         if (HotbarManager.getSupport() == Support.BEDWARS1058) path = Bukkit.getPluginManager().getPlugin("BedWars1058").getDataFolder() + "/Cache/";

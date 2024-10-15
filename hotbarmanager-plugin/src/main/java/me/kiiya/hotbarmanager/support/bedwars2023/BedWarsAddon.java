@@ -1,6 +1,7 @@
 package me.kiiya.hotbarmanager.support.bedwars2023;
 
 import com.tomkeuper.bedwars.api.addon.Addon;
+import com.tomkeuper.bedwars.api.configuration.ConfigManager;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.database.Database;
 import me.kiiya.hotbarmanager.config.MainConfig;
@@ -9,7 +10,6 @@ import me.kiiya.hotbarmanager.database.providers.MySQL;
 import me.kiiya.hotbarmanager.database.providers.SQLite;
 import me.kiiya.hotbarmanager.listeners.InventoryListener;
 import me.kiiya.hotbarmanager.listeners.CustomItemSecurity;
-import me.kiiya.hotbarmanager.listeners.JoinLeaveListener;
 import me.kiiya.hotbarmanager.listeners.bedwars2023.*;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
@@ -27,7 +27,7 @@ public class BedWarsAddon extends Addon {
 
     @Override
     public Plugin getPlugin() {
-        return HotbarManager.getPlugins();
+        return HotbarManager.getInstance();
     }
 
     @Override
@@ -48,12 +48,11 @@ public class BedWarsAddon extends Addon {
     @Override
     public void load() {
         Utility.info("LOADING BEDWARS2023 SUPPORT");
-        if (Bukkit.getPluginManager().getPlugin("BedWars1058-Compass") != null) {
-            compassAddon = true;
-        }
+        compassAddon = Bukkit.getPluginManager().getPlugin("BedWars1058-Compass") != null;
 
         connectDatabase();
         loadConfig();
+        HotbarManager.manager = me.kiiya.hotbarmanager.player.HotbarManager.init();
         loadMessages();
         loadCommands();
         loadListeners();
@@ -64,48 +63,46 @@ public class BedWarsAddon extends Addon {
         Bukkit.getPluginManager().disablePlugin(getPlugin());
     }
 
-    public void connectDatabase() {
+    private void connectDatabase() {
         Utility.info("&eConnecting to database...");
         Database db;
-        if (HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.type").equalsIgnoreCase("mysql")) {
-            db = new MySQL();
-        } else {
-            db = new SQLite();
-        }
-        HotbarManager.getPlugins().setDB(db);
+        ConfigManager config = HotbarManager.getBW2023Api().getConfigs().getMainConfig();
+
+        if (config.getString("database.type").equalsIgnoreCase("mysql")) db = new MySQL();
+        else db = new SQLite();
+
+        HotbarManager.getInstance().setDB(db);
         Utility.info("&aDatabase connected!");
     }
 
-    public void loadConfig() {
+    private void loadConfig() {
         Utility.info("&eLoading config...");
-        mainConfig = new MainConfig(HotbarManager.getPlugins(), "config", bw2023Api.getAddonsPath().getPath() + File.separator + "HotbarManager");
+        mainConfig = new MainConfig(HotbarManager.getInstance(), "config", bw2023Api.getAddonsPath().getPath() + File.separator + "HotbarManager");
         Utility.info("&aConfig loaded!");
     }
 
-    public void loadMessages() {
+    private void loadMessages() {
         Utility.info("&eLoading messages...");
         new MessagesData();
         Utility.info("&aMessages loaded!");
     }
 
-    public void loadCommands() {
+    private void loadCommands() {
         Utility.info("&eLoading commands...");
         Utility.info("&aCommands loaded!");
     }
 
-    public void loadListeners() {
+    private void loadListeners() {
         Utility.info("&eLoading listeners...");
         Bukkit.getPluginManager().registerEvents(new ShopBuy(), getPlugin());
         Bukkit.getPluginManager().registerEvents(new ShopOpen(), getPlugin());
         Bukkit.getPluginManager().registerEvents(new PlayerKill(), getPlugin());
         Bukkit.getPluginManager().registerEvents(new RespawnListener(), getPlugin());
-        Bukkit.getPluginManager().registerEvents(new InventoryListener(), getPlugins());
-        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), getPlugins());
-        if (bw2023Api.getVersionSupport().getVersion() == 0) {
-            Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.Legacy(), getPlugins());
-        } else {
-            Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.New(), getPlugins());
-        }
+        Bukkit.getPluginManager().registerEvents(new InventoryListener(), getInstance());
+
+        if (bw2023Api.getVersionSupport().getVersion() == 0) Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.Legacy(), getInstance());
+        else Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.New(), getInstance());
+
         Utility.info("&aListeners loaded!");
     }
 }

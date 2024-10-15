@@ -1,6 +1,7 @@
 package me.kiiya.hotbarmanager.support.bedwars1058;
 
 import com.andrei1058.bedwars.api.BedWars;
+import com.andrei1058.bedwars.api.configuration.ConfigManager;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.config.bedwars1058.MessagesData;
@@ -8,7 +9,6 @@ import me.kiiya.hotbarmanager.database.providers.MySQL;
 import me.kiiya.hotbarmanager.database.providers.SQLite;
 import me.kiiya.hotbarmanager.listeners.InventoryListener;
 import me.kiiya.hotbarmanager.listeners.CustomItemSecurity;
-import me.kiiya.hotbarmanager.listeners.JoinLeaveListener;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.PlayerKill;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.RespawnListener;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.ShopBuy;
@@ -22,11 +22,12 @@ import java.io.File;
 import static me.kiiya.hotbarmanager.HotbarManager.*;
 
 public class BedWars1058 {
+
     public BedWars1058() {
         start();
     }
 
-    public void start() {
+    private void start() {
         support = Support.BEDWARS1058;
         bw1058Api = Bukkit.getServicesManager().getRegistration(BedWars.class).getProvider();
 
@@ -36,51 +37,49 @@ public class BedWars1058 {
 
         connectDatabase();
         loadConfig();
+        HotbarManager.manager = me.kiiya.hotbarmanager.player.HotbarManager.init();
         loadMessages();
         loadCommands();
         loadListeners();
     }
 
-    public void connectDatabase() {
+    private void connectDatabase() {
         Utility.info("&eConnecting to database...");
-        if (HotbarManager.getBW1058Api().getConfigs().getMainConfig().getBoolean("database.enable")) {
-            HotbarManager.getPlugins().setDB(new MySQL());
-        } else {
-            HotbarManager.getPlugins().setDB(new SQLite());
-        }
+        ConfigManager config = HotbarManager.getBW1058Api().getConfigs().getMainConfig();
+        if (config.getBoolean("database.enable")) HotbarManager.getInstance().setDB(new MySQL());
+        else HotbarManager.getInstance().setDB(new SQLite());
+
         Utility.info("&aDatabase connected!");
     }
 
-    public void loadConfig() {
+    private void loadConfig() {
         Utility.info("&eLoading config...");
-        mainConfig = new MainConfig(HotbarManager.getPlugins(), "config", bw1058Api.getAddonsPath().getPath() + File.separator + "HotbarManager");
+        mainConfig = new MainConfig(HotbarManager.getInstance(), "config", bw1058Api.getAddonsPath().getPath() + File.separator + "HotbarManager");
         Utility.info("&aConfig loaded!");
     }
 
-    public void loadMessages() {
+    private void loadMessages() {
         Utility.info("&eLoading messages...");
         new MessagesData();
         Utility.info("&aMessages loaded!");
     }
 
-    public void loadCommands() {
+    private void loadCommands() {
         Utility.info("&eLoading commands...");
         Utility.info("&aCommands loaded!");
     }
 
-    public void loadListeners() {
+    private void loadListeners() {
         Utility.info("&eLoading listeners...");
-        Bukkit.getPluginManager().registerEvents(new ShopBuy(), getPlugins());
-        Bukkit.getPluginManager().registerEvents(new ShopOpen(), getPlugins());
-        Bukkit.getPluginManager().registerEvents(new PlayerKill(), getPlugins());
-        Bukkit.getPluginManager().registerEvents(new RespawnListener(), getPlugins());
-        Bukkit.getPluginManager().registerEvents(new InventoryListener(), getPlugins());
-        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), getPlugins());
-        if (bw1058Api.getVersionSupport().getVersion() == 0) {
-            Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.Legacy(), getPlugins());
-        } else {
-            Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.New(), getPlugins());
-        }
+        Bukkit.getPluginManager().registerEvents(new ShopBuy(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new ShopOpen(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new PlayerKill(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new RespawnListener(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new InventoryListener(), getInstance());
+
+        if (bw1058Api.getVersionSupport().getVersion() == 0) Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.Legacy(), getInstance());
+        else Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.New(), getInstance());
+
         Utility.info("&aListeners loaded!");
     }
 }

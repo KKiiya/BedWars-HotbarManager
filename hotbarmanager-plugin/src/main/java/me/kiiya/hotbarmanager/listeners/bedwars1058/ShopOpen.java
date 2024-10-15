@@ -30,7 +30,7 @@ public class ShopOpen implements Listener {
             hotbarManagerItemMeta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEM_NAME));
             hotbarManagerItemMeta.setLore(Utility.getListMsg(player, INVENTORY_ITEM_LORE));
             hotbarManagerItem.setItemMeta(hotbarManagerItemMeta);
-            e.getInventory().setItem(HotbarManager.getMainConfig().getInt(ITEM_POSITION) - 1, hotbarManagerItem);
+            e.getInventory().setItem(HotbarManager.getMainConfig().getInt(ITEM_POSITION) - 1, Utility.setItemTag(hotbarManagerItem, "hbm", "menu"));
         }
     }
 
@@ -46,7 +46,8 @@ public class ShopOpen implements Listener {
         if (!HotbarManager.getBW1058Api().getArenaUtil().isPlaying(p)) return;
 
         if (e.getView().getTitle().equals(Utility.getMsg(p, "shop-items-messages.inventory-name"))) {
-            if (e.getCurrentItem().getItemMeta().getDisplayName().equals(Utility.getMsg(p, INVENTORY_ITEM_NAME))) {
+            String hbmTag = Utility.getTag(e.getCurrentItem(), "hbm");
+            if (hbmTag != null && hbmTag.equalsIgnoreCase("menu")) {
                 Bukkit.getServer().dispatchCommand(p, "hbm");
             }
         }

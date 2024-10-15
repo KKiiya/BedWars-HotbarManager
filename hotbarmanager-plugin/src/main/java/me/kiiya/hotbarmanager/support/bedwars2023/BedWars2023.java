@@ -7,11 +7,12 @@ import static me.kiiya.hotbarmanager.HotbarManager.bw2023Api;
 import static me.kiiya.hotbarmanager.HotbarManager.support;
 
 public class BedWars2023 {
+
     public BedWars2023() {
         start();
     }
 
-    public void start() {
+    private void start() {
         support = Support.BEDWARS2023;
         bw2023Api = Bukkit.getServicesManager().getRegistration(BedWars.class).getProvider();
 

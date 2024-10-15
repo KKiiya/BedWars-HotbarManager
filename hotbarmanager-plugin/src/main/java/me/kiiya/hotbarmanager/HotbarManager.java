@@ -1,16 +1,14 @@
 package me.kiiya.hotbarmanager;
 
 import me.kiiya.hotbarmanager.api.database.Database;
+import me.kiiya.hotbarmanager.api.hotbar.IHotbarManager;
 import me.kiiya.hotbarmanager.commands.MenuCommand;
 import me.kiiya.hotbarmanager.config.MainConfig;
-import me.kiiya.hotbarmanager.listeners.InventoryListener;
-import me.kiiya.hotbarmanager.listeners.JoinLeaveListener;
 import me.kiiya.hotbarmanager.support.bedwars1058.BedWars1058;
 import me.kiiya.hotbarmanager.support.bedwars1058.BedWarsProxy;
 import me.kiiya.hotbarmanager.support.bedwars2023.BedWars2023;
 import me.kiiya.hotbarmanager.support.bedwars2023.BedWarsProxy2023;
 import me.kiiya.hotbarmanager.utils.Support;
-import me.kiiya.hotbarmanager.utils.Utility;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
@@ -25,16 +23,20 @@ public final class HotbarManager extends JavaPlugin {
     public static com.tomkeuper.bedwars.api.BedWars bw2023Api;
     public static MainConfig mainConfig;
     public static Support support;
+    public static IHotbarManager manager;
     private Database db;
 
     @Override
     public void onEnable() {
         loadSupport();
-        new Metrics(this, 20334);
-        api = new API();
 
-        Bukkit.getServicesManager().register(me.kiiya.hotbarmanager.api.HotbarManager.class, api, this, ServicePriority.Normal);
-        getServer().getPluginCommand("hbm").setExecutor(new MenuCommand());
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            new Metrics(this, 20334);
+            api = new API();
+
+            Bukkit.getServicesManager().register(me.kiiya.hotbarmanager.api.HotbarManager.class, api, this, ServicePriority.Normal);
+            getServer().getPluginCommand("hbm").setExecutor(new MenuCommand());
+        }, 40L);
     }
 
     @Override
@@ -43,22 +45,21 @@ public final class HotbarManager extends JavaPlugin {
     }
 
     private void loadSupport() {
-        if (Bukkit.getPluginManager().getPlugin("BedWars1058") != null) {
-            new BedWars1058();
-        } else if (Bukkit.getPluginManager().getPlugin("BedWars2023") != null) {
-            new BedWars2023();
-        } else if (Bukkit.getPluginManager().getPlugin("BedWarsProxy") != null) {
-            new BedWarsProxy();
-        } else if (Bukkit.getPluginManager().getPlugin("BWProxy2023") != null) {
-            new BedWarsProxy2023();
-        }
+        if (Bukkit.getPluginManager().getPlugin("BedWars1058") != null) new BedWars1058();
+        else if (Bukkit.getPluginManager().getPlugin("BedWars2023") != null) new BedWars2023();
+        else if (Bukkit.getPluginManager().getPlugin("BedWarsProxy") != null) new BedWarsProxy();
+        else if (Bukkit.getPluginManager().getPlugin("BWProxy2023") != null) new BedWarsProxy2023();
+    }
+
+    public static IHotbarManager getManager() {
+        return manager;
     }
 
     public static MainConfig getMainConfig() {
         return mainConfig;
     }
 
-    public static HotbarManager getPlugins() {
+    public static HotbarManager getInstance() {
         return HotbarManager.getPlugin(HotbarManager.class);
     }
 

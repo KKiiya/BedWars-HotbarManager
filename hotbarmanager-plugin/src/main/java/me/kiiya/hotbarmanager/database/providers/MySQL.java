@@ -3,6 +3,7 @@ package me.kiiya.hotbarmanager.database.providers;
 import com.zaxxer.hikari.HikariDataSource;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.database.Database;
+import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
@@ -11,6 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class MySQL implements Database {
     private final String host;
@@ -69,9 +71,9 @@ public class MySQL implements Database {
     }
 
     @Override
-    public void createPlayerData(Player player) {
+    public void createPlayerData(Player player, List<Category> defaultSlots) {
         String path = player.getUniqueId().toString();
-        Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getPlugins(), () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getInstance(), () -> {
             try {
                 Connection c = db.getConnection();
 
@@ -87,15 +89,11 @@ public class MySQL implements Database {
                     String sql = "INSERT INTO bedwars_hotbar_manager(player, slot0, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8) VALUES (?,?,?,?,?,?,?,?,?,?)";
                     PreparedStatement ps = c.prepareStatement(sql);
                     ps.setString(1, path);
-                    ps.setString(2, "MELEE");
-                    ps.setString(3, "NONE");
-                    ps.setString(4, "NONE");
-                    ps.setString(5, "NONE");
-                    ps.setString(6, "NONE");
-                    ps.setString(7, "NONE");
-                    ps.setString(8, "NONE");
-                    ps.setString(9, "NONE");
-                    ps.setString(10, "COMPASS");
+                    for (int i = 2; i <= 10; i++) {
+                        Category slot = defaultSlots.get(i-2);
+                        if (slot == null) slot = Category.NONE;
+                        ps.setString(i, slot.toString());
+                    }
                     ps.executeUpdate();
                     ps.close();
                     c.close();

@@ -62,7 +62,8 @@ public class HotbarManagerMenu implements GUIHolder {
         if (e.getAction() != InventoryAction.PICKUP_ALL
             && e.getAction() != InventoryAction.PICKUP_ONE
             && e.getAction() != InventoryAction.PLACE_ALL
-            && e.getAction() != InventoryAction.PLACE_ONE) {
+            && e.getAction() != InventoryAction.PLACE_ONE
+            && e.getAction() != InventoryAction.SWAP_WITH_CURSOR) {
             e.setCursor(new ItemStack(Material.AIR));
             e.setCancelled(true);
             return;

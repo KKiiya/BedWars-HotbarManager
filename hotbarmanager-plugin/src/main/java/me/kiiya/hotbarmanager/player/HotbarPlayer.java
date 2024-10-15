@@ -13,34 +13,32 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public class HotbarPlayer implements IHotbarPlayer {
-    private static final LinkedHashMap<String, HotbarPlayer> hotbarPlayers = new LinkedHashMap<>();
+
     private HashMap<Integer, Category> hotbar;
     private Player player;
     private Database db;
 
     public HotbarPlayer(Player player) {
-        this.db = HotbarManager.getPlugins().getDB();
+        this.db = HotbarManager.getInstance().getDB();
         this.player = player;
         this.hotbar = new HashMap<>();
-        Bukkit.getScheduler().runTask(HotbarManager.getPlugins(), () -> {
+        Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
             for (int i = 0; i < 9; i++) {
                 hotbar.put(i, Category.getFromString(this.db.getData(player, "slot" + i)));
             }
         });
-        hotbarPlayers.put(player.getUniqueId().toString(), this);
     }
 
     public HotbarPlayer(UUID uuid) {
-        this.db = HotbarManager.getPlugins().getDB();
+        this.db = HotbarManager.getInstance().getDB();
         this.player = Bukkit.getServer().getPlayer(uuid);
         this.hotbar = new HashMap<>();
         for (int i = 0; i < 9; i++) hotbar.put(i, Category.NONE);
-        Bukkit.getScheduler().runTask(HotbarManager.getPlugins(), () -> {
+        Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
             for (int i = 0; i < 9; i++) {
                 hotbar.put(i, Category.getFromString(this.db.getData(player, "slot" + i)));
             }
         });
-        hotbarPlayers.put(player.getUniqueId().toString(), this);
     }
 
     @Override
@@ -84,32 +82,28 @@ public class HotbarPlayer implements IHotbarPlayer {
         Bukkit.getPluginManager().callEvent(e);
         if (e.isCancelled()) return;
 
-        hotbar.put(0, Category.MELEE);
-        hotbar.put(1, Category.NONE);
-        hotbar.put(2, Category.NONE);
-        hotbar.put(3, Category.NONE);
-        hotbar.put(4, Category.NONE);
-        hotbar.put(5, Category.NONE);
-        hotbar.put(6, Category.NONE);
-        hotbar.put(7, Category.NONE);
+        List<Category> defaultSlots = me.kiiya.hotbarmanager.player.HotbarManager.getInstance().getDefaultSlots();
+        for (int i = 0; i < defaultSlots.size(); i++) {
 
-        if (HotbarManager.getSupport() == Support.BEDWARSPROXY || HotbarManager.getSupport() == Support.BEDWARSPROXY2023) {
-            if (HotbarManager.getMainConfig().getBoolean("enable-compass-support")) {
-                hotbar.put(8, Category.COMPASS);
+            if (HotbarManager.getSupport() == Support.BEDWARSPROXY || HotbarManager.getSupport() == Support.BEDWARSPROXY2023) {
+                if (HotbarManager.getMainConfig().getBoolean("enable-compass-support") && defaultSlots.get(i) == Category.COMPASS) {
+                    hotbar.put(8, Category.COMPASS);
+                    continue;
+                }
+                else hotbar.put(i, Category.NONE);
             } else {
-                hotbar.put(8, Category.NONE);
+                if (HotbarManager.isCompassAddon() && HotbarManager.getMainConfig().getBoolean("enable-compass-support") && defaultSlots.get(i) == Category.COMPASS) {
+                    hotbar.put(8, Category.COMPASS);
+                    continue;
+                }
+                else hotbar.put(i, Category.NONE);
             }
-        } else {
-            if (HotbarManager.isCompassAddon() && HotbarManager.getMainConfig().getBoolean("enable-compass-support")) {
-                hotbar.put(8, Category.COMPASS);
-            } else {
-                hotbar.put(8, Category.NONE);
-            }
+            hotbar.put(i, defaultSlots.get(i));
         }
     }
 
     public void saveHotbar() {
-        Bukkit.getScheduler().runTask(HotbarManager.getPlugins(), () -> {
+        Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
             for (int i = 0; i < 9; i++) {
                 this.db.setData(player, "slot" + i, hotbar.get(i).toString());
             }
@@ -119,19 +113,11 @@ public class HotbarPlayer implements IHotbarPlayer {
     @Override
     public void destroy() {
         saveHotbar();
-        hotbarPlayers.remove(player.getUniqueId().toString());
-        Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> {
+        me.kiiya.hotbarmanager.player.HotbarManager.getPrivateInstance().getPlayersMap().remove(player.getUniqueId().toString());
+        Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> {
             hotbar = null;
             player = null;
             db = null;
         }, 10L);
-    }
-
-    public static HotbarPlayer getHotbarPlayer(Player player) {
-        return hotbarPlayers.get(player.getUniqueId().toString());
-    }
-
-    public static HotbarPlayer getHotbarPlayer(UUID uuid) {
-        return hotbarPlayers.get(uuid.toString());
     }
 }

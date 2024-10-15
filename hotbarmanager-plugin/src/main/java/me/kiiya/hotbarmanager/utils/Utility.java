@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 
 public class Utility {
     public static void info(String text) {
-        Bukkit.getConsoleSender().sendMessage("[" + HotbarManager.getPlugins().getName() + "] " + c(text));
+        Bukkit.getConsoleSender().sendMessage("[" + HotbarManager.getInstance().getName() + "] " + c(text));
     }
 
     public static void warn(String text) {
-        HotbarManager.getPlugins().getLogger().warning(c(text));
+        HotbarManager.getInstance().getLogger().warning(c(text));
     }
 
     public static String c(String text) {
@@ -46,6 +46,17 @@ public class Utility {
         else if (HotbarManager.getSupport() == Support.BEDWARSPROXY) return HotbarManager.getBWProxyApi().getLanguageUtil().getList(player, path).stream().map(s -> p(player, s)).collect(Collectors.toList());
         else if (HotbarManager.getSupport() == Support.BEDWARSPROXY2023) return HotbarManager.getBWProxy2023Api().getLanguageUtil().getList(player, path).stream().map(s -> p(player, s)).collect(Collectors.toList());
         else return Collections.singletonList(c("&cMISSING"));
+    }
+
+    public static boolean isTool(ItemStack itemStack) {
+        switch (HotbarManager.getSupport()) {
+            case BEDWARS2023:
+                return HotbarManager.getBW2023Api().getVersionSupport().isTool(itemStack);
+            case BEDWARS1058:
+                return HotbarManager.getBW1058Api().getVersionSupport().isTool(itemStack);
+            default:
+                return false;
+        }
     }
 
     public static boolean isItemHigherTier(ItemStack item1, ItemStack item2) {

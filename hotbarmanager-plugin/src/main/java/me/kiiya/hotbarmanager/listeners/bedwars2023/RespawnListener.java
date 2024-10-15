@@ -1,5 +1,6 @@
 package me.kiiya.hotbarmanager.listeners.bedwars2023;
 
+import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.arena.GameState;
 import com.tomkeuper.bedwars.api.events.gameplay.GameStateChangeEvent;
 import com.tomkeuper.bedwars.api.events.player.PlayerReSpawnEvent;
@@ -21,10 +22,11 @@ public class RespawnListener implements Listener {
         Player ap = e.getPlayer();
         IHotbarPlayer p = HotbarManager.getAPI().getHotbarPlayer(e.getPlayer());
         List<Category> hotbar = p.getHotbarAsList();
-        ItemStack compass = e.getPlayer().getInventory().getItem(8);
-        ItemStack sword = e.getPlayer().getInventory().getItem(0);
 
-        Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> {
+        ItemStack sword = e.getPlayer().getInventory().getItem(0);
+        ItemStack compass = e.getPlayer().getInventory().getItem(8);
+
+        Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> {
             if (hotbar.contains(Category.MELEE)) {
                 if (sword == null || sword.getType() == Material.AIR) return;
                 int slot = 0;
@@ -56,44 +58,23 @@ public class RespawnListener implements Listener {
             }
 
             if (hotbar.contains(Category.TOOLS)) {
-                ItemStack tool1 = ap.getInventory().getItem(1);
-                ItemStack tool2 = ap.getInventory().getItem(2);
-                ItemStack tool3 = ap.getInventory().getItem(3);
-                int slot = 0;
-                if (tool1 != null && tool1.getType() != Material.AIR) {
-                    for (Category cat : hotbar) {
-                        if (cat == Category.TOOLS) {
-                            ap.getInventory().setItem(1, new ItemStack(Material.AIR));
-                            ap.getInventory().setItem(slot, tool1);
-                            break;
+                for (int i = 0; i < 9; i++) {
+                    ItemStack currentItem = ap.getInventory().getItem(i);
+
+                    if (currentItem != null && currentItem.getType() != Material.AIR && (BedWars.nms.isTool(currentItem) || currentItem.getType() == Material.SHEARS)) {
+                        int availableSlot = -1;
+
+                        for (int j = 0; j < 9; j++) {
+                            if (hotbar.get(j) == Category.TOOLS && ap.getInventory().getItem(j) == null) {
+                                availableSlot = j;
+                                break;
+                            }
                         }
-                        slot++;
-                    }
-                }
-                if (tool2 != null && tool2.getType() != Material.AIR) {
-                    slot = 0;
-                    for (Category cat : hotbar) {
-                        if (cat == Category.TOOLS) {
-                            if (ap.getInventory().getItem(slot) == null || ap.getInventory().getItem(slot).getType() == Material.AIR) {
-                                ap.getInventory().setItem(2, new ItemStack(Material.AIR));
-                                ap.getInventory().setItem(slot, tool2);
-                            } else continue;
-                            break;
+
+                        if (availableSlot != -1) {
+                            ap.getInventory().setItem(i, new ItemStack(Material.AIR));
+                            ap.getInventory().setItem(availableSlot, currentItem);
                         }
-                        slot++;
-                    }
-                }
-                if (tool3 != null && tool3.getType() != Material.AIR) {
-                    slot = 0;
-                    for (Category cat : hotbar) {
-                        if (cat == Category.TOOLS) {
-                            if (ap.getInventory().getItem(slot) == null || ap.getInventory().getItem(slot).getType() == Material.AIR) {
-                                ap.getInventory().setItem(3, new ItemStack(Material.AIR));
-                                ap.getInventory().setItem(slot, tool3);
-                            } else continue;
-                            break;
-                        }
-                        slot++;
                     }
                 }
             }
@@ -109,7 +90,7 @@ public class RespawnListener implements Listener {
             ItemStack compass = ap.getInventory().getItem(8);
             ItemStack sword = ap.getInventory().getItem(0);
 
-            Bukkit.getScheduler().runTaskLater(HotbarManager.getPlugins(), () -> {
+            Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> {
                 if (hotbar.contains(Category.MELEE)) {
                     if (sword == null || sword.getType() == Material.AIR) return;
                     int slot = 0;

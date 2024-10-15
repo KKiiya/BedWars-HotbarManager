@@ -1,9 +1,11 @@
 package me.kiiya.hotbarmanager.api.database;
 
+import me.kiiya.hotbarmanager.api.hotbar.Category;
 import org.bukkit.entity.Player;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public interface Database {
     /**
@@ -29,7 +31,7 @@ public interface Database {
      * Doing it more than once won't do anything
      * @param player - Player you want to create the data to
      */
-    void createPlayerData(Player player);
+    void createPlayerData(Player player, List<Category> defaultSlots);
 
     /**
      * Get the database connection

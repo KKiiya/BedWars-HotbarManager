@@ -4,6 +4,7 @@ import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -14,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 public class CustomItemSecurity {
 
     public static class Legacy implements Listener {
-        @EventHandler
+        @EventHandler(priority = EventPriority.LOWEST)
         public void onPickUp(PlayerPickupItemEvent e) {
             Item item = e.getItem();
             ItemStack itemStack = item.getItemStack();
@@ -26,7 +27,7 @@ public class CustomItemSecurity {
             }
         }
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.LOWEST)
         public void onDrop(PlayerDropItemEvent e) {
             Item item = e.getItemDrop();
             ItemStack itemStack = item.getItemStack();
@@ -39,7 +40,7 @@ public class CustomItemSecurity {
             }
         }
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.LOWEST)
         public void onItemUse(PlayerInteractEvent e) {
             ItemStack itemStack = e.getItem();
             if (itemStack == null || itemStack.getType() == Material.AIR) return;
@@ -52,7 +53,7 @@ public class CustomItemSecurity {
     }
 
     public static class New implements Listener {
-        @EventHandler
+        @EventHandler(priority = EventPriority.LOWEST)
         public void onPickUp(EntityPickupItemEvent e) {
             Item item = e.getItem();
             ItemStack itemStack = item.getItemStack();
@@ -64,7 +65,7 @@ public class CustomItemSecurity {
             }
         }
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.LOWEST)
         public void onDrop(PlayerDropItemEvent e) {
             Item item = e.getItemDrop();
             ItemStack itemStack = item.getItemStack();
@@ -77,7 +78,7 @@ public class CustomItemSecurity {
             }
         }
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.LOWEST)
         public void onItemUse(PlayerInteractEvent e) {
             ItemStack itemStack = e.getItem();
             if (itemStack == null || itemStack.getType() == Material.AIR) return;
