@@ -35,6 +35,8 @@ public class ProxyMessagesData {
         yml.addDefault(INVENTORY_ITEMS_USED_LORE, Arrays.asList("&7{category} &7items will prioritize this", "&7slot!", "", "&eClick to remove!"));
         yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_NAME, "&aGo Back");
         yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_LORE, Collections.singletonList("&7To Play BedWars"));
+        yml.addDefault(INVENTORY_ITEMS_PLACEHOLDER_NAME, "&7Slot &e{slot}");
+        yml.addDefault(INVENTORY_ITEMS_PLACEHOLDER_LORE, Arrays.asList("&7Drag an item here to", "&7prioritize this slot."));
         yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_NAME, "&aGo Back");
         yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_LORE, Collections.singletonList("&7To Quick Buy."));
         yml.addDefault(INVENTORY_ITEMS_RESET_NAME, "&cReset to Default");

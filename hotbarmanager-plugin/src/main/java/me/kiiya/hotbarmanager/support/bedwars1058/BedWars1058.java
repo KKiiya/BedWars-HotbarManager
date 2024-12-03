@@ -13,6 +13,7 @@ import me.kiiya.hotbarmanager.listeners.bedwars1058.PlayerKill;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.RespawnListener;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.ShopBuy;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.ShopOpen;
+import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
@@ -55,6 +56,7 @@ public class BedWars1058 {
     private void loadConfig() {
         Utility.info("&eLoading config...");
         mainConfig = new MainConfig(HotbarManager.getInstance(), "config", bw1058Api.getAddonsPath().getPath() + File.separator + "HotbarManager");
+        HotbarUtils.initialize(mainConfig);
         Utility.info("&aConfig loaded!");
     }
 

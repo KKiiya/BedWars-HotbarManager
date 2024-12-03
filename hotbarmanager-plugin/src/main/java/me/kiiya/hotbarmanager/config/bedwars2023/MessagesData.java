@@ -32,6 +32,8 @@ public class MessagesData {
                     yml.addDefault(INVENTORY_ITEMS_COMPASS_LORE, Arrays.asList("&7Coloque esse item onde você", "&7deseja que ela apareça quando você nascer.", "", "&cSe você não deixar esse item", "&cem nenhum lugar, ela não nascerá com você.", "", "&eClique para alterar!"));
                     yml.addDefault(INVENTORY_ITEMS_LORE, Arrays.asList("&7Arraste isso para sua hotbar", "&7para sempre que você comprar", "&7qualquer item dessa categoria", "&7venha automaticamente para esse slot.", "", "&eClique para alterar!"));
                     yml.addDefault(INVENTORY_ITEMS_USED_LORE, Arrays.asList("&7{category} &7items will prioritize this", "&7slot!", "", "&eClique para Remover!"));
+                    yml.addDefault(INVENTORY_ITEMS_PLACEHOLDER_NAME, "&7Slot &e{slot}");
+                    yml.addDefault(INVENTORY_ITEMS_PLACEHOLDER_LORE, Arrays.asList("&7Arraste um item para cá", "&7para priorizar esse slot."));
                     yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_NAME, "&aVoltar");
                     yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_LORE, Collections.singletonList("&7Para Jogar Bed Wars"));
                     yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_NAME, "&aVoltar");
@@ -64,6 +66,8 @@ public class MessagesData {
                     yml.addDefault(INVENTORY_ITEMS_USED_LORE, Arrays.asList("&7{category} &7items will prioritize this", "&7slot!", "", "&eClick to remove!"));
                     yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_NAME, "&aGo Back");
                     yml.addDefault(INVENTORY_ITEMS_BACK_LOBBY_LORE, Collections.singletonList("&7To Play BedWars"));
+                    yml.addDefault(INVENTORY_ITEMS_PLACEHOLDER_NAME, "&7Slot &e{slot}");
+                    yml.addDefault(INVENTORY_ITEMS_PLACEHOLDER_LORE, Arrays.asList("&7Drag an item here to", "&7prioritize this slot."));
                     yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_NAME, "&aGo Back");
                     yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_LORE, Collections.singletonList("&7To Quick Buy."));
                     yml.addDefault(INVENTORY_ITEMS_RESET_NAME, "&cReset to Default");

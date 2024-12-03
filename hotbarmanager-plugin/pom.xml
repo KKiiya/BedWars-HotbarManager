@@ -7,7 +7,7 @@
     <parent>
         <groupId>me.kiiya</groupId>
         <artifactId>BedWars-HotbarManager</artifactId>
-        <version>1.3.0</version>
+        <version>1.4.0</version>
     </parent>
     <artifactId>hotbarmanager-plugin</artifactId>
     <packaging>jar</packaging>
@@ -47,7 +47,62 @@
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>hotbarmanager-api</artifactId>
-            <version>1.3.0</version>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_8_R3</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_12_R1</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_16_R3</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_17_R1</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_18_R2</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_19_R3</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_20_R1</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_20_R2</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_20_R3</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_20_R4</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>me.kiiya</groupId>
+            <artifactId>v1_21_R1</artifactId>
+            <version>1.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
@@ -61,6 +116,34 @@
             <version>1.0.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/libs/BedWars1058-HypixelMigrator-1.0.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.andrei1058.bedwars</groupId>
+            <artifactId>BedWars1058</artifactId>
+            <version>23.3</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/bedwars-plugin-23.3.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.andrei1058.bedwars</groupId>
+            <artifactId>BedWarsProxy</artifactId>
+            <version>1.2.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/proxy-plugin-1.2.4.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.tompkeuper</groupId>
+            <artifactId>BedWars2023</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/BedWars-1.0-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.tomkeuper.bedwars</groupId>
+            <artifactId>BWProxy2023</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/proxy-plugin-1.0-SNAPSHOT.jar</systemPath>
         </dependency>
     </dependencies>
 

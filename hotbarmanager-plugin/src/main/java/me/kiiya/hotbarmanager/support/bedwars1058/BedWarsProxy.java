@@ -5,6 +5,7 @@ import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.config.proxy.ProxyMessagesData;
 import me.kiiya.hotbarmanager.database.providers.MySQL;
 import me.kiiya.hotbarmanager.listeners.InventoryListener;
+import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
@@ -43,6 +44,7 @@ public class BedWarsProxy {
     private void loadConfig() {
         Utility.info("&eLoading config...");
         mainConfig = new MainConfig(HotbarManager.getInstance(), "config", Bukkit.getWorldContainer().getPath() + "/plugins/BedWarsProxy/Addons/HotbarManager");
+        HotbarUtils.initialize(mainConfig);
         Utility.info("&aConfig loaded!");
     }
 

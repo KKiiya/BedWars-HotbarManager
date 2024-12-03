@@ -1,6 +1,7 @@
 package me.kiiya.hotbarmanager.listeners.bedwars2023;
 
 import me.kiiya.hotbarmanager.HotbarManager;
+import me.kiiya.hotbarmanager.api.support.VersionSupport;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
@@ -16,6 +17,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import static me.kiiya.hotbarmanager.config.ConfigPaths.*;
 
 public class ShopOpen implements Listener {
+    private final VersionSupport vs;
+
+    public ShopOpen() {
+        vs = HotbarManager.getVersionSupport();
+    }
+
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent e) {
         if (HotbarManager.getSupport() != Support.BEDWARS2023) return;
@@ -29,7 +36,7 @@ public class ShopOpen implements Listener {
             hotbarManagerItemMeta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEM_NAME));
             hotbarManagerItemMeta.setLore(Utility.getListMsg(player, INVENTORY_ITEM_LORE));
             hotbarManagerItem.setItemMeta(hotbarManagerItemMeta);
-            e.getInventory().setItem(HotbarManager.getMainConfig().getInt(ITEM_POSITION) - 1, Utility.setItemTag(hotbarManagerItem, "hbm", "menu"));
+            e.getInventory().setItem(HotbarManager.getMainConfig().getInt(ITEM_POSITION) - 1, vs.setItemTag(hotbarManagerItem, "hbm", "menu"));
         }
     }
 
@@ -45,7 +52,7 @@ public class ShopOpen implements Listener {
         if (!HotbarManager.getBW2023Api().getArenaUtil().isPlaying(p)) return;
 
         if (e.getView().getTitle().equals(Utility.getMsg(p, "shop-items-messages.inventory-name"))) {
-            String hbmTag = Utility.getTag(e.getCurrentItem(), "hbm");
+            String hbmTag = vs.getItemTag(e.getCurrentItem(), "hbm");
             if (hbmTag != null && hbmTag.equalsIgnoreCase("menu")) {
                 Bukkit.getServer().dispatchCommand(p, "hbm");
             }

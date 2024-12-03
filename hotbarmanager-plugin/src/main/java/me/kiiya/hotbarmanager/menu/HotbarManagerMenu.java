@@ -5,6 +5,8 @@ import com.andrei1058.bedwars.shop.quickbuy.PlayerQuickBuyCache;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
+import me.kiiya.hotbarmanager.api.support.VersionSupport;
+import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
@@ -19,17 +21,25 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static me.kiiya.hotbarmanager.config.ConfigPaths.*;
 
 public class HotbarManagerMenu implements GUIHolder {
+
+    private final VersionSupport vs;
+    private final HotbarUtils hu;
+    private final MainConfig mc;
     private final Player player;
     private Inventory inventory;
 
     public HotbarManagerMenu(Player player) {
         this.player = player;
+        this.vs = HotbarManager.getVersionSupport();
+        this.hu = HotbarUtils.getInstance();
+        this.mc = HotbarManager.getMainConfig();
         try {
             createInventory();
             addContents();
@@ -51,6 +61,10 @@ public class HotbarManagerMenu implements GUIHolder {
     @Override
     public void onInventoryClick(InventoryClickEvent e) {
         IHotbarPlayer p = HotbarManager.getAPI().getHotbarPlayer(player);
+        ItemStack item = e.getCurrentItem();
+        ItemStack cursor = e.getCursor();
+        String tag = item != null  && item.getType() != Material.AIR ? vs.getItemTag(item, "hbm") : null;
+        String cursorTag = cursor != null && cursor.getType() != Material.AIR ? vs.getItemTag(cursor, "hbm") : null;
 
         if (e.getInventory() != e.getClickedInventory() || e.getClickedInventory() == player.getInventory()){
             e.setCursor(new ItemStack(Material.AIR));
@@ -69,11 +83,43 @@ public class HotbarManagerMenu implements GUIHolder {
             return;
         }
 
-        switch (e.getSlot()) {
-            case 48:
-                if (HotbarManager.getSupport() == Support.BEDWARSPROXY || HotbarManager.getSupport() == Support.BEDWARSPROXY2023) {
-                    p.getPlayer().closeInventory();
-                } else {
+        if (tag == null) {
+            if (cursorTag != null && hu.getPosForSlot(e.getSlot()) != -1) {
+                p.setSlotCategory(hu.getPosForSlot(e.getSlot()), Category.valueOf(cursorTag.toUpperCase()), true);
+                e.setCursor(new ItemStack(Material.AIR));
+                new HotbarManagerMenu(player);
+            }
+            return;
+        }
+        switch (tag.toLowerCase()) {
+            case "blocks":
+            case "melee":
+            case "tools":
+            case "ranged":
+            case "potions":
+            case "utility":
+            case "compass":
+                ItemStack newItem = vs.setItemTag(e.getCurrentItem(), "hbm", tag);
+                e.getInventory().setItem(e.getSlot(), newItem);
+                e.setCursor(newItem);
+                break;
+            case "melee-slot":
+            case "blocks-slot":
+            case "tools-slot":
+            case "ranged-slot":
+            case "potions-slot":
+            case "utility-slot":
+            case "compass-slot":
+            case "none-slot":
+                String category = cursorTag == null ? "NONE" : cursorTag.toUpperCase();
+                p.setSlotCategory(hu.getPosForSlot(e.getSlot()), Category.valueOf(category), true);
+                e.setCursor(new ItemStack(Material.AIR));
+                new HotbarManagerMenu(player);
+                break;
+            case "back":
+                boolean isProxy = HotbarManager.getSupport() == Support.BEDWARSPROXY || HotbarManager.getSupport() == Support.BEDWARSPROXY2023;
+                if (isProxy) p.getPlayer().closeInventory();
+                else {
                     boolean isPlaying = false;
                     if (HotbarManager.getSupport() == Support.BEDWARS1058) {
                         isPlaying = HotbarManager.getBW1058Api().getArenaUtil().isPlaying(p.getPlayer());
@@ -88,63 +134,17 @@ public class HotbarManagerMenu implements GUIHolder {
                             com.tomkeuper.bedwars.shop.ShopManager.shop.open(p.getPlayer(), com.tomkeuper.bedwars.shop.quickbuy.PlayerQuickBuyCache.getInstance().getQuickBuyCache(p.getPlayer().getUniqueId()), false);
                         }
                     } else {
-                        if (HotbarManager.getMainConfig().getString(BACK_COMMAND).equalsIgnoreCase("close")) {
-                            p.getPlayer().closeInventory();
-                        } else {
-                            p.getPlayer().performCommand(HotbarManager.getMainConfig().getString(BACK_COMMAND));
-                        }
+                        if (HotbarManager.getMainConfig().getString(BACK_COMMAND).equalsIgnoreCase("close")) p.getPlayer().closeInventory();
+                        else p.getPlayer().performCommand(HotbarManager.getMainConfig().getString(BACK_COMMAND));
                     }
                 }
                 break;
-            case 50:
-                p.resetHotbar();
-                e.setCancelled(true);
-                new HotbarManagerMenu(player);
-                break;
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 14:
-            case 15:
-            case 16:
-                if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
-                    e.getInventory().setItem(e.getSlot(), e.getCurrentItem());
-                    e.setCursor(e.getCurrentItem());
-                }
-                break;
-            case 27:
-            case 28:
-            case 29:
-            case 30:
-            case 31:
-            case 32:
-            case 33:
-            case 34:
-            case 35:
-                int slot = HotbarUtils.getPosForSlot(e.getSlot());
-                if (e.getCursor().getType() == Material.AIR || e.getCursor().getType() == null) {
-                    p.setSlotCategory(slot, Category.NONE, true);
-                }
-                if (e.getAction() == InventoryAction.PLACE_ALL || e.getAction() == InventoryAction.PLACE_ONE || e.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
-                    if (e.getCursor().getType() == Material.HARD_CLAY) {
-                        p.setSlotCategory(slot, Category.BLOCKS, true);
-                    } else if (e.getCursor().getType() == Material.GOLD_SWORD) {
-                        p.setSlotCategory(slot, Category.MELEE, true);
-                    } else if (e.getCursor().getType() == Material.IRON_PICKAXE) {
-                        p.setSlotCategory(slot, Category.TOOLS, true);
-                    } else if (e.getCursor().getType() == Material.BOW) {
-                        p.setSlotCategory(slot, Category.RANGED, true);
-                    } else if (e.getCursor().getType() == Material.BREWING_STAND_ITEM) {
-                        p.setSlotCategory(slot, Category.POTIONS, true);
-                    } else if (e.getCursor().getType() == Material.TNT) {
-                        p.setSlotCategory(slot, Category.UTILITY, true);
-                    } else if (e.getCursor().getType() == Material.COMPASS) {
-                        p.setSlotCategory(slot, Category.COMPASS, true);
-                    }
-                }
-                e.setCursor(new ItemStack(Material.AIR));
-                new HotbarManagerMenu(player);
+            case "reset":
+                if (cursorTag == null) {
+                    p.resetHotbar();
+                    e.setCancelled(true);
+                    new HotbarManagerMenu(player);
+                } else e.setCancelled(true);
                 break;
             default:
                 e.setCancelled(true);
@@ -174,7 +174,7 @@ public class HotbarManagerMenu implements GUIHolder {
             if (HotbarManager.getSupport() == Support.BEDWARS1058) {
                 isPlaying = HotbarManager.getBW1058Api().getArenaUtil().isPlaying(p.getPlayer());
             } else if (HotbarManager.getSupport() == Support.BEDWARS2023) {
-                isPlaying = HotbarManager.bw2023Api.getArenaUtil().isPlaying(p.getPlayer());
+                isPlaying = HotbarManager.getBW2023Api().getArenaUtil().isPlaying(p.getPlayer());
             }
 
             if (isPlaying) {
@@ -188,32 +188,34 @@ public class HotbarManagerMenu implements GUIHolder {
         back.setItemMeta(back_meta);
 
         // RESET ITEM
-        ItemStack reset = new ItemStack(Material.BARRIER);
+        ItemStack reset = new ItemStack(Material.valueOf(mc.getString(HOTBAR_RESET_MATERIAL)), 1, (byte) mc.getInt(HOTBAR_RESET_DATA));
         ItemMeta reset_meta = reset.getItemMeta();
         reset_meta.setDisplayName((Utility.getMsg(player, INVENTORY_ITEMS_RESET_NAME)));
         reset_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_RESET_LORE));
         reset.setItemMeta(reset_meta);
 
         // SEPARATOR ITEM
-        ItemStack separator = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
+        ItemStack separator = new ItemStack(Material.valueOf(mc.getString(SEPARATOR_MATERIAL)), 1, (byte) mc.getInt(SEPARATOR_DATA));
         ItemMeta separator_meta = separator.getItemMeta();
         separator_meta.setDisplayName((Utility.getMsg(player, SEPARATOR_NAME)));
         separator_meta.setLore(Utility.getListMsg(player, SEPARATOR_LORE));
         separator.setItemMeta(separator_meta);
-
-        for (int i = 18; i < 27; i++) {
-            inventory.setItem(i, separator);
+        int[] positions = Arrays.stream(mc.getString("separator.positions").split(",")).mapToInt(Integer::parseInt).toArray();
+        for (int i : positions) {
+            inventory.setItem(i, vs.setItemTag(separator, "hbm", "separator"));
         }
 
-        inventory.setItem(48, back);
-        inventory.setItem(50, reset);
+        inventory.setItem(mc.getInt(BACK_POSITION), vs.setItemTag(back, "hbm", "back"));
+        inventory.setItem(mc.getInt(HOTBAR_RESET_POSITION), vs.setItemTag(reset, "hbm", "reset"));
         // -------------------------------------------------------------------------- //
 
 
 
         // ---------------------------- CATEGORY ITEMS ---------------------------- //
         // BLOCKS CATEGORY
-        ItemStack blocks = new ItemStack(Material.HARD_CLAY);
+        ItemStack blocks = new ItemStack(Material.valueOf(mc.getString(CATEGORY_BLOCKS_MATERIAL)));
+        blocks.setDurability((short) mc.getInt(CATEGORY_BLOCKS_DATA));
+        if (vs.isPlayerHead(blocks)) blocks = Utility.getSkull(mc.getString(CATEGORY_BLOCKS_SKULL_URL));
         ItemMeta blocks_meta = blocks.getItemMeta();
         blocks_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_BLOCKS_NAME));
         blocks_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_LORE));
@@ -221,7 +223,9 @@ public class HotbarManagerMenu implements GUIHolder {
         blocks.setItemMeta(blocks_meta);
 
         //  MELEE CATEGORY
-        ItemStack melee = new ItemStack(Material.GOLD_SWORD);
+        ItemStack melee = new ItemStack(Material.valueOf(mc.getString(CATEGORY_MELEE_MATERIAL)));
+        melee.setDurability((short) mc.getInt(CATEGORY_MELEE_DATA));
+        if (vs.isPlayerHead(melee)) melee = Utility.getSkull(mc.getString(CATEGORY_MELEE_SKULL_URL));
         ItemMeta melee_meta = melee.getItemMeta();
         melee_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_MELEE_NAME));
         melee_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_LORE));
@@ -229,7 +233,9 @@ public class HotbarManagerMenu implements GUIHolder {
         melee.setItemMeta(melee_meta);
 
         // TOOLS CATEGORY
-        ItemStack tools = new ItemStack(Material.IRON_PICKAXE);
+        ItemStack tools = new ItemStack(Material.valueOf(mc.getString(CATEGORY_TOOLS_MATERIAL)));
+        tools.setDurability((short) mc.getInt(CATEGORY_TOOLS_DATA));
+        if (vs.isPlayerHead(tools)) tools = Utility.getSkull(mc.getString(CATEGORY_TOOLS_SKULL_URL));
         ItemMeta tools_meta = tools.getItemMeta();
         tools_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_TOOLS_NAME));
         tools_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_LORE));
@@ -237,7 +243,9 @@ public class HotbarManagerMenu implements GUIHolder {
         tools.setItemMeta(tools_meta);
 
         // RANGED CATEGORY
-        ItemStack ranged = new ItemStack(Material.BOW);
+        ItemStack ranged = new ItemStack(Material.valueOf(mc.getString(CATEGORY_RANGED_MATERIAL)));
+        ranged.setDurability((short) mc.getInt(CATEGORY_RANGED_DATA));
+        if (vs.isPlayerHead(ranged)) ranged = Utility.getSkull(mc.getString(CATEGORY_RANGED_SKULL_URL));
         ItemMeta ranged_meta = ranged.getItemMeta();
         ranged_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_RANGED_NAME));
         ranged_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_LORE));
@@ -245,7 +253,9 @@ public class HotbarManagerMenu implements GUIHolder {
         ranged.setItemMeta(ranged_meta);
 
         // POTIONS CATEGORY
-        ItemStack potions = new ItemStack(Material.BREWING_STAND_ITEM);
+        ItemStack potions = new ItemStack(Material.valueOf(mc.getString(CATEGORY_POTIONS_MATERIAL)));
+        potions.setDurability((short) mc.getInt(CATEGORY_POTIONS_DATA));
+        if (vs.isPlayerHead(potions)) potions = Utility.getSkull(mc.getString(CATEGORY_POTIONS_SKULL_URL));
         ItemMeta potions_meta = potions.getItemMeta();
         potions_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_POTIONS_NAME));
         potions_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_LORE));
@@ -253,7 +263,9 @@ public class HotbarManagerMenu implements GUIHolder {
         potions.setItemMeta(potions_meta);
 
         // SPECIALS CATEGORY
-        ItemStack utility = new ItemStack(Material.TNT);
+        ItemStack utility = new ItemStack(Material.valueOf(mc.getString(CATEGORY_SPECIALS_MATERIAL)));
+        utility.setDurability((short) mc.getInt(CATEGORY_SPECIALS_DATA));
+        if (vs.isPlayerHead(utility)) utility = Utility.getSkull(mc.getString(CATEGORY_SPECIALS_SKULL_URL));
         ItemMeta utility_meta = utility.getItemMeta();
         utility_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_SPECIALS_NAME));
         utility_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_LORE));
@@ -261,29 +273,31 @@ public class HotbarManagerMenu implements GUIHolder {
         utility.setItemMeta(utility_meta);
 
         // COMPASS CATEGORY
-        ItemStack compass = new ItemStack(Material.COMPASS);
+        ItemStack compass = new ItemStack(Material.valueOf(mc.getString(CATEGORY_COMPASS_MATERIAL)));
+        compass.setDurability((short) mc.getInt(CATEGORY_COMPASS_DATA));
+        if (vs.isPlayerHead(compass)) compass = Utility.getSkull(mc.getString(CATEGORY_COMPASS_SKULL_URL));
         ItemMeta compass_meta = compass.getItemMeta();
         compass_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_COMPASS_NAME));
         compass_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_COMPASS_LORE));
         compass_meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         compass.setItemMeta(compass_meta);
 
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_BLOCKS_CATEGORY)) inventory.setItem(10, Utility.setItemTag(blocks, "hbm", "blocks"));
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_MELEE_CATEGORY)) inventory.setItem(11, Utility.setItemTag(melee, "hbm", "melee"));
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_TOOLS_CATEGORY)) inventory.setItem(12, Utility.setItemTag(tools, "hbm", "tools"));
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_RANGED_CATEGORY)) inventory.setItem(13, Utility.setItemTag(ranged, "hbm", "ranged"));
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_POTIONS_CATEGORY)) inventory.setItem(14, Utility.setItemTag(potions, "hbm", "potions"));
-        if (HotbarManager.getMainConfig().getBoolean(ENABLE_SPECIALS_CATEGORY))inventory.setItem(15, Utility.setItemTag(utility, "hbm", "utility"));
+        if (mc.getBoolean(CATEGORY_BLOCKS_ENABLED)) inventory.setItem(mc.getInt(CATEGORY_BLOCKS_POSITION), vs.setItemTag(blocks, "hbm", "blocks"));
+        if (mc.getBoolean(CATEGORY_MELEE_ENABLED)) inventory.setItem(mc.getInt(CATEGORY_MELEE_POSITION), vs.setItemTag(melee, "hbm", "melee"));
+        if (mc.getBoolean(CATEGORY_TOOLS_ENABLED)) inventory.setItem(mc.getInt(CATEGORY_TOOLS_POSITION), vs.setItemTag(tools, "hbm", "tools"));
+        if (mc.getBoolean(CATEGORY_RANGED_ENABLED)) inventory.setItem(mc.getInt(CATEGORY_RANGED_POSITION), vs.setItemTag(ranged, "hbm", "ranged"));
+        if (mc.getBoolean(CATEGORY_POTIONS_ENABLED)) inventory.setItem(mc.getInt(CATEGORY_POTIONS_POSITION), vs.setItemTag(potions, "hbm", "potions"));
+        if (mc.getBoolean(CATEGORY_SPECIALS_ENABLED)) inventory.setItem(mc.getInt(CATEGORY_SPECIALS_POSITION), vs.setItemTag(utility, "hbm", "utility"));
         switch (HotbarManager.getSupport()) {
             case BEDWARS1058:
             case BEDWARS2023:
-                if (HotbarManager.isCompassAddon() && HotbarManager.mainConfig.getBoolean("enable-compass-support"))
-                    inventory.setItem(16, Utility.setItemTag(compass, "hbm", "compass"));
+                if (HotbarManager.isCompassAddon() && mc.getBoolean("enable-compass-support"))
+                    inventory.setItem(mc.getInt(CATEGORY_COMPASS_POSITION), vs.setItemTag(compass, "hbm", "compass"));
                 break;
             case BEDWARSPROXY:
             case BEDWARSPROXY2023:
-                if (HotbarManager.mainConfig.getBoolean("enable-compass-support"))
-                    inventory.setItem(16, Utility.setItemTag(compass, "hbm", "compass"));
+                if (mc.getBoolean("enable-compass-support"))
+                    inventory.setItem(mc.getInt(CATEGORY_COMPASS_POSITION), vs.setItemTag(compass, "hbm", "compass"));
                 break;
         }
         // -------------------------------------------------------------------------- //
@@ -296,91 +310,108 @@ public class HotbarManagerMenu implements GUIHolder {
         ItemMeta category_meta;
 
         List<Integer> slots = new ArrayList<>();
-        slots.add(0);
-        slots.add(1);
-        slots.add(2);
-        slots.add(3);
-        slots.add(4);
-        slots.add(5);
-        slots.add(6);
-        slots.add(7);
-        slots.add(8);
+        for (int i = 0; i < 9; i++) slots.add(i);
 
         for (Integer slot : slots) {
             switch (p.getSlotCategory(slot)) {
                 case NONE:
-                    category = new ItemStack(Material.AIR);
-                    inventory.setItem(HotbarUtils.getSlotForPos(slot), category);
+                    if (!mc.getBoolean(PLACEHOLDER_NONE_ENABLED)) category = new ItemStack(Material.AIR);
+                    else {
+                        category = new ItemStack(Material.valueOf(mc.getString(PLACEHOLDER_NONE_MATERIAL)));
+                        category.setDurability((short) mc.getInt(PLACEHOLDER_NONE_DATA));
+                        if (vs.isPlayerHead(category)) category = Utility.getSkull(mc.getString(PLACEHOLDER_NONE_SKULL_URL));
+                        category_meta = category.getItemMeta();
+                        category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_PLACEHOLDER_NAME).replace("{slot}", String.valueOf(slot + 1)));
+                        category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_PLACEHOLDER_LORE));
+                        category.setItemMeta(category_meta);
+                    }
+                    inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "none-slot"));
                     break;
                 case MELEE:
-                    category = new ItemStack(Material.GOLD_SWORD);
+                    category = new ItemStack(Material.valueOf(mc.getString(CATEGORY_MELEE_MATERIAL)));
+                    category.setDurability((short) mc.getInt(CATEGORY_MELEE_DATA));
+                    if (vs.isPlayerHead(category)) category = Utility.getSkull(mc.getString(CATEGORY_MELEE_SKULL_URL));
                     category_meta = category.getItemMeta();
                     category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_MELEE_NAME));
                     category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE).stream().map(s -> s.replace("{category}", Utility.getMsg(player, MEANING_MELEE))).collect(Collectors.toList()));
                     category_meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                     category.setItemMeta(category_meta);
-                    inventory.setItem(HotbarUtils.getSlotForPos(slot), category);
+                    inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "melee-slot"));
                     break;
                 case BLOCKS:
-                    category = new ItemStack(Material.HARD_CLAY);
+                    category = new ItemStack(Material.valueOf(mc.getString(CATEGORY_BLOCKS_MATERIAL)));
+                    category.setDurability((short) mc.getInt(CATEGORY_BLOCKS_DATA));
+                    if (vs.isPlayerHead(category)) category = Utility.getSkull(mc.getString(CATEGORY_BLOCKS_SKULL_URL));
                     category_meta = category.getItemMeta();
                     category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_BLOCKS_NAME));
                     category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE).stream().map(s -> s.replace("{category}", Utility.getMsg(player, MEANING_BLOCKS))).collect(Collectors.toList()));
                     category.setItemMeta(category_meta);
-                    inventory.setItem(HotbarUtils.getSlotForPos(slot), category);
+                    inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "blocks-slot"));
                     break;
                 case TOOLS:
-                    category = new ItemStack(Material.IRON_PICKAXE);
+                    category = new ItemStack(Material.valueOf(mc.getString(CATEGORY_TOOLS_MATERIAL)));
+                    category.setDurability((short) mc.getInt(CATEGORY_TOOLS_DATA));
+                    if (vs.isPlayerHead(category)) category = Utility.getSkull(mc.getString(CATEGORY_TOOLS_SKULL_URL));
                     category_meta = category.getItemMeta();
                     category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_TOOLS_NAME));
                     category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE).stream().map(s -> s.replace("{category}", Utility.getMsg(player, MEANING_TOOLS))).collect(Collectors.toList()));
                     category_meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                     category.setItemMeta(category_meta);
-                    inventory.setItem(HotbarUtils.getSlotForPos(slot), category);
+                    inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "tools-slot"));
                     break;
                 case RANGED:
-                    category = new ItemStack(Material.BOW);
+                    category = new ItemStack(Material.valueOf(mc.getString(CATEGORY_RANGED_MATERIAL)));
+                    category.setDurability((short) mc.getInt(CATEGORY_RANGED_DATA));
+                    if (vs.isPlayerHead(category)) category = Utility.getSkull(mc.getString(CATEGORY_RANGED_SKULL_URL));
                     category_meta = category.getItemMeta();
                     category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_RANGED_NAME));
                     category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE).stream().map(s -> s.replace("{category}", Utility.getMsg(player, MEANING_RANGED))).collect(Collectors.toList()));
                     category_meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                     category.setItemMeta(category_meta);
-                    inventory.setItem(HotbarUtils.getSlotForPos(slot), category);
+                    inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "ranged-slot"));
                     break;
                 case POTIONS:
-                    category = new ItemStack(Material.BREWING_STAND_ITEM);
+                    category = new ItemStack(Material.valueOf(mc.getString(CATEGORY_POTIONS_MATERIAL)));
+                    category.setDurability((short) mc.getInt(CATEGORY_POTIONS_DATA));
+                    if (vs.isPlayerHead(category)) category = Utility.getSkull(mc.getString(CATEGORY_POTIONS_SKULL_URL));
                     category_meta = category.getItemMeta();
                     category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_POTIONS_NAME));
                     category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE).stream().map(s -> s.replace("{category}", Utility.getMsg(player, MEANING_POTIONS))).collect(Collectors.toList()));
                     category.setItemMeta(category_meta);
-                    inventory.setItem(HotbarUtils.getSlotForPos(slot), category);
+                    inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "potions-slot"));
                     break;
                 case UTILITY:
-                    category = new ItemStack(Material.TNT);
+                    category = new ItemStack(Material.valueOf(mc.getString(CATEGORY_SPECIALS_MATERIAL)));
+                    category.setDurability((short) mc.getInt(CATEGORY_SPECIALS_DATA));
+                    if (vs.isPlayerHead(category)) category = Utility.getSkull(mc.getString(CATEGORY_SPECIALS_SKULL_URL));
                     category_meta = category.getItemMeta();
                     category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_SPECIALS_NAME));
                     category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE).stream().map(s -> s.replace("{category}", Utility.getMsg(player, MEANING_SPECIALS))).collect(Collectors.toList()));
                     category.setItemMeta(category_meta);
-                    inventory.setItem(HotbarUtils.getSlotForPos(slot), category);
+                    inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "utility-slot"));
                     break;
                 case COMPASS:
                     if (HotbarManager.getSupport() == Support.BEDWARSPROXY || HotbarManager.getSupport() == Support.BEDWARSPROXY2023) {
                         if (HotbarManager.getMainConfig().getBoolean("enable-compass-support")) {
-                            category = new ItemStack(Material.COMPASS);
+                            category = new ItemStack(Material.valueOf(mc.getString(CATEGORY_COMPASS_MATERIAL)));
+                            category.setDurability((short) mc.getInt(CATEGORY_COMPASS_DATA));
+                            if (vs.isPlayerHead(category)) category = Utility.getSkull(mc.getString(CATEGORY_COMPASS_SKULL_URL));
                             category_meta = category.getItemMeta();
                             category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_COMPASS_NAME));
                             category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE).stream().map(s -> s.replace("{category}", Utility.getMsg(player, MEANING_COMPASS))).collect(Collectors.toList()));
                             category.setItemMeta(category_meta);
-                            inventory.setItem(HotbarUtils.getSlotForPos(slot), category);
+                            inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "compass-slot"));
                         }
                     } else {
                         if (HotbarManager.isCompassAddon() && HotbarManager.getMainConfig().getBoolean("enable-compass-support")) {
-                            category = new ItemStack(Material.COMPASS);
+                            category = new ItemStack(Material.valueOf(mc.getString(CATEGORY_COMPASS_MATERIAL)));
+                            category.setDurability((short) mc.getInt(CATEGORY_COMPASS_DATA));
+                            if (vs.isPlayerHead(category)) category = Utility.getSkull(mc.getString(CATEGORY_COMPASS_SKULL_URL));
                             category_meta = category.getItemMeta();
                             category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_COMPASS_NAME));
                             category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE).stream().map(s -> s.replace("{category}", Utility.getMsg(player, MEANING_COMPASS))).collect(Collectors.toList()));
                             category.setItemMeta(category_meta);
-                            inventory.setItem(HotbarUtils.getSlotForPos(slot), category);
+                            inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "compass-slot"));
                         }
                     }
                     break;

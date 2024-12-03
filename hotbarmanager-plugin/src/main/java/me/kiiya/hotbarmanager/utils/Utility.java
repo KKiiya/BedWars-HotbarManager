@@ -2,16 +2,23 @@ package me.kiiya.hotbarmanager.utils;
 
 import com.andrei1058.bedwars.BedWars;
 import com.andrei1058.bedwars.api.arena.team.ITeam;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
+import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Utility {
@@ -46,17 +53,6 @@ public class Utility {
         else if (HotbarManager.getSupport() == Support.BEDWARSPROXY) return HotbarManager.getBWProxyApi().getLanguageUtil().getList(player, path).stream().map(s -> p(player, s)).collect(Collectors.toList());
         else if (HotbarManager.getSupport() == Support.BEDWARSPROXY2023) return HotbarManager.getBWProxy2023Api().getLanguageUtil().getList(player, path).stream().map(s -> p(player, s)).collect(Collectors.toList());
         else return Collections.singletonList(c("&cMISSING"));
-    }
-
-    public static boolean isTool(ItemStack itemStack) {
-        switch (HotbarManager.getSupport()) {
-            case BEDWARS2023:
-                return HotbarManager.getBW2023Api().getVersionSupport().isTool(itemStack);
-            case BEDWARS1058:
-                return HotbarManager.getBW1058Api().getVersionSupport().isTool(itemStack);
-            default:
-                return false;
-        }
     }
 
     public static boolean isItemHigherTier(ItemStack item1, ItemStack item2) {
@@ -128,29 +124,44 @@ public class Utility {
         return Category.NONE;
     }
 
-    public static ItemStack setItemTag(ItemStack item, String tag, String value) {
-        switch (HotbarManager.getSupport()) {
-            case BEDWARS2023:
-                return HotbarManager.getBW2023Api().getVersionSupport().setTag(item, tag, value);
-            case BEDWARS1058:
-                return HotbarManager.getBW1058Api().getVersionSupport().setTag(item, tag, value);
-            case BEDWARSPROXY2023:
-            case BEDWARSPROXY:
+    public static String getForCurrentVersion(String v18, String v12, String v13) {
+        switch (Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3]) {
+            case "v1_8_R3":
+                return v18;
+            case "v1_12_R1":
+                return v12;
             default:
-                return item;
+                return v13;
         }
     }
 
-    public static String getTag(ItemStack item, String tag) {
-        switch (HotbarManager.getSupport()) {
-            case BEDWARS2023:
-                return HotbarManager.getBW2023Api().getVersionSupport().getTag(item, tag);
-            case BEDWARS1058:
-                return HotbarManager.getBW1058Api().getVersionSupport().getTag(item, tag);
-            case BEDWARSPROXY2023:
-            case BEDWARSPROXY:
-            default:
-                return null;
+    public static ItemStack getSkull(String url) {
+        ItemStack skull = new ItemStack(HotbarManager.getVersionSupport().getSkullMaterial(), 1, (short) 3);
+
+        if (url == null || url.isEmpty()) return skull;
+        if (url.equalsIgnoreCase("url-here") || !url.startsWith("https://") || !url.startsWith("http://")) return skull;
+
+        ItemMeta skullMeta = skull.getItemMeta();
+        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+        byte[] encodedData = Base64.encodeBase64(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
+        profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
+        Field profileField;
+
+        try {
+            profileField = skullMeta.getClass().getDeclaredField("profile");
+        } catch (NoSuchFieldException | SecurityException e) {
+            throw new RuntimeException(e);
         }
+
+        profileField.setAccessible(true);
+
+        try {
+            profileField.set(skullMeta, profile);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        skull.setItemMeta(skullMeta);
+        return skull;
     }
 }

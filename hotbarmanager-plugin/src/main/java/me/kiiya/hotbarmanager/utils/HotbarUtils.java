@@ -1,81 +1,61 @@
 package me.kiiya.hotbarmanager.utils;
 
+import me.kiiya.hotbarmanager.api.config.ConfigManager;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
-import org.bukkit.Material;
+import java.util.HashMap;
 
 public class HotbarUtils {
+
+    private final HashMap<String, Integer> posForSlot;
+    private final HashMap<String, Integer> slotForPos;
+    private static HotbarUtils instance;
+
+    private HotbarUtils(ConfigManager config) {
+        posForSlot = new HashMap<>();
+        slotForPos = new HashMap<>();
+
+        slotForPos.put("0", config.getInt("hotbar-slots.position-0"));
+        slotForPos.put("1", config.getInt("hotbar-slots.position-1"));
+        slotForPos.put("2", config.getInt("hotbar-slots.position-2"));
+        slotForPos.put("3", config.getInt("hotbar-slots.position-3"));
+        slotForPos.put("4", config.getInt("hotbar-slots.position-4"));
+        slotForPos.put("5", config.getInt("hotbar-slots.position-5"));
+        slotForPos.put("6", config.getInt("hotbar-slots.position-6"));
+        slotForPos.put("7", config.getInt("hotbar-slots.position-7"));
+        slotForPos.put("8", config.getInt("hotbar-slots.position-8"));
+
+        posForSlot.put(config.getInt("hotbar-slots.position-0") + "", 0);
+        posForSlot.put(config.getInt("hotbar-slots.position-1") + "", 1);
+        posForSlot.put(config.getInt("hotbar-slots.position-2") + "", 2);
+        posForSlot.put(config.getInt("hotbar-slots.position-3") + "", 3);
+        posForSlot.put(config.getInt("hotbar-slots.position-4") + "", 4);
+        posForSlot.put(config.getInt("hotbar-slots.position-5") + "", 5);
+        posForSlot.put(config.getInt("hotbar-slots.position-6") + "", 6);
+        posForSlot.put(config.getInt("hotbar-slots.position-7") + "", 7);
+    }
+
+    public static void initialize(ConfigManager config) {
+        instance = new HotbarUtils(config);
+    }
+
+    public static HotbarUtils getInstance() {
+        return instance;
+    }
+
+
     public static Category getCategoryFromString(String path) {
         String category =  ((path.split("\\.")[0]).split("-")[0]).toUpperCase();
         if (!Category.getCategoriesAsStringList().contains(category)) return Category.NONE;
         return Category.getFromString(category);
     }
 
-    public static Category getCategoryFromMaterial(Material m) {
-        switch (m) {
-            case IRON_PICKAXE:
-                return Category.TOOLS;
-            case HARD_CLAY:
-                return Category.BLOCKS;
-            case GOLD_SWORD:
-                return Category.MELEE;
-            case BOW:
-                return Category.RANGED;
-            case BREWING_STAND_ITEM:
-                return Category.POTIONS;
-            case TNT:
-                return Category.UTILITY;
-            case COMPASS:
-                return Category.COMPASS;
-            default:
-                return Category.NONE;
-        }
+    public int getSlotForPos(int position) {
+        if (slotForPos.get(position + "") == null) return -1;
+        return slotForPos.get(position + "");
     }
 
-    public static int getSlotForPos(int position) {
-        switch (position) {
-            case 0:
-                return 27;
-            case 1:
-                return 28;
-            case 2:
-                return 29;
-            case 3:
-                return 30;
-            case 4:
-                return 31;
-            case 5:
-                return 32;
-            case 6:
-                return 33;
-            case 7:
-                return 34;
-            case 8:
-                return 35;
-        }
-        return position;
-    }
-
-    public static int getPosForSlot(int slot) {
-        switch (slot) {
-            case 27:
-                return 0;
-            case 28:
-                return 1;
-            case 29:
-                return 2;
-            case 30:
-                return 3;
-            case 31:
-                return 4;
-            case 32:
-                return 5;
-            case 33:
-                return 6;
-            case 34:
-                return 7;
-            case 35:
-                return 8;
-        }
-        return slot;
+    public int getPosForSlot(int slot) {
+        if (posForSlot.get(slot + "") == null) return -1;
+        return posForSlot.get(slot + "");
     }
 }

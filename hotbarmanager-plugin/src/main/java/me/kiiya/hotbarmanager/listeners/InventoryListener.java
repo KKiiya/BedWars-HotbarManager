@@ -1,5 +1,7 @@
 package me.kiiya.hotbarmanager.listeners;
 
+import me.kiiya.hotbarmanager.HotbarManager;
+import me.kiiya.hotbarmanager.api.support.VersionSupport;
 import me.kiiya.hotbarmanager.menu.GUIHolder;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Material;
@@ -16,6 +18,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public class InventoryListener implements Listener {
+
+    private final VersionSupport vs;
+
+    public InventoryListener() {
+        vs = HotbarManager.getVersionSupport();
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent e) {
@@ -65,7 +73,7 @@ public class InventoryListener implements Listener {
 
         try {
             for (ItemStack item : inv.getContents()) {
-                String tag = Utility.getTag(item, "hbm");
+                String tag = vs.getItemTag(item, "hbm");
                 if (tag == null) continue;
                 inv.remove(item);
             }

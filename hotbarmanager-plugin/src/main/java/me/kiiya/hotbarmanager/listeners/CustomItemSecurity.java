@@ -1,5 +1,7 @@
 package me.kiiya.hotbarmanager.listeners;
 
+import me.kiiya.hotbarmanager.HotbarManager;
+import me.kiiya.hotbarmanager.api.support.VersionSupport;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -13,13 +15,19 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class CustomItemSecurity {
-
     public static class Legacy implements Listener {
+
+        private final VersionSupport vs;
+
+        public Legacy() {
+            vs = HotbarManager.getVersionSupport();
+        }
+
         @EventHandler(priority = EventPriority.LOWEST)
         public void onPickUp(PlayerPickupItemEvent e) {
             Item item = e.getItem();
             ItemStack itemStack = item.getItemStack();
-            String tag = Utility.getTag(itemStack, "hbm");
+            String tag = vs.getItemTag(itemStack, "hbm");
 
             if (tag != null) {
                 e.setCancelled(true);
@@ -31,7 +39,7 @@ public class CustomItemSecurity {
         public void onDrop(PlayerDropItemEvent e) {
             Item item = e.getItemDrop();
             ItemStack itemStack = item.getItemStack();
-            String tag = Utility.getTag(itemStack, "hbm");
+            String tag = vs.getItemTag(itemStack, "hbm");
 
             if (tag != null) {
                 item.remove();
@@ -44,7 +52,7 @@ public class CustomItemSecurity {
         public void onItemUse(PlayerInteractEvent e) {
             ItemStack itemStack = e.getItem();
             if (itemStack == null || itemStack.getType() == Material.AIR) return;
-            String tag = Utility.getTag(itemStack, "hbm");
+            String tag = vs.getItemTag(itemStack, "hbm");
             if (tag == null) return;
 
             e.setCancelled(true);
@@ -53,11 +61,18 @@ public class CustomItemSecurity {
     }
 
     public static class New implements Listener {
+
+        private final VersionSupport vs;
+
+        public New() {
+            vs = HotbarManager.getVersionSupport();
+        }
+
         @EventHandler(priority = EventPriority.LOWEST)
         public void onPickUp(EntityPickupItemEvent e) {
             Item item = e.getItem();
             ItemStack itemStack = item.getItemStack();
-            String tag = Utility.getTag(itemStack, "hbm");
+            String tag = vs.getItemTag(itemStack, "hbm");
 
             if (tag != null) {
                 e.setCancelled(true);
@@ -69,7 +84,7 @@ public class CustomItemSecurity {
         public void onDrop(PlayerDropItemEvent e) {
             Item item = e.getItemDrop();
             ItemStack itemStack = item.getItemStack();
-            String tag = Utility.getTag(itemStack, "hbm");
+            String tag = vs.getItemTag(itemStack, "hbm");
 
             if (tag != null) {
                 item.remove();
@@ -82,7 +97,7 @@ public class CustomItemSecurity {
         public void onItemUse(PlayerInteractEvent e) {
             ItemStack itemStack = e.getItem();
             if (itemStack == null || itemStack.getType() == Material.AIR) return;
-            String tag = Utility.getTag(itemStack, "hbm");
+            String tag = vs.getItemTag(itemStack, "hbm");
             if (tag == null) return;
 
             e.setCancelled(true);

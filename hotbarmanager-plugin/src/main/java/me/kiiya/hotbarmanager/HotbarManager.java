@@ -2,12 +2,14 @@ package me.kiiya.hotbarmanager;
 
 import me.kiiya.hotbarmanager.api.database.Database;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarManager;
+import me.kiiya.hotbarmanager.api.support.VersionSupport;
 import me.kiiya.hotbarmanager.commands.MenuCommand;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.support.bedwars1058.BedWars1058;
 import me.kiiya.hotbarmanager.support.bedwars1058.BedWarsProxy;
 import me.kiiya.hotbarmanager.support.bedwars2023.BedWars2023;
 import me.kiiya.hotbarmanager.support.bedwars2023.BedWarsProxy2023;
+import me.kiiya.hotbarmanager.support.version.*;
 import me.kiiya.hotbarmanager.utils.Support;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -18,6 +20,7 @@ public final class HotbarManager extends JavaPlugin {
 
     public static boolean compassAddon = false;
 
+    public static VersionSupport versionSupport;
     public static me.kiiya.hotbarmanager.api.HotbarManager api;
     public static com.andrei1058.bedwars.api.BedWars bw1058Api;
     public static com.tomkeuper.bedwars.api.BedWars bw2023Api;
@@ -29,6 +32,7 @@ public final class HotbarManager extends JavaPlugin {
     @Override
     public void onEnable() {
         loadSupport();
+        loadVersionSupport();
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
             new Metrics(this, 20334);
@@ -51,12 +55,55 @@ public final class HotbarManager extends JavaPlugin {
         else if (Bukkit.getPluginManager().getPlugin("BWProxy2023") != null) new BedWarsProxy2023();
     }
 
+    private void loadVersionSupport() {
+        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        switch (version) {
+            case "v1_8_R3":
+                versionSupport = new v1_8_R3();
+                break;
+            case "v1_12_R1":
+                versionSupport = new v1_12_R1();
+                break;
+            case "v1_16_R3":
+                versionSupport = new v1_16_R3();
+                break;
+            case "v1_17_R1":
+                versionSupport = new v1_17_R1();
+                break;
+            case "v1_18_R2":
+                versionSupport = new v1_18_R2();
+                break;
+            case "v1_19_R3":
+                versionSupport = new v1_19_R3();
+                break;
+            case "v1_20_R1":
+                versionSupport = new v1_20_R1();
+                break;
+            case "v1_20_R2":
+                versionSupport = new v1_20_R2();
+                break;
+            case "v1_20_R3":
+                versionSupport = new v1_20_R3();
+                break;
+            case "v1_20_R4":
+                versionSupport = new v1_20_R4();
+                break;
+            case "v1_21_R1":
+                versionSupport = new v1_21_R1();
+                break;
+        }
+    }
+
     public static IHotbarManager getManager() {
         return manager;
     }
 
     public static MainConfig getMainConfig() {
         return mainConfig;
+    }
+
+    public static VersionSupport getVersionSupport() {
+        return versionSupport;
     }
 
     public static HotbarManager getInstance() {

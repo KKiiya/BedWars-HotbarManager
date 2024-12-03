@@ -11,6 +11,7 @@ import me.kiiya.hotbarmanager.database.providers.SQLite;
 import me.kiiya.hotbarmanager.listeners.InventoryListener;
 import me.kiiya.hotbarmanager.listeners.CustomItemSecurity;
 import me.kiiya.hotbarmanager.listeners.bedwars2023.*;
+import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -78,6 +79,7 @@ public class BedWarsAddon extends Addon {
     private void loadConfig() {
         Utility.info("&eLoading config...");
         mainConfig = new MainConfig(HotbarManager.getInstance(), "config", bw2023Api.getAddonsPath().getPath() + File.separator + "HotbarManager");
+        HotbarUtils.initialize(mainConfig);
         Utility.info("&aConfig loaded!");
     }
 

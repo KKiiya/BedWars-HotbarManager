@@ -52,7 +52,7 @@ public class ShopBuy implements Listener {
         Material currency = upgradableContent.getCurrency();
         int price = upgradableContent.getPrice();
 
-        ItemStack item = BedWars.nms.addCustomData(Utility.formatItemStack(upgradableContent.getBuyItemsList().get(0).getItemStack(), e.getArena().getTeam(p)), "");
+        ItemStack item = Utility.formatItemStack(upgradableContent.getBuyItemsList().get(0).getItemStack(), e.getArena().getTeam(p));
 
         if (BedWars.nms.isSword(item)) {
             inv.remove(Material.getMaterial(BedWars.getForCurrentVersion("WOOD_SWORD", "WOOD_SWORD", "WOODEN_SWORD")));
@@ -102,15 +102,8 @@ public class ShopBuy implements Listener {
                         inv.setItem(i, vs.setShopUpgradeIdentifier(item, identifier));
                         CategoryContent.takeMoney(p, currency, price);
                     } else if (item.getType() == itemSlot.getType() && item.getDurability() == itemSlot.getDurability()) {
-                        if (itemSlot.getAmount() + item.getAmount() > itemSlot.getType().getMaxStackSize()) {
-                            int restAmount = itemSlot.getAmount() + item.getAmount() - itemSlot.getType().getMaxStackSize();
-                            ItemStack finalItem = new ItemStack(item.getType(), restAmount);
-                            Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> {
-                                itemSlot.setAmount(itemSlot.getType().getMaxStackSize());
-                                inv.addItem(BedWars.nms.addCustomData(Utility.formatItemStack(finalItem, t), ""));
-                                CategoryContent.takeMoney(p, currency, price);
-                            }, 1L);
-                        } else {
+                        if (itemSlot.getAmount() + item.getAmount() > itemSlot.getType().getMaxStackSize()) return;
+                        else {
                             itemSlot.setAmount(itemSlot.getAmount() + item.getAmount());
                             CategoryContent.takeMoney(p, currency, price);
                         }
