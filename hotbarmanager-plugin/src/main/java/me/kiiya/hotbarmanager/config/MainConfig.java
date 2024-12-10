@@ -19,13 +19,13 @@ public class MainConfig extends ConfigManager {
         yml.addDefault(ITEM_TYPE, "BLAZE_POWDER");
         yml.addDefault(ITEM_POSITION, 54);
 
-        yml.addDefault(SEPARATOR_MATERIAL, getForCurrentVersion("STAINED_GLASS_PANE", "STAINED_GLASS_PANE", "STAINED_GLASS_PANE"));
+        yml.addDefault(SEPARATOR_MATERIAL, getForCurrentVersion("STAINED_GLASS_PANE", "STAINED_GLASS_PANE", "LEGACY_STAINED_GLASS_PANE"));
         yml.addDefault(SEPARATOR_DATA, 7);
         yml.addDefault(SEPARATOR_SKULL_URL, "url-here");
         yml.addDefault(SEPARATOR_POSITIONS, "18,19,20,21,22,23,24,25,26");
 
         yml.addDefault(PLACEHOLDER_NONE_ENABLED, true);
-        yml.addDefault(PLACEHOLDER_NONE_MATERIAL, getForCurrentVersion("STAINED_GLASS_PANE", "STAINED_GLASS_PANE", "STAINED_GLASS_PANE"));
+        yml.addDefault(PLACEHOLDER_NONE_MATERIAL, getForCurrentVersion("STAINED_GLASS_PANE", "STAINED_GLASS_PANE", "LEGACY_STAINED_GLASS_PANE"));
         yml.addDefault(PLACEHOLDER_NONE_DATA, 14);
         yml.addDefault(PLACEHOLDER_NONE_SKULL_URL, "url-here");
 

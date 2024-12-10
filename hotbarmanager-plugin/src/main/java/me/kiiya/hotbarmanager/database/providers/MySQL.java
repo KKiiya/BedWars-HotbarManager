@@ -56,12 +56,14 @@ public class MySQL implements Database {
     }
 
     private void connect() {
+        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         Utility.info("&eConnecting to MySQL database...");
         db = new HikariDataSource();
         db.setPoolName("HotbarManager-Pool");
         db.setConnectionTimeout(480000000L);
         db.setMaximumPoolSize(10);
-        db.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+        if (version.contains("v1_8") || version.contains("v1_12")) db.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+        else db.setDataSourceClassName("com.mysql.cj.jdbc.MysqlDataSource");
         db.addDataSourceProperty("serverName", this.host);
         db.addDataSourceProperty("databaseName", this.database);
         db.addDataSourceProperty("port", this.port);

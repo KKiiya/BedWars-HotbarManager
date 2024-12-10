@@ -14,24 +14,10 @@ public class HotbarUtils {
         posForSlot = new HashMap<>();
         slotForPos = new HashMap<>();
 
-        slotForPos.put("0", config.getInt("hotbar-slots.position-0"));
-        slotForPos.put("1", config.getInt("hotbar-slots.position-1"));
-        slotForPos.put("2", config.getInt("hotbar-slots.position-2"));
-        slotForPos.put("3", config.getInt("hotbar-slots.position-3"));
-        slotForPos.put("4", config.getInt("hotbar-slots.position-4"));
-        slotForPos.put("5", config.getInt("hotbar-slots.position-5"));
-        slotForPos.put("6", config.getInt("hotbar-slots.position-6"));
-        slotForPos.put("7", config.getInt("hotbar-slots.position-7"));
-        slotForPos.put("8", config.getInt("hotbar-slots.position-8"));
-
-        posForSlot.put(config.getInt("hotbar-slots.position-0") + "", 0);
-        posForSlot.put(config.getInt("hotbar-slots.position-1") + "", 1);
-        posForSlot.put(config.getInt("hotbar-slots.position-2") + "", 2);
-        posForSlot.put(config.getInt("hotbar-slots.position-3") + "", 3);
-        posForSlot.put(config.getInt("hotbar-slots.position-4") + "", 4);
-        posForSlot.put(config.getInt("hotbar-slots.position-5") + "", 5);
-        posForSlot.put(config.getInt("hotbar-slots.position-6") + "", 6);
-        posForSlot.put(config.getInt("hotbar-slots.position-7") + "", 7);
+        for (int i = 0; i < 9; i++) {
+            slotForPos.put(i + "", config.getInt("hotbar-slots.position-" + i));
+            posForSlot.put(config.getInt("hotbar-slots.position-" + i) + "", i);
+        }
     }
 
     public static void initialize(ConfigManager config) {
