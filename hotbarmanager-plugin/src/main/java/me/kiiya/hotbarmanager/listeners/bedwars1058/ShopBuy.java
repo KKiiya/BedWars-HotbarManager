@@ -1,14 +1,14 @@
 package me.kiiya.hotbarmanager.listeners.bedwars1058;
 
 import com.andrei1058.bedwars.BedWars;
-import com.andrei1058.bedwars.api.arena.team.TeamEnchant;
-import com.andrei1058.bedwars.api.events.shop.ShopBuyEvent;
-import com.andrei1058.bedwars.configuration.Sounds;
-import com.andrei1058.bedwars.shop.main.CategoryContent;
 import com.andrei1058.bedwars.api.arena.shop.IContentTier;
 import com.andrei1058.bedwars.api.arena.team.ITeam;
+import com.andrei1058.bedwars.api.arena.team.TeamEnchant;
+import com.andrei1058.bedwars.api.events.shop.ShopBuyEvent;
 import com.andrei1058.bedwars.api.server.VersionSupport;
+import com.andrei1058.bedwars.configuration.Sounds;
 import com.andrei1058.bedwars.shop.ShopCache;
+import com.andrei1058.bedwars.shop.main.CategoryContent;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
@@ -23,139 +23,130 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ShopBuy implements Listener {
+
+    // Debounce cache to limit rapid purchases
+    private static final HashMap<Player, Long> debounceCache = new HashMap<>();
+    private static final long DEBOUNCE_THRESHOLD = 300; // 300 ms
+
     @EventHandler
     public void onBuy(ShopBuyEvent e) {
-        // MAIN VARIABLES
-        Player p = e.getBuyer();
-        PlayerInventory inv = p.getInventory();
-        IHotbarPlayer hp = HotbarManager.getAPI().getHotbarPlayer(e.getBuyer());
-        Category cat = HotbarUtils.getCategoryFromString(e.getCategoryContent().getIdentifier());
-        List<Category> hotbar = hp.getHotbarAsList();
+        Player player = e.getBuyer();
+        PlayerInventory inventory = player.getInventory();
+        IHotbarPlayer hotbarPlayer = HotbarManager.getAPI().getHotbarPlayer(player);
+        Category category = HotbarUtils.getCategoryFromString(e.getCategoryContent().getIdentifier());
+        List<Category> hotbar = hotbarPlayer.getHotbarAsList();
 
-        // CHECKS
-        if (cat == null || cat == Category.NONE) return;
-
-        // ITEM BOUGHT VARIABLES
-        VersionSupport vs = HotbarManager.getBW1058Api().getVersionSupport();
-        ITeam t = e.getArena().getTeam(p);
-        CategoryContent cc = (CategoryContent) e.getCategoryContent();
-        String identifier = cc.getIdentifier();
-        ShopCache cache = ShopCache.getShopCache(p.getUniqueId());
-        cache.upgradeCachedItem(cc, cc.getSlot());
-        ShopCache.CachedItem cachedItem = cache.getCachedItem(cc);
-        IContentTier upgradableContent = cc.getContentTiers().get(cachedItem.getTier()-1);
-
-        Material currency = upgradableContent.getCurrency();
-        int price = upgradableContent.getPrice();
-
-        ItemStack item = Utility.formatItemStack(upgradableContent.getBuyItemsList().get(0).getItemStack(), e.getArena().getTeam(p));
-
-        if (BedWars.nms.isSword(item)) {
-            inv.remove(Material.getMaterial(BedWars.getForCurrentVersion("WOOD_SWORD", "WOOD_SWORD", "WOODEN_SWORD")));
-        }
-
-        if (BedWars.nms.isTool(item) || item.getType() == Material.SHEARS) {
-            unbreakable(item);
-            vs.setShopUpgradeIdentifier(item, identifier);
-        }
-
-        // SOUNDS
-        String buySound = "shop-bought";
-
-        if (!hotbar.contains(cat)) return;
-
-        if (inv.firstEmpty() == -1) {
-            p.sendMessage(Utility.getMsg(p, "upgrades-lore-insuff-space")
-                    .replace("{prefix}", Utility.getMsg(p, "prefix")));
+        // Debounce check
+        if (!isDebounceAllowed(player)) {
+            player.sendMessage(Utility.getMsg(player, "shop-too-fast"));
             return;
         }
 
-        try {
-            for (int i = 0; i < 9; i++) {
-                ItemStack itemSlot = p.getInventory().getItem(i);
-                if (hotbar.get(i) != cat) continue;
+        // Validate category
+        if (category == null || category == Category.NONE) return;
 
-                if (itemSlot != null) {
+        // Cache commonly used data
+        VersionSupport versionSupport = HotbarManager.getBW1058Api().getVersionSupport();
+        ITeam team = e.getArena().getTeam(player);
+        CategoryContent content = (CategoryContent) e.getCategoryContent();
+        String identifier = content.getIdentifier();
+        ShopCache shopCache = ShopCache.getShopCache(player.getUniqueId());
+        ShopCache.CachedItem cachedItem = shopCache.getCachedItem(content);
+        IContentTier contentTier = content.getContentTiers().get(cachedItem.getTier() - 1);
 
-                    if (BedWars.nms.isSword(item) && hotbar.get(i) == Category.MELEE) {
-                        if (Utility.isItemHigherTier(item, itemSlot)) {
-                            inv.addItem(itemSlot);
-                            unbreakable(item);
-                            for (TeamEnchant teamEnchant : t.getSwordsEnchantments()) {
-                                item.addEnchantment(teamEnchant.getEnchantment(), teamEnchant.getAmplifier());
-                            }
-                            inv.setItem(i, item);
-                            CategoryContent.takeMoney(p, currency, price);
-                        } else {
-                            unbreakable(item);
-                            for (TeamEnchant teamEnchant : t.getSwordsEnchantments()) {
-                                item.addEnchantment(teamEnchant.getEnchantment(), teamEnchant.getAmplifier());
-                            }
-                            inv.addItem(item);
-                            CategoryContent.takeMoney(p, currency, price);
-                        }
-                    } else if (vs.getShopUpgradeIdentifier(item) != null && vs.getShopUpgradeIdentifier(item).equals(identifier)) {
-                        inv.setItem(i, vs.setShopUpgradeIdentifier(item, identifier));
-                        CategoryContent.takeMoney(p, currency, price);
-                    } else if (item.getType() == itemSlot.getType() && item.getDurability() == itemSlot.getDurability()) {
-                        if (itemSlot.getAmount() + item.getAmount() > itemSlot.getType().getMaxStackSize()) return;
-                        else {
-                            itemSlot.setAmount(itemSlot.getAmount() + item.getAmount());
-                            CategoryContent.takeMoney(p, currency, price);
-                        }
-                    } else {
-                        if (Utility.getItemCategory(itemSlot) == cat && !vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier)) continue;
+        synchronized (player) {
+            Material currency = contentTier.getCurrency();
+            int price = contentTier.getPrice();
+            ItemStack item = Utility.formatItemStack(contentTier.getBuyItemsList().get(0).getItemStack(), team);
 
-                        if (cc.isPermanent()) {
-                            unbreakable(item);
-                            item = vs.setShopUpgradeIdentifier(item, identifier);
-                        }
-                        if (BedWars.nms.isSword(item)) {
-                            unbreakable(item);
-                            for (TeamEnchant teamEnchant : t.getSwordsEnchantments()) {
-                                item.addEnchantment(teamEnchant.getEnchantment(), teamEnchant.getAmplifier());
-                            }
-                        }
-                        inv.setItem(i, item);
-                        CategoryContent.takeMoney(p, currency, price);
-                        Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> inv.addItem(itemSlot), 2L);
-                    }
-                } else {
-                    if (cc.isPermanent()) {
-                        unbreakable(item);
-                        item = vs.setShopUpgradeIdentifier(item, identifier);
-                    }
-                    if (BedWars.nms.isSword(item)) {
-                        unbreakable(item);
-                        for (TeamEnchant teamEnchant : t.getSwordsEnchantments()) {
-                            item.addEnchantment(teamEnchant.getEnchantment(), teamEnchant.getAmplifier());
-                        }
-                    }
-                    inv.setItem(i, item);
-                    CategoryContent.takeMoney(p, currency, price);
-                }
-
-                Sounds.playSound(buySound, p);
-                e.setCancelled(true);
-                p.sendMessage(Utility.getMsg(p, "shop-new-purchase")
-                        .replace("{prefix}", Utility.getMsg(p, "prefix"))
-                        .replace("{item}", Utility.getMsg(p, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
-                        .replace("{color}", "")
-                        .replace("{tier}", !BedWars.nms.isTool(item) ? "" : CategoryContent.getRomanNumber(cachedItem.getTier())));
-                break;
+            if (inventory.firstEmpty() == -1) {
+                player.sendMessage(Utility.getMsg(player, "upgrades-lore-insuff-space")
+                        .replace("{prefix}", Utility.getMsg(player, "prefix")));
+                return;
             }
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+
+            if (BedWars.nms.isSword(item)) {
+                inventory.remove(Material.getMaterial(BedWars.getForCurrentVersion("WOOD_SWORD", "WOOD_SWORD", "WOODEN_SWORD")));
+            }
+
+            if (BedWars.nms.isTool(item) || item.getType() == Material.SHEARS) {
+                makeUnbreakable(item);
+                versionSupport.setShopUpgradeIdentifier(item, identifier);
+            }
+
+            // Try placing item in hotbar
+            boolean placed = placeInHotbar(player, inventory, hotbar, category, item, content, versionSupport, currency, price, team);
+            if (!placed) {
+                inventory.addItem(item);
+            }
+
+            CategoryContent.takeMoney(player, currency, price);
+            Sounds.playSound("shop-bought", player);
         }
+
+        Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getInstance(), () -> {
+            player.sendMessage(Utility.getMsg(player, "shop-new-purchase")
+                    .replace("{prefix}", Utility.getMsg(player, "prefix"))
+                    .replace("{item}", Utility.getMsg(player, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
+                    .replace("{color}", "")
+                    .replace("{tier}", BedWars.nms.isTool(item) ? CategoryContent.getRomanNumber(cachedItem.getTier()) : ""));
+        });
+
+        e.setCancelled(true);
     }
 
-    public void unbreakable(ItemStack itemStack) {
+    private boolean isDebounceAllowed(Player player) {
+        long currentTime = System.currentTimeMillis();
+        if (debounceCache.containsKey(player)) {
+            long lastPurchaseTime = debounceCache.get(player);
+            if (currentTime - lastPurchaseTime < DEBOUNCE_THRESHOLD) {
+                return false;
+            }
+        }
+        debounceCache.put(player, currentTime);
+        return true;
+    }
+
+    private void makeUnbreakable(ItemStack itemStack) {
         ItemMeta meta = itemStack.getItemMeta();
         BedWars.nms.setUnbreakable(meta);
         itemStack.setItemMeta(meta);
+    }
+
+    private boolean placeInHotbar(Player player, PlayerInventory inventory, List<Category> hotbar, Category category, ItemStack item, CategoryContent content, VersionSupport versionSupport, Material currency, int price, ITeam team) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack slotItem = inventory.getItem(i);
+            if (hotbar.get(i) != category) continue;
+
+            if (slotItem == null) {
+                inventory.setItem(i, prepareItemForHotbar(item, content, versionSupport, team));
+                return true;
+            }
+
+            if (BedWars.nms.isSword(item) && hotbar.get(i) == Category.MELEE) {
+                if (Utility.isItemHigherTier(item, slotItem)) {
+                    inventory.setItem(i, prepareItemForHotbar(item, content, versionSupport, team));
+                    return true;
+                }
+            } else if (slotItem.getType() == item.getType() && slotItem.getAmount() + item.getAmount() <= slotItem.getMaxStackSize()) {
+                slotItem.setAmount(slotItem.getAmount() + item.getAmount());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ItemStack prepareItemForHotbar(ItemStack item, CategoryContent content, VersionSupport versionSupport, ITeam team) {
+        makeUnbreakable(item);
+        if (BedWars.nms.isSword(item)) {
+            for (TeamEnchant enchant : team.getSwordsEnchantments()) {
+                item.addEnchantment(enchant.getEnchantment(), enchant.getAmplifier());
+            }
+        }
+        return versionSupport.setShopUpgradeIdentifier(item, content.getIdentifier());
     }
 }
