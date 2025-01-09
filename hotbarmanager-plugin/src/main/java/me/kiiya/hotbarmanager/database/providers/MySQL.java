@@ -20,6 +20,7 @@ public class MySQL implements Database {
     private final String database;
     private final String user;
     private final String pass;
+    private final boolean ssl;
     private HikariDataSource db;
 
     public MySQL() {
@@ -30,24 +31,28 @@ public class MySQL implements Database {
             this.user = HotbarManager.getBW1058Api().getConfigs().getMainConfig().getString("database.user");
             this.pass = HotbarManager.getBW1058Api().getConfigs().getMainConfig().getString("database.pass");
             this.port = HotbarManager.getBW1058Api().getConfigs().getMainConfig().getInt("database.port");
+            this.ssl = HotbarManager.getBW1058Api().getConfigs().getMainConfig().getBoolean("database.ssl");
         } else if (HotbarManager.getSupport() == Support.BEDWARS2023) {
             this.host = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.host");
             this.database = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.database");
             this.user = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.user");
             this.pass = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getString("database.pass");
             this.port = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getInt("database.port");
+            this.ssl = HotbarManager.getBW2023Api().getConfigs().getMainConfig().getBoolean("database.ssl");
         } else if (HotbarManager.getSupport() == Support.BEDWARSPROXY2023) {
             this.host = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getString("database.host");
             this.database = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getString("database.database");
             this.user = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getString("database.user");
             this.pass = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getString("database.pass");
             this.port = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getInt("database.port");
+            this.ssl = Bukkit.getPluginManager().getPlugin("BWProxy2023").getConfig().getBoolean("database.ssl");
         } else {
             this.host = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getString("database.host");
             this.database = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getString("database.database");
             this.user = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getString("database.user");
             this.pass = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getString("database.pass");
             this.port = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getInt("database.port");
+            this.ssl = Bukkit.getPluginManager().getPlugin("BedWarsProxy").getConfig().getBoolean("database.ssl");
         }
 
         connect();
@@ -60,7 +65,10 @@ public class MySQL implements Database {
         Utility.info("&eConnecting to MySQL database...");
         db = new HikariDataSource();
         db.setPoolName("HotbarManager-Pool");
-        db.setConnectionTimeout(480000000L);
+        db.setMaximumPoolSize(10);
+        db.setConnectionTimeout(30000L);
+        db.setMaxLifetime(1800000L);
+        db.setIdleTimeout(60000L);
         db.setMaximumPoolSize(10);
         if (version.contains("v1_8") || version.contains("v1_12")) db.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
         else db.setDataSourceClassName("com.mysql.cj.jdbc.MysqlDataSource");
@@ -69,6 +77,7 @@ public class MySQL implements Database {
         db.addDataSourceProperty("port", this.port);
         db.addDataSourceProperty("user", this.user);
         db.addDataSourceProperty("password", this.pass);
+        db.addDataSourceProperty("useSSL", this.ssl);
         Utility.info("&aSuccessfully connected!");
     }
 
@@ -114,21 +123,14 @@ public class MySQL implements Database {
     @Override
     public String getData(Player player, String column) {
         String path = player.getUniqueId().toString();
-        try {
-            Connection c = db.getConnection();
-            PreparedStatement ps = c.prepareStatement("SELECT " + column + " FROM bedwars_hotbar_manager WHERE player=?");
+        try (Connection c = db.getConnection();
+             PreparedStatement ps = c.prepareStatement("SELECT " + column + " FROM bedwars_hotbar_manager WHERE player=?")) {
             ps.setString(1, path);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                String str = rs.getString(column);
-                c.close();
-                return str;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getString(column);
             }
-            rs.close();
-            ps.close();
-            c.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); // Consider logging the exception instead of throwing
         }
         return null;
     }

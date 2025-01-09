@@ -22,9 +22,18 @@ public class HotbarPlayer implements IHotbarPlayer {
         this.db = HotbarManager.getInstance().getDB();
         this.player = player;
         this.hotbar = new HashMap<>();
-        Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
-            for (int i = 0; i < 9; i++) {
-                hotbar.put(i, Category.getFromString(this.db.getData(player, "slot" + i)));
+        Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getInstance(), () -> {
+            try {
+                for (int i = 0; i < 9; i++) {
+                    String data = this.db.getData(player, "slot" + i);
+
+                    int finalI = i;
+                    Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
+                        hotbar.put(finalI, Category.getFromString(data));
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
@@ -33,10 +42,18 @@ public class HotbarPlayer implements IHotbarPlayer {
         this.db = HotbarManager.getInstance().getDB();
         this.player = Bukkit.getServer().getPlayer(uuid);
         this.hotbar = new HashMap<>();
-        for (int i = 0; i < 9; i++) hotbar.put(i, Category.NONE);
-        Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
-            for (int i = 0; i < 9; i++) {
-                hotbar.put(i, Category.getFromString(this.db.getData(player, "slot" + i)));
+        Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getInstance(), () -> {
+            try {
+                for (int i = 0; i < 9; i++) {
+                    String data = this.db.getData(player, "slot" + i);
+
+                    int finalI = i;
+                    Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
+                        hotbar.put(finalI, Category.getFromString(data));
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }

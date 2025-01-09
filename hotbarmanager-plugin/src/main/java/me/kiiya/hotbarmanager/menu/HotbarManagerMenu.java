@@ -66,13 +66,6 @@ public class HotbarManagerMenu implements GUIHolder {
         String tag = item != null  && item.getType() != Material.AIR ? vs.getItemTag(item, "hbm") : null;
         String cursorTag = cursor != null && cursor.getType() != Material.AIR ? vs.getItemTag(cursor, "hbm") : null;
 
-        if (e.getInventory() != e.getClickedInventory() || e.getClickedInventory() == player.getInventory()){
-            e.setCursor(new ItemStack(Material.AIR));
-            e.getCursor().setType(Material.AIR);
-            e.setCancelled(true);
-            return;
-        }
-
         if (e.getAction() != InventoryAction.PICKUP_ALL
             && e.getAction() != InventoryAction.PICKUP_ONE
             && e.getAction() != InventoryAction.PLACE_ALL
@@ -80,6 +73,12 @@ public class HotbarManagerMenu implements GUIHolder {
             && e.getAction() != InventoryAction.SWAP_WITH_CURSOR) {
             e.setCursor(new ItemStack(Material.AIR));
             e.setCancelled(true);
+            return;
+        }
+
+        if (e.getClickedInventory().getHolder() != this) {
+            e.setCancelled(true);
+            e.setCursor(new ItemStack(Material.AIR));
             return;
         }
 
@@ -91,6 +90,7 @@ public class HotbarManagerMenu implements GUIHolder {
             }
             return;
         }
+
         switch (tag.toLowerCase()) {
             case "blocks":
             case "melee":

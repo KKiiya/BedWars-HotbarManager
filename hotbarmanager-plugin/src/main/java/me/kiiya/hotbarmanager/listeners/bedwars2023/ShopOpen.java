@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -35,8 +36,9 @@ public class ShopOpen implements Listener {
             ItemMeta hotbarManagerItemMeta = hotbarManagerItem.getItemMeta();
             hotbarManagerItemMeta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEM_NAME));
             hotbarManagerItemMeta.setLore(Utility.getListMsg(player, INVENTORY_ITEM_LORE));
+            hotbarManagerItemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_ENCHANTS);
             hotbarManagerItem.setItemMeta(hotbarManagerItemMeta);
-            e.getInventory().setItem(HotbarManager.getMainConfig().getInt(ITEM_POSITION) - 1, vs.setItemTag(hotbarManagerItem, "hbm", "menu"));
+            Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> e.getInventory().setItem(HotbarManager.getMainConfig().getInt(ITEM_POSITION) - 1, vs.setItemTag(hotbarManagerItem, "hbm", "menu")), 1);
         }
     }
 

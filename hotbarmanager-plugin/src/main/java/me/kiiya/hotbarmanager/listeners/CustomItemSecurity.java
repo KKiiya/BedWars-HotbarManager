@@ -26,7 +26,10 @@ public class CustomItemSecurity {
         @EventHandler(priority = EventPriority.LOWEST)
         public void onPickUp(PlayerPickupItemEvent e) {
             Item item = e.getItem();
+            if (item == null) return;
             ItemStack itemStack = item.getItemStack();
+            if (itemStack == null) return;
+            if (itemStack.getType() == Material.AIR) return;
             String tag = vs.getItemTag(itemStack, "hbm");
 
             if (tag != null) {
@@ -38,7 +41,10 @@ public class CustomItemSecurity {
         @EventHandler(priority = EventPriority.LOWEST)
         public void onDrop(PlayerDropItemEvent e) {
             Item item = e.getItemDrop();
+            if (item == null) return;
             ItemStack itemStack = item.getItemStack();
+            if (itemStack == null) return;
+            if (itemStack.getType() == Material.AIR) return;
             String tag = vs.getItemTag(itemStack, "hbm");
 
             if (tag != null) {
@@ -71,7 +77,10 @@ public class CustomItemSecurity {
         @EventHandler(priority = EventPriority.LOWEST)
         public void onPickUp(EntityPickupItemEvent e) {
             Item item = e.getItem();
+            if (item == null) return;
             ItemStack itemStack = item.getItemStack();
+            if (itemStack == null) return;
+            if (itemStack.getType() == Material.AIR) return;
             String tag = vs.getItemTag(itemStack, "hbm");
 
             if (tag != null) {
@@ -83,7 +92,10 @@ public class CustomItemSecurity {
         @EventHandler(priority = EventPriority.LOWEST)
         public void onDrop(PlayerDropItemEvent e) {
             Item item = e.getItemDrop();
+            if (item == null) return;
             ItemStack itemStack = item.getItemStack();
+            if (itemStack == null) return;
+            if (itemStack.getType() == Material.AIR) return;
             String tag = vs.getItemTag(itemStack, "hbm");
 
             if (tag != null) {

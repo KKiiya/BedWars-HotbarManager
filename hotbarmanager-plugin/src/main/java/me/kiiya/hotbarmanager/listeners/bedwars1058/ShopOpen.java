@@ -38,7 +38,7 @@ public class ShopOpen implements Listener {
             hotbarManagerItemMeta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEM_NAME));
             hotbarManagerItemMeta.setLore(Utility.getListMsg(player, INVENTORY_ITEM_LORE));
             hotbarManagerItem.setItemMeta(hotbarManagerItemMeta);
-            e.getInventory().setItem(HotbarManager.getMainConfig().getInt(ITEM_POSITION) - 1, vs.setItemTag(hotbarManagerItem, "hbm", "menu"));
+            Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> e.getInventory().setItem(HotbarManager.getMainConfig().getInt(ITEM_POSITION) - 1, vs.setItemTag(hotbarManagerItem, "hbm", "menu")), 1);
         }
     }
 

@@ -31,8 +31,8 @@ public final class HotbarManager extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        loadSupport();
         loadVersionSupport();
+        loadSupport();
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
             new Metrics(this, 20334);
@@ -56,39 +56,39 @@ public final class HotbarManager extends JavaPlugin {
     }
 
     private void loadVersionSupport() {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].toLowerCase();
         switch (version) {
-            case "v1_8_R3":
+            case "v1_8_r3":
                 versionSupport = new v1_8_R3();
                 break;
-            case "v1_12_R1":
+            case "v1_12_r1":
                 versionSupport = new v1_12_R1();
                 break;
-            case "v1_16_R3":
+            case "v1_16_r3":
                 versionSupport = new v1_16_R3();
                 break;
-            case "v1_17_R1":
+            case "v1_17_r1":
                 versionSupport = new v1_17_R1();
                 break;
-            case "v1_18_R2":
+            case "v1_18_r2":
                 versionSupport = new v1_18_R2();
                 break;
-            case "v1_19_R3":
+            case "v1_19_r3":
                 versionSupport = new v1_19_R3();
                 break;
-            case "v1_20_R1":
+            case "v1_20_r1":
                 versionSupport = new v1_20_R1();
                 break;
-            case "v1_20_R2":
+            case "v1_20_r2":
                 versionSupport = new v1_20_R2();
                 break;
-            case "v1_20_R3":
+            case "v1_20_r3":
                 versionSupport = new v1_20_R3();
                 break;
-            case "v1_20_R4":
+            case "v1_20_r4":
                 versionSupport = new v1_20_R4();
                 break;
-            case "v1_21_R1":
+            case "v1_21_r1":
                 versionSupport = new v1_21_R1();
                 break;
         }
