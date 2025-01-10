@@ -2,6 +2,7 @@ package me.kiiya.hotbarmanager.listeners.bedwars2023;
 
 import com.tomkeuper.bedwars.api.shop.IPlayerQuickBuyCache;
 import com.tomkeuper.bedwars.api.shop.IQuickBuyElement;
+import com.tomkeuper.bedwars.shop.ShopManager;
 import com.tomkeuper.bedwars.shop.main.ShopIndex;
 import com.tomkeuper.bedwars.shop.quickbuy.PlayerQuickBuyCache;
 import com.tomkeuper.bedwars.BedWars;
@@ -174,6 +175,7 @@ public class ShopBuy implements Listener {
                         .replace("%bw_item%", Utility.getMsg(p, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
                         .replace("%bw_color%", "")
                         .replace("%bw_tier%", !cc.isUpgradable() ? "" : CategoryContent.getRomanNumber(cachedItem.getTier())));
+                ShopManager.shop.open(p, quickBuyCache, false);
                 break;
             }
         } catch (Exception ex) {

@@ -12,6 +12,7 @@ import com.andrei1058.bedwars.shop.ShopCache;
 import com.andrei1058.bedwars.shop.main.ShopIndex;
 import com.andrei1058.bedwars.shop.quickbuy.PlayerQuickBuyCache;
 import com.andrei1058.bedwars.shop.quickbuy.QuickBuyElement;
+import com.andrei1058.bedwars.shop.ShopManager;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
@@ -168,6 +169,7 @@ public class ShopBuy implements Listener {
                         .replace("{item}", Utility.getMsg(p, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
                         .replace("{color}", "")
                         .replace("{tier}", !BedWars.nms.isTool(item) ? "" : CategoryContent.getRomanNumber(cachedItem.getTier())));
+                ShopManager.shop.open(p, quickBuyCache, false);
                 break;
             }
         } catch (Exception ex) {

@@ -65,11 +65,10 @@ public class MySQL implements Database {
         Utility.info("&eConnecting to MySQL database...");
         db = new HikariDataSource();
         db.setPoolName("HotbarManager-Pool");
-        db.setMaximumPoolSize(10);
+        db.setMaximumPoolSize(20); // Increase pool size
         db.setConnectionTimeout(30000L);
         db.setMaxLifetime(1800000L);
         db.setIdleTimeout(60000L);
-        db.setMaximumPoolSize(10);
         if (version.contains("v1_8") || version.contains("v1_12")) db.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
         else db.setDataSourceClassName("com.mysql.cj.jdbc.MysqlDataSource");
         db.addDataSourceProperty("serverName", this.host);
@@ -127,7 +126,12 @@ public class MySQL implements Database {
              PreparedStatement ps = c.prepareStatement("SELECT " + column + " FROM bedwars_hotbar_manager WHERE player=?")) {
             ps.setString(1, path);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getString(column);
+                if (rs.next()) {
+                    String str = rs.getString(column);
+                    ps.close();
+                    c.close();
+                    return str;
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e); // Consider logging the exception instead of throwing

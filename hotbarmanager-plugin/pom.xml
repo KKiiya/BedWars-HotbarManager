@@ -7,7 +7,7 @@
     <parent>
         <groupId>me.kiiya</groupId>
         <artifactId>BedWars-HotbarManager</artifactId>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
     </parent>
     <artifactId>hotbarmanager-plugin</artifactId>
     <packaging>jar</packaging>
@@ -27,11 +27,6 @@
         <repository>
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-        <repository>
-            <id>codemc-repo</id>
-            <url>https://repo.codemc.io/repository/maven-public/</url>
-            <layout>default</layout>
         </repository>
     </repositories>
 
@@ -57,62 +52,62 @@
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>hotbarmanager-api</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_8_R3</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_12_R1</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_16_R3</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_17_R1</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_18_R2</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_19_R3</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_20_R1</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_20_R2</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_20_R3</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_20_R4</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>v1_21_R1</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>

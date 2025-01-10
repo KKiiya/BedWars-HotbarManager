@@ -14,6 +14,7 @@ import java.util.List;
 
 public class SQLite implements Database {
     private Connection connection;
+
     public SQLite() {
         Utility.info("&eUsing SQLite as a database provider!");
         Utility.info("&eConnecting to SQLite database...");
@@ -92,24 +93,11 @@ public class SQLite implements Database {
     @Override
     public void setData(Player player, String column, String value) {
         String path = player.getUniqueId().toString();
-        try {
-            Connection c = getConnection();
-            try {
-                PreparedStatement ps = c.prepareStatement("UPDATE bedwars_hotbar_manager SET " + column + "=? WHERE player=?");
-                ps.setString(1, value);
-                ps.setString(2, path);
-                ps.executeUpdate();
-                ps.close();
-                c.close();
-            } catch (Throwable throwable) {
-                if (c != null)
-                    try {
-                        c.close();
-                    } catch (Throwable throwable1) {
-                        throwable.addSuppressed(throwable1);
-                    }
-                throw throwable;
-            }
+        try (Connection c = getConnection();
+             PreparedStatement ps = c.prepareStatement("UPDATE bedwars_hotbar_manager SET " + column + "=? WHERE player=?")) {
+            ps.setString(1, value);
+            ps.setString(2, path);
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

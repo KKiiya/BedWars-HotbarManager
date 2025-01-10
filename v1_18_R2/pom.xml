@@ -7,7 +7,7 @@
     <parent>
         <groupId>me.kiiya</groupId>
         <artifactId>BedWars-HotbarManager</artifactId>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
     </parent>
     <artifactId>v1_18_R2</artifactId>
     <packaging>jar</packaging>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>me.kiiya</groupId>
             <artifactId>hotbarmanager-api</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version>
         </dependency>
     </dependencies>
 

@@ -122,7 +122,7 @@ public class HotbarPlayer implements IHotbarPlayer {
     public void saveHotbar() {
         Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
             for (int i = 0; i < 9; i++) {
-                this.db.setData(player, "slot" + i, hotbar.get(i).toString());
+                db.setData(player, "slot" + i, hotbar.get(i).toString());
             }
         });
     }
