@@ -30,9 +30,13 @@ public class InventoryListener implements Listener {
         Player p = (Player) e.getWhoClicked();
 
         if (p == null) return;
+
+        PlayerInventory inv = p.getInventory();
         if (e.getInventory() == null) return;
         if (e.getClickedInventory() == null) return;
         if (e.getInventory().getHolder() == null) return;
+        if (e.getClickedInventory().getHolder() == null) return;
+        if (e.getClickedInventory().getHolder() instanceof PlayerInventory) return;
         if (!(e.getInventory().getHolder() instanceof GUIHolder)) return;
 
         if (e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
@@ -43,7 +47,7 @@ public class InventoryListener implements Listener {
             return;
         }
 
-        if (e.getInventory() != e.getClickedInventory() || e.getClickedInventory() == p.getInventory()) {
+        if (e.getInventory() != e.getClickedInventory() || e.getClickedInventory() == inv) {
             e.getCursor().setType(Material.AIR);
             e.setCancelled(true);
             return;

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static me.kiiya.hotbarmanager.config.ConfigPaths.*;
+import static me.kiiya.hotbarmanager.utils.Utility.debug;
 
 public class HotbarManagerMenu implements GUIHolder {
 
@@ -36,6 +37,7 @@ public class HotbarManagerMenu implements GUIHolder {
     private Inventory inventory;
 
     public HotbarManagerMenu(Player player) {
+        debug("Opening HotbarManager menu for " + player.getName());
         this.player = player;
         this.vs = HotbarManager.getVersionSupport();
         this.hu = HotbarUtils.getInstance();
@@ -47,6 +49,7 @@ public class HotbarManagerMenu implements GUIHolder {
         } catch (Exception e) {
             throw new RuntimeException("Error while opening the hotbar manager menu", e);
         }
+        debug("HotbarManager menu opened for " + player.getName());
     }
 
     @Override
@@ -71,8 +74,8 @@ public class HotbarManagerMenu implements GUIHolder {
             && e.getAction() != InventoryAction.PLACE_ALL
             && e.getAction() != InventoryAction.PLACE_ONE
             && e.getAction() != InventoryAction.SWAP_WITH_CURSOR) {
-            e.setCursor(new ItemStack(Material.AIR));
             e.setCancelled(true);
+            e.setCursor(new ItemStack(Material.AIR));
             return;
         }
 
@@ -85,9 +88,9 @@ public class HotbarManagerMenu implements GUIHolder {
         if (tag == null) {
             if (cursorTag != null && hu.getPosForSlot(e.getSlot()) != -1) {
                 p.setSlotCategory(hu.getPosForSlot(e.getSlot()), Category.valueOf(cursorTag.toUpperCase()), true);
-                e.setCursor(new ItemStack(Material.AIR));
-                new HotbarManagerMenu(player);
-            }
+            } else e.setCancelled(true);
+            e.setCursor(new ItemStack(Material.AIR));
+            new HotbarManagerMenu(player);
             return;
         }
 
@@ -112,6 +115,12 @@ public class HotbarManagerMenu implements GUIHolder {
             case "compass-slot":
             case "none-slot":
                 String category = cursorTag == null ? "NONE" : cursorTag.toUpperCase();
+                if (hu.getPosForSlot(e.getSlot()) == -1) {
+                    e.setCancelled(true);
+                    e.setCursor(new ItemStack(Material.AIR));
+                    new HotbarManagerMenu(player);
+                    return;
+                }
                 p.setSlotCategory(hu.getPosForSlot(e.getSlot()), Category.valueOf(category), true);
                 e.setCursor(new ItemStack(Material.AIR));
                 new HotbarManagerMenu(player);
@@ -148,6 +157,8 @@ public class HotbarManagerMenu implements GUIHolder {
                 break;
             default:
                 e.setCancelled(true);
+                e.setCursor(new ItemStack(Material.AIR));
+                new HotbarManagerMenu(player);
                 break;
         }
     }
@@ -315,7 +326,10 @@ public class HotbarManagerMenu implements GUIHolder {
         for (Integer slot : slots) {
             switch (p.getSlotCategory(slot)) {
                 case NONE:
-                    if (!mc.getBoolean(PLACEHOLDER_NONE_ENABLED)) category = new ItemStack(Material.AIR);
+                    if (!mc.getBoolean(PLACEHOLDER_NONE_ENABLED)) {
+                        category = new ItemStack(Material.AIR);
+                        inventory.setItem(hu.getSlotForPos(slot), category);
+                    }
                     else {
                         category = new ItemStack(Material.valueOf(mc.getString(PLACEHOLDER_NONE_MATERIAL)));
                         category.setDurability((short) mc.getInt(PLACEHOLDER_NONE_DATA));
@@ -324,8 +338,8 @@ public class HotbarManagerMenu implements GUIHolder {
                         category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_PLACEHOLDER_NAME).replace("{slot}", String.valueOf(slot + 1)));
                         category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_PLACEHOLDER_LORE));
                         category.setItemMeta(category_meta);
+                        inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "none-slot"));
                     }
-                    inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "none-slot"));
                     break;
                 case MELEE:
                     category = new ItemStack(Material.valueOf(mc.getString(CATEGORY_MELEE_MATERIAL)));
@@ -412,6 +426,21 @@ public class HotbarManagerMenu implements GUIHolder {
                             category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE).stream().map(s -> s.replace("{category}", Utility.getMsg(player, MEANING_COMPASS))).collect(Collectors.toList()));
                             category.setItemMeta(category_meta);
                             inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "compass-slot"));
+                        } else {
+                            if (!mc.getBoolean(PLACEHOLDER_NONE_ENABLED)) {
+                                category = new ItemStack(Material.AIR);
+                                inventory.setItem(hu.getSlotForPos(slot), category);
+                            }
+                            else {
+                                category = new ItemStack(Material.valueOf(mc.getString(PLACEHOLDER_NONE_MATERIAL)));
+                                category.setDurability((short) mc.getInt(PLACEHOLDER_NONE_DATA));
+                                if (vs.isPlayerHead(category)) category = Utility.getSkull(mc.getString(PLACEHOLDER_NONE_SKULL_URL));
+                                category_meta = category.getItemMeta();
+                                category_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_PLACEHOLDER_NAME).replace("{slot}", String.valueOf(slot + 1)));
+                                category_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_PLACEHOLDER_LORE));
+                                category.setItemMeta(category_meta);
+                                inventory.setItem(hu.getSlotForPos(slot), vs.setItemTag(category, "hbm", "none-slot"));
+                            }
                         }
                     }
                     break;
