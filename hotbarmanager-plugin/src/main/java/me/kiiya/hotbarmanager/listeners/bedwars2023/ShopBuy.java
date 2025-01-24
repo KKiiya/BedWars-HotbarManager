@@ -2,6 +2,7 @@ package me.kiiya.hotbarmanager.listeners.bedwars2023;
 
 import com.tomkeuper.bedwars.api.shop.IPlayerQuickBuyCache;
 import com.tomkeuper.bedwars.api.shop.IQuickBuyElement;
+import com.tomkeuper.bedwars.api.shop.IShopCategory;
 import com.tomkeuper.bedwars.shop.ShopManager;
 import com.tomkeuper.bedwars.shop.main.ShopIndex;
 import com.tomkeuper.bedwars.shop.quickbuy.PlayerQuickBuyCache;
@@ -21,11 +22,9 @@ import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
 import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Utility;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -33,11 +32,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
+import static me.kiiya.hotbarmanager.utils.Utility.debug;
+
 public class ShopBuy implements Listener {
 
     private final Set<UUID> processing = Collections.synchronizedSet(new HashSet<>());
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     public void onBuy(ShopBuyEvent e) {
         VersionSupport vs = HotbarManager.getBW2023Api().getVersionSupport();
 
@@ -68,16 +69,22 @@ public class ShopBuy implements Listener {
         String buySound = "shop-bought";
 
         if (!hotbar.contains(cat)) return;
+        if (processing.contains(p.getUniqueId())) return;
 
         try {
             processing.add(p.getUniqueId());
             for (int i = 0; i < 9; i++) {
+                debug("Checking slot " + i);
                 Category currentCategory = hotbar.get(i);
                 ItemStack itemSlot = inv.getItem(i);
                 if (currentCategory != cat) continue;
 
                 if (cc.isUpgradable() && itemSlot != null) {
-                    if (Utility.getItemCategory(itemSlot) == cat && !vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier)) continue;
+                    debug("Item is upgradable");
+                    if (Utility.getItemCategory(itemSlot) == cat && !vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier)) {
+                        debug("Item is the same category but doesn't have the same identifier");
+                        continue;
+                    }
                 }
 
                 if (indexViewers.contains(p.getUniqueId()) && element != null) cache.upgradeCachedItem(cc, element.getSlot());
@@ -87,6 +94,7 @@ public class ShopBuy implements Listener {
                 IContentTier upgradableContent = cc.getContentTiers().get(cachedItem.getTier()-1);
 
                 Material currency = upgradableContent.getCurrency();
+                int totalPlayerMoney = CategoryContent.calculateMoney(p, currency);
                 int price = upgradableContent.getPrice();
 
                 ItemStack item = Utility.formatItemStack(upgradableContent.getBuyItemsList().get(0).getItemStack(), t);
@@ -95,87 +103,138 @@ public class ShopBuy implements Listener {
                     inv.remove(Material.getMaterial(BedWars.getForCurrentVersion("WOOD_SWORD", "WOOD_SWORD", "WOODEN_SWORD")));
                 }
 
-                if (BedWars.nms.isTool(item) || item.getType() == Material.SHEARS) {
+                if (cc.isUpgradable() || cc.isPermanent()) {
                     unbreakable(item);
                     vs.setShopUpgradeIdentifier(item, identifier);
                 }
 
-                if (itemSlot != null) {
+                if (itemSlot != null && itemSlot.getType() != Material.AIR) {
                     if (BedWars.nms.isSword(item) && currentCategory == Category.MELEE) {
+                        debug("Item is a sword and the category is MELEE");
                         unbreakable(item);
                         for (TeamEnchant teamEnchant : t.getSwordsEnchantments()) {
                             item.addEnchantment(teamEnchant.getEnchantment(), teamEnchant.getAmplifier());
                         }
 
-                        CategoryContent.takeMoney(p, currency, price);
-                        if (Utility.isItemHigherTier(item, itemSlot)) {
-                            Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> inv.addItem(itemSlot), 1L);
-                            ItemStack finalItem = item;
-                            int finalI = i;
-                            Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> inv.setItem(finalI, finalItem), 2L);
-                        } else inv.addItem(item);
+                        if (BedWars.nms.isSword(itemSlot) && Utility.isItemHigherTier(item, itemSlot)) {
+                            debug("Item is a sword and the item in the slot is lower tier, replacing it");
+                            ItemStack itemToAdd = inv.getItem(i);
+                            if (itemToAdd != null) itemToAdd = itemToAdd.clone();
+
+                            inv.setItem(i, item);
+                            p.updateInventory();
+
+                            if (itemToAdd != null) {
+                                inv.addItem(itemToAdd);
+                                p.updateInventory();
+                            }
+                        } else {
+                            debug("Item is a sword and the item in the slot is higher tier, adding it to the inventory");
+                            inv.addItem(item);
+                            p.updateInventory();
+                        }
                     } else if (vs.getShopUpgradeIdentifier(item) != null && vs.getShopUpgradeIdentifier(item).equals(identifier)) {
-                        CategoryContent.takeMoney(p, currency, price);
-                        ItemStack finalItem4 = item;
-                        int finalI3 = i;
-                        Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> inv.setItem(finalI3, vs.setShopUpgradeIdentifier(finalItem4, identifier)), 1L);
+                        debug("Item has the same identifier, replacing...");
+                        inv.setItem(i, vs.setShopUpgradeIdentifier(itemSlot, identifier));
+                        p.updateInventory();
                     } else if (item.getType() == itemSlot.getType() && item.getDurability() == itemSlot.getDurability()) {
-                        if (itemSlot.getAmount() + item.getAmount() > itemSlot.getType().getMaxStackSize()) continue;
-                        else {
-                            CategoryContent.takeMoney(p, currency, price);
-                            ItemStack finalItem2 = item;
-                            Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> itemSlot.setAmount(itemSlot.getAmount() + finalItem2.getAmount()), 1L);
+                        if (itemSlot.getAmount() + item.getAmount() > itemSlot.getType().getMaxStackSize()) {
+                            debug("Item is the same type and durability, but the amount is higher than the max stack size");
+                            continue;
+                        } else {
+                            debug("Item is the same type and durability, adding the amount");
+                            itemSlot.setAmount(itemSlot.getAmount() + item.getAmount());
+                            p.updateInventory();
                         }
                     } else {
-                        if (Utility.getItemCategory(itemSlot) == cat && !vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier)) continue;
+                        if (Utility.getItemCategory(itemSlot) == cat && (vs.getShopUpgradeIdentifier(itemSlot) == null || !vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier))) continue;
+                        debug("Item is same category but different identifier or no identifier");
 
                         if (cc.isPermanent()) {
+                            debug("Item is permanent");
                             unbreakable(item);
                             item = vs.setShopUpgradeIdentifier(item, identifier);
                         }
 
                         if (BedWars.nms.isSword(item)) {
+                            debug("Item is a sword");
                             unbreakable(item);
                             for (TeamEnchant teamEnchant : t.getSwordsEnchantments()) {
                                 item.addEnchantment(teamEnchant.getEnchantment(), teamEnchant.getAmplifier());
                             }
                         }
 
-                        CategoryContent.takeMoney(p, currency, price);
                         ItemStack itemToAdd = inv.getItem(i);
-                        if (itemToAdd != null) Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> inv.addItem(itemToAdd), 1L);
-                        int finalI2 = i;
-                        ItemStack finalItem3 = item;
-                        Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> inv.setItem(finalI2, finalItem3), 2L);
+                        if (itemToAdd != null) itemToAdd = itemToAdd.clone();
+
+                        inv.setItem(i, item);
+                        p.updateInventory();
+
+                        if (itemToAdd != null) {
+                            debug("Adding replaced item to inventory");
+                            inv.addItem(itemToAdd);
+                            p.updateInventory();
+                        }
                     }
                 } else {
+                    debug("No item was found in slot " + i);
                     if (cc.isPermanent()) {
+                        debug("Item is permanent");
                         unbreakable(item);
                         item = vs.setShopUpgradeIdentifier(item, identifier);
                     }
 
                     if (BedWars.nms.isSword(item)) {
+                        debug("Item is a sword");
                         unbreakable(item);
                         for (TeamEnchant teamEnchant : t.getSwordsEnchantments()) {
                             item.addEnchantment(teamEnchant.getEnchantment(), teamEnchant.getAmplifier());
                         }
                     }
 
-                    CategoryContent.takeMoney(p, currency, price);
-                    int finalI1 = i;
-                    ItemStack finalItem1 = item;
-                    Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> inv.setItem(finalI1, finalItem1), 1L);
+                    debug("Setting item in slot " + i);
+                    inv.setItem(i, item);
+                    p.updateInventory();
                 }
 
+                debug("Removing money from player with currency " + currency + " and price " + price);
+                CategoryContent.takeMoney(p, currency, price);
+                p.updateInventory();
                 e.setCancelled(true);
                 Sounds.playSound(buySound, p);
+
+                int finalPlayerMoney = CategoryContent.calculateMoney(p, currency);
+                int expectedPlayerMoney = totalPlayerMoney - price;
+                debug("Starter money: " + totalPlayerMoney + ", expected money: " + expectedPlayerMoney + ", final money: " + finalPlayerMoney);
+
+                if (expectedPlayerMoney > finalPlayerMoney) {
+                    debug("Final money (" + finalPlayerMoney + ") is lower than expected money (" + expectedPlayerMoney + "), adding...");
+                    ItemStack addMissingMoney = new ItemStack(currency, expectedPlayerMoney - finalPlayerMoney);
+                    inv.addItem(addMissingMoney);
+                } else if (finalPlayerMoney > expectedPlayerMoney) {
+                    debug("Final money (" + finalPlayerMoney + ") is higher than expected money (" + expectedPlayerMoney + "), removing...");
+                    ItemStack removeExtraMoney = new ItemStack(currency, finalPlayerMoney - expectedPlayerMoney);
+                    inv.removeItem(removeExtraMoney);
+                }
+                debug("Money took successfully");
+
                 p.sendMessage(Utility.getMsg(p, "shop-new-purchase")
                         .replace("%bw_prefix%", Utility.getMsg(p, "prefix"))
                         .replace("%bw_lang_prefix%", Utility.getMsg(p, "prefix"))
                         .replace("%bw_item%", Utility.getMsg(p, "shop-items-messages." + identifier.split("\\.")[0] + ".content-item-" + identifier.split("\\.")[2] + "-name"))
                         .replace("%bw_color%", "")
                         .replace("%bw_tier%", !cc.isUpgradable() ? "" : CategoryContent.getRomanNumber(cachedItem.getTier())));
-                ShopManager.shop.open(p, quickBuyCache, false);
+                if (indexViewers.contains(p.getUniqueId())) ShopManager.shop.open(p, quickBuyCache, false);
+                else {
+                    for (IShopCategory sc : ShopManager.shop.getCategoryList()) {
+                        String ccId = cc.getIdentifier().split("\\.")[0];
+                        String scId =  sc.getCategoryContentList().get(0).getIdentifier().split("\\.")[0];
+                        if (ccId.equals(scId)) {
+                            sc.open(p, ShopManager.shop, cache);
+                            break;
+                        }
+                    }
+                }
                 break;
             }
         } catch (Exception ex) {
