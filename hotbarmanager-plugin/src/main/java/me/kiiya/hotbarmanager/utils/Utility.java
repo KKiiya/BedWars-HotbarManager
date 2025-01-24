@@ -22,6 +22,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Utility {
+
+    public static void debug(String text) {
+        if (HotbarManager.debug) info( "[DEBUG] " + text);
+    }
+
     public static void info(String text) {
         Bukkit.getConsoleSender().sendMessage("[" + HotbarManager.getInstance().getName() + "] " + c(text));
     }
@@ -93,7 +98,7 @@ public class Utility {
         Material type = item.getType();
         switch (HotbarManager.getSupport()) {
             case BEDWARS1058:
-                if (BedWars.nms.isTool(item)) return Category.TOOLS;
+                if (BedWars.nms.isTool(item) || type == Material.SHEARS) return Category.TOOLS;
                 if (BedWars.nms.isBow(item)) return Category.RANGED;
                 if (BedWars.nms.isSword(item) || type == Material.STICK) return Category.MELEE;
 
@@ -107,7 +112,7 @@ public class Utility {
                 if (item.getType().isBlock()) return Category.BLOCKS;
                 break;
             case BEDWARS2023:
-                if (com.tomkeuper.bedwars.BedWars.nms.isTool(item)) return Category.TOOLS;
+                if (com.tomkeuper.bedwars.BedWars.nms.isTool(item) || type == Material.SHEARS) return Category.TOOLS;
                 if (com.tomkeuper.bedwars.BedWars.nms.isBow(item)) return Category.RANGED;
                 if (com.tomkeuper.bedwars.BedWars.nms.isSword(item) || type == Material.STICK) return Category.MELEE;
 
