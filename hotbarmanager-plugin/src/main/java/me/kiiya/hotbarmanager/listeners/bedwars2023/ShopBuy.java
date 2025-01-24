@@ -133,9 +133,9 @@ public class ShopBuy implements Listener {
                             inv.addItem(item);
                             p.updateInventory();
                         }
-                    } else if (vs.getShopUpgradeIdentifier(item) != null && vs.getShopUpgradeIdentifier(item).equals(identifier)) {
+                    } else if (vs.getShopUpgradeIdentifier(itemSlot) != null && vs.getShopUpgradeIdentifier(itemSlot).equals(identifier)) {
                         debug("Item has the same identifier, replacing...");
-                        inv.setItem(i, vs.setShopUpgradeIdentifier(itemSlot, identifier));
+                        inv.setItem(i, vs.setShopUpgradeIdentifier(item, identifier));
                         p.updateInventory();
                     } else if (item.getType() == itemSlot.getType() && item.getDurability() == itemSlot.getDurability()) {
                         if (itemSlot.getAmount() + item.getAmount() > itemSlot.getType().getMaxStackSize()) {
