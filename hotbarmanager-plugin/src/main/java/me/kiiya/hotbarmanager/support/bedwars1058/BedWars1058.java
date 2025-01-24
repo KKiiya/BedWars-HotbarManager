@@ -56,6 +56,7 @@ public class BedWars1058 {
     private void loadConfig() {
         Utility.info("&eLoading config...");
         mainConfig = new MainConfig(HotbarManager.getInstance(), "config", bw1058Api.getAddonsPath().getPath() + File.separator + "HotbarManager");
+        HotbarManager.debug = mainConfig.getBoolean("debug");
         HotbarUtils.initialize(mainConfig);
         Utility.info("&aConfig loaded!");
     }

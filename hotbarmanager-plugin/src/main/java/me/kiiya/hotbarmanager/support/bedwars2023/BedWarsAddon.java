@@ -79,6 +79,7 @@ public class BedWarsAddon extends Addon {
     private void loadConfig() {
         Utility.info("&eLoading config...");
         mainConfig = new MainConfig(HotbarManager.getInstance(), "config", bw2023Api.getAddonsPath().getPath() + File.separator + "HotbarManager");
+        HotbarManager.debug = mainConfig.getBoolean("debug");
         HotbarUtils.initialize(mainConfig);
         Utility.info("&aConfig loaded!");
     }

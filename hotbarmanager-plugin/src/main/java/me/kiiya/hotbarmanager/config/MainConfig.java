@@ -16,6 +16,7 @@ public class MainConfig extends ConfigManager {
         super(plugin, name, dir);
         YamlConfiguration yml = getYml();
         yml.options().header("BedWars-HotBarManager v" + HotbarManager.getInstance().getDescription().getVersion() + " By Kiiya.\nDiscord: https://discord.gg/n5yNavRvrP");
+        yml.addDefault("debug", false);
         yml.addDefault(ITEM_TYPE, "BLAZE_POWDER");
         yml.addDefault(ITEM_POSITION, 54);
 

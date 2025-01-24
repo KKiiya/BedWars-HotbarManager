@@ -27,6 +27,7 @@ public final class HotbarManager extends JavaPlugin {
     public static MainConfig mainConfig;
     public static Support support;
     public static IHotbarManager manager;
+    public static boolean debug = false;
     private Database db;
 
     @Override
