@@ -11,6 +11,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static me.kiiya.hotbarmanager.utils.Utility.debug;
 
 public class HotbarPlayer implements IHotbarPlayer {
 
@@ -19,43 +23,44 @@ public class HotbarPlayer implements IHotbarPlayer {
     private Database db;
 
     public HotbarPlayer(Player player) {
+        debug("Creating HotbarPlayer for " + player.getName());
         this.db = HotbarManager.getInstance().getDB();
         this.player = player;
         this.hotbar = new HashMap<>();
-        Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getInstance(), () -> {
-            try {
-                for (int i = 0; i < 9; i++) {
-                    String data = this.db.getData(player, "slot" + i);
+        HashMap<String, String> data;
 
-                    int finalI = i;
-                    Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
-                        hotbar.put(finalI, Category.getFromString(data));
-                    });
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        try {
+            data = db.getData(player);
+            for (int i = 0; i < 9; i++) {
+                String category = data.get("slot" + i);
+                debug("Loading slot " + i + " for " + player.getName() + " with value " + category);
+                hotbar.put(i, Category.getFromString(category));
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        debug("Creating HotbarPlayer for " + player.getName() + " was successful.");
     }
 
     public HotbarPlayer(UUID uuid) {
         this.db = HotbarManager.getInstance().getDB();
         this.player = Bukkit.getServer().getPlayer(uuid);
+        debug("Creating HotbarPlayer for " + player.getName());
         this.hotbar = new HashMap<>();
-        Bukkit.getScheduler().runTaskAsynchronously(HotbarManager.getInstance(), () -> {
-            try {
-                for (int i = 0; i < 9; i++) {
-                    String data = this.db.getData(player, "slot" + i);
+        HashMap<String, String> data;
 
-                    int finalI = i;
-                    Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
-                        hotbar.put(finalI, Category.getFromString(data));
-                    });
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        try {
+            data = db.getData(player);
+            for (int i = 0; i < 9; i++) {
+                String category = data.get("slot" + i);
+                debug("Loading slot " + i + " for " + player.getName() + " with value " + category);
+                hotbar.put(i, Category.getFromString(category));
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        debug("Creating HotbarPlayer for " + player.getName() + " was successful.");
     }
 
     @Override
@@ -72,11 +77,17 @@ public class HotbarPlayer implements IHotbarPlayer {
     public void setSlotCategory(int slot, Category newCategory, boolean callEvent) {
         Category oldCategory = hotbar.get(slot);
         if (oldCategory == newCategory) return;
+
+        debug("Setting slot " + slot + " for " + player.getName() + ". OLD: " + oldCategory.toString() + ", NEW: " + newCategory.toString());
         PlayerHotbarUpdateEvent event = new PlayerHotbarUpdateEvent(this, slot, oldCategory, newCategory);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) return;
+        if (event.isCancelled()) {
+            debug("Setting slot " + slot + " for " + player.getName() + " was cancelled.");
+            return;
+        }
 
         hotbar.put(slot, newCategory);
+        debug("Setting slot " + slot + " for " + player.getName() + " was successful.");
     }
 
     @Override
@@ -95,46 +106,86 @@ public class HotbarPlayer implements IHotbarPlayer {
 
     @Override
     public void resetHotbar() {
+        debug("Resetting Hotbar for " + player.getName());
         PlayerHotbarResetEvent e = new PlayerHotbarResetEvent(this);
         Bukkit.getPluginManager().callEvent(e);
-        if (e.isCancelled()) return;
+        if (e.isCancelled()) {
+            debug("Resetting Hotbar for " + player.getName() + " was cancelled.");
+            return;
+        }
 
         List<Category> defaultSlots = me.kiiya.hotbarmanager.player.HotbarManager.getInstance().getDefaultSlots();
         for (int i = 0; i < defaultSlots.size(); i++) {
 
             if (HotbarManager.getSupport() == Support.BEDWARSPROXY || HotbarManager.getSupport() == Support.BEDWARSPROXY2023) {
                 if (HotbarManager.getMainConfig().getBoolean("enable-compass-support") && defaultSlots.get(i) == Category.COMPASS) {
+                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i).toString() + ", NEW: " + Category.COMPASS);
                     hotbar.put(8, Category.COMPASS);
                     continue;
                 }
-                else hotbar.put(i, Category.NONE);
+                else {
+                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i).toString() + ", NEW: " + Category.NONE);
+                    hotbar.put(i, Category.NONE);
+                }
             } else {
                 if (HotbarManager.isCompassAddon() && HotbarManager.getMainConfig().getBoolean("enable-compass-support") && defaultSlots.get(i) == Category.COMPASS) {
+                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i).toString() + ", NEW: " + Category.COMPASS);
                     hotbar.put(8, Category.COMPASS);
                     continue;
                 }
-                else hotbar.put(i, Category.NONE);
+                else {
+                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i).toString() + ", NEW: " + defaultSlots.get(i).toString());
+                    hotbar.put(i, Category.NONE);
+                }
             }
+            debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i).toString() + ", NEW: " + defaultSlots.get(i).toString());
             hotbar.put(i, defaultSlots.get(i));
         }
+        debug("Resetting Hotbar for " + player.getName() + " was successful.");
     }
 
     public void saveHotbar() {
+        debug("Saving Hotbar for " + player.getName());
         Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
+            if (hotbar == null) {
+                debug("Hotbar is null, skipping save.");
+                return;
+            }
             for (int i = 0; i < 9; i++) {
-                db.setData(player, "slot" + i, hotbar.get(i).toString());
+                Category category = hotbar.get(i);
+                if (category != null) {
+                    debug("Saving slot " + i + " for " + player.getName() + " with value " + category.toString());
+                    db.setData(player, "slot" + i, category.toString());
+                } else {
+                    debug("Slot " + i + " for " + player.getName() + " is null, skipping save.");
+                }
             }
         });
+        debug("Saving Hotbar for " + player.getName() + " was successful.");
     }
 
     @Override
+    @Deprecated
     public void destroy() {
+        debug("Destroying HotbarPlayer for " + player.getName());
         saveHotbar();
-        me.kiiya.hotbarmanager.player.HotbarManager.getPrivateInstance().getPlayersMap().remove(player.getUniqueId().toString());
         Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> {
             hotbar = null;
             player = null;
             db = null;
         }, 10L);
+        me.kiiya.hotbarmanager.player.HotbarManager.getPrivateInstance().getPlayersMap().remove(player.getUniqueId().toString());
+    }
+
+    @Override
+    public void destroy(boolean save) {
+        debug("Destroying HotbarPlayer for " + player.getName());
+        if (save) saveHotbar();
+        Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> {
+            hotbar = null;
+            player = null;
+            db = null;
+        }, 10L);
+        me.kiiya.hotbarmanager.player.HotbarManager.getPrivateInstance().getPlayersMap().remove(player.getUniqueId().toString());
     }
 }

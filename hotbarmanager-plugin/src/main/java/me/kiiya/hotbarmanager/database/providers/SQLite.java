@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class SQLite implements Database {
@@ -27,68 +29,91 @@ public class SQLite implements Database {
     }
 
     @Override
-    public void createPlayerData(Player p, List<Category> defaultSlots) {
-        Connection connection = null;
-        PreparedStatement ps = null;
-        String path = p.getUniqueId().toString();
-        try {
-            connection = getConnection();
-            ps = connection.prepareStatement("SELECT * FROM bedwars_hotbar_manager WHERE player = '" + path + "'");
-            ResultSet rs = ps.executeQuery();
-            String player = null;
-            if (rs.next()) player = rs.getString("player");
-            if (player != null) {
-            }
-            else {
-                connection = getConnection();
-                ps = connection.prepareStatement("INSERT INTO bedwars_hotbar_manager(player, slot0, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8) VALUES (?,?,?,?,?,?,?,?,?,?)");
-                ps.setString(1, path);
-                for (int i = 2; i <= 10; i++) {
-                    Category slot = defaultSlots.get(i-2);
-                    if (slot == null) slot = Category.NONE;
-                    ps.setString(i, slot.toString());
+    public void createPlayerData(Player player, List<Category> defaultSlots) {
+        String path = player.getUniqueId().toString();
+
+        try (Connection c = getConnection()) {
+            PreparedStatement check = c.prepareStatement("SELECT player FROM bedwars_hotbar_manager WHERE player=?");
+            check.setString(1, path);
+            ResultSet rs = check.executeQuery();
+            if (rs.next()) {
+                String str = rs.getString("player");
+                if (str != null) {
+                    check.close();
+                    c.close();
+                    return;
                 }
-                ps.executeUpdate();
             }
+            String sql = "INSERT INTO bedwars_hotbar_manager(player, slot0, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8) VALUES (?,?,?,?,?,?,?,?,?,?)";
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, path);
+            for (int i = 2; i <= 10; i++) {
+                Category slot = defaultSlots.get(i-2);
+                if (slot == null) slot = Category.NONE;
+                ps.setString(i, slot.toString());
+            }
+            ps.executeUpdate();
+            ps.close();
+            c.close();
         } catch(SQLException e){
             throw new RuntimeException(e);
-        } finally {
-            try {
-                if (ps != null)
-                    ps.close();
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 
     @Override
-    public String getData(Player player, String column) {
+    public HashMap<String, String> getData(Player player) {
+        HashMap<String, String> data = new HashMap<>();
         String path = player.getUniqueId().toString();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = getConnection();
-            ps = conn.prepareStatement("SELECT * FROM bedwars_hotbar_manager WHERE player = '" + path + "';");
-            ResultSet rs = ps.executeQuery();
-            if (rs.next())
-                return rs.getString(column);
+        try (Connection c = getConnection();
+             PreparedStatement ps = c.prepareStatement("SELECT * FROM bedwars_hotbar_manager WHERE player=?")) {
+            ps.setString(1, path);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    data.put("slot0", rs.getString("slot0"));
+                    data.put("slot1", rs.getString("slot1"));
+                    data.put("slot2", rs.getString("slot2"));
+                    data.put("slot3", rs.getString("slot3"));
+                    data.put("slot4", rs.getString("slot4"));
+                    data.put("slot5", rs.getString("slot5"));
+                    data.put("slot6", rs.getString("slot6"));
+                    data.put("slot7", rs.getString("slot7"));
+                    data.put("slot8", rs.getString("slot8"));
+                    rs.close();
+                    ps.close();
+                    c.close();
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            try {
-                if (ps != null)
+        }
+        return data;
+    }
+
+    @Override
+    public String getData(Player player, String column) {
+        if (!isValidColumn(column)) {
+            throw new IllegalArgumentException("Invalid column name");
+        }
+
+        String path = player.getUniqueId().toString();
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT " + column + " FROM bedwars_hotbar_manager WHERE player=?")) {
+            ps.setString(1, path);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String result = rs.getString(column);
+                    rs.close();
                     ps.close();
-                if (conn != null)
                     conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+                    return result;
+                }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e); // Consider logging the exception instead of throwing
         }
         return null;
     }
+
 
     @Override
     public void setData(Player player, String column, String value) {
@@ -98,6 +123,8 @@ public class SQLite implements Database {
             ps.setString(1, value);
             ps.setString(2, path);
             ps.executeUpdate();
+            ps.close();
+            c.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -120,12 +147,14 @@ public class SQLite implements Database {
         else path = Bukkit.getPluginManager().getPlugin("BedWars2023").getDataFolder() + "/Cache/";
 
         File dataFolder = new File(path, "hotbar_manager.db");
-        if (!dataFolder.exists())
+        if (!dataFolder.exists()) {
             try {
                 dataFolder.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+
         try {
             if (this.connection != null && !this.connection.isClosed())
                 return this.connection;
@@ -135,5 +164,10 @@ public class SQLite implements Database {
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean isValidColumn(String column) {
+        List<String> validColumns = Arrays.asList("slot0", "slot1", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8");
+        return validColumns.contains(column);
     }
 }

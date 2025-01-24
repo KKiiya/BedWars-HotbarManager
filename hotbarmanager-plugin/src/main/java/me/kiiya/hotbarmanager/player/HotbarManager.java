@@ -4,15 +4,17 @@ import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
 import me.kiiya.hotbarmanager.config.MainConfig;
-import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
+
+import static me.kiiya.hotbarmanager.utils.Utility.debug;
 
 public class HotbarManager implements IHotbarManager, Listener {
 
@@ -70,8 +72,12 @@ public class HotbarManager implements IHotbarManager, Listener {
         if (e == null) return;
         if (e.getPlayer() == null) return;
 
-        me.kiiya.hotbarmanager.HotbarManager.getInstance().getDB().createPlayerData(e.getPlayer(), defaultSlots);
-        playersMap.put(e.getPlayer().getUniqueId().toString(), new HotbarPlayer(e.getPlayer()));
+        Player p = e.getPlayer();
+
+        debug("Player " + p.getName() + " joined the server.");
+        me.kiiya.hotbarmanager.HotbarManager.getInstance().getDB().createPlayerData(p, defaultSlots);
+        playersMap.put(p.getUniqueId().toString(), new HotbarPlayer(p));
+        debug("Player " + p.getName() + " data has been loaded.");
     }
 
     @EventHandler
@@ -79,10 +85,13 @@ public class HotbarManager implements IHotbarManager, Listener {
         if (e == null) return;
         if (e.getPlayer() == null) return;
 
-        IHotbarPlayer hp = me.kiiya.hotbarmanager.HotbarManager.getAPI().getHotbarPlayer(e.getPlayer());
+        Player p = e.getPlayer();
+
+        debug("Player " + e.getPlayer().getName() + " left the server.");
+        IHotbarPlayer hp = playersMap.get(p.getUniqueId().toString());
         if (hp == null) return;
 
-        hp.saveHotbar();
-        hp.destroy();
+        hp.destroy(true);
+        debug("Player " + p.getName() + " data has been saved and destroyed.");
     }
 }

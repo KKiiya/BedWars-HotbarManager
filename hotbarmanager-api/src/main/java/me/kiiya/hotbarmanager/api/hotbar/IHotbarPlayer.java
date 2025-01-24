@@ -57,5 +57,13 @@ public interface IHotbarPlayer {
     /**
      * Destroy the hotbar player
      */
+    @Deprecated
     void destroy();
+
+    /**
+     * Destroy the hotbar player
+     *
+     * @param save - whether to save the hotbar before destroying it
+     */
+    void destroy(boolean save);
 }

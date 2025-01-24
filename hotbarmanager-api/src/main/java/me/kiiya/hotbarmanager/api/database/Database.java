@@ -5,9 +5,18 @@ import org.bukkit.entity.Player;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 public interface Database {
+
+    /**
+     * Get the data of a player
+     * @param player - Player you want to get the data from
+     * @return - HashMap
+     */
+    HashMap<String, String> getData(Player player);
+
     /**
      * Get the data of a player
      * @param player - Player you want to get the data from
