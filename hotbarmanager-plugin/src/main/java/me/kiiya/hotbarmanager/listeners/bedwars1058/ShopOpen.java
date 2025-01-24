@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import static me.kiiya.hotbarmanager.config.ConfigPaths.*;
 import static me.kiiya.hotbarmanager.config.ConfigPaths.ITEM_POSITION;
+import static me.kiiya.hotbarmanager.utils.Utility.debug;
 
 public class ShopOpen implements Listener {
 
@@ -38,6 +39,7 @@ public class ShopOpen implements Listener {
             hotbarManagerItemMeta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEM_NAME));
             hotbarManagerItemMeta.setLore(Utility.getListMsg(player, INVENTORY_ITEM_LORE));
             hotbarManagerItem.setItemMeta(hotbarManagerItemMeta);
+            debug("HotbarManager item created for " + player.getName());
             Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> e.getInventory().setItem(HotbarManager.getMainConfig().getInt(ITEM_POSITION) - 1, vs.setItemTag(hotbarManagerItem, "hbm", "menu")), 1);
         }
     }
@@ -55,6 +57,7 @@ public class ShopOpen implements Listener {
 
         if (e.getView().getTitle().equals(Utility.getMsg(p, "shop-items-messages.inventory-name"))) {
             String hbmTag = vs.getItemTag(e.getCurrentItem(), "hbm");
+            debug("HotbarManager item clicked by " + p.getName());
             if (hbmTag != null && hbmTag.equalsIgnoreCase("menu")) {
                 Bukkit.getServer().dispatchCommand(p, "hbm");
             }
