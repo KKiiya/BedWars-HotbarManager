@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,10 +65,18 @@ public class HotbarManagerMenu implements GUIHolder {
     @Override
     public void onInventoryClick(InventoryClickEvent e) {
         IHotbarPlayer p = HotbarManager.getAPI().getHotbarPlayer(player);
+        PlayerInventory playerInventory = player.getInventory();
         ItemStack item = e.getCurrentItem();
         ItemStack cursor = e.getCursor();
         String tag = item != null  && item.getType() != Material.AIR ? vs.getItemTag(item, "hbm") : null;
         String cursorTag = cursor != null && cursor.getType() != Material.AIR ? vs.getItemTag(cursor, "hbm") : null;
+
+        for (ItemStack pItem : playerInventory.getContents()) {
+            if (pItem == null || pItem.getType() == Material.AIR) continue;
+            String pTag = vs.getItemTag(pItem, "hbm");
+            if (pTag == null) continue;
+            pItem.setType(Material.AIR);
+        }
 
         if (e.getAction() != InventoryAction.PICKUP_ALL
             && e.getAction() != InventoryAction.PICKUP_ONE
