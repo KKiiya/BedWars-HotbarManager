@@ -61,6 +61,7 @@ public class BedWarsAddon extends Addon {
 
     @Override
     public void unload() {
+        me.kiiya.hotbarmanager.player.HotbarManager.getInstance().saveHotbars(true);
         Bukkit.getPluginManager().disablePlugin(getPlugin());
     }
 

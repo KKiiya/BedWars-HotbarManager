@@ -46,7 +46,9 @@ public final class HotbarManager extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        if (support != Support.BEDWARS2023) {
+            me.kiiya.hotbarmanager.player.HotbarManager.getInstance().saveHotbars(true);
+        }
     }
 
     private void loadSupport() {
@@ -57,7 +59,7 @@ public final class HotbarManager extends JavaPlugin {
     }
 
     private void loadVersionSupport() {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].toLowerCase();
+        String version = getServer().getClass().getPackage().getName().split("\\.")[3].toLowerCase();
         switch (version) {
             case "v1_8_r3":
                 versionSupport = new v1_8_R3();
