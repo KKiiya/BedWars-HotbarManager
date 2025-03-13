@@ -2,7 +2,6 @@ package me.kiiya.hotbarmanager.listeners;
 
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.support.VersionSupport;
-import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
