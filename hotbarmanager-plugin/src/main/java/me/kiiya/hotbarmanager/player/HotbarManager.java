@@ -67,6 +67,14 @@ public class HotbarManager implements IHotbarManager, Listener {
         return Collections.unmodifiableList(defaultSlots);
     }
 
+    @Override
+    public void saveHotbars(boolean destroy) {
+        for (IHotbarPlayer hp : playersMap.values()) {
+            hp.saveHotbar();
+            if (destroy) hp.destroy(false);
+        }
+    }
+
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         if (e == null) return;

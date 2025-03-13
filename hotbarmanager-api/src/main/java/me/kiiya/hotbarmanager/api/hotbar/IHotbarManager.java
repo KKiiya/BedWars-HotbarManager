@@ -35,4 +35,11 @@ public interface IHotbarManager {
      * @return A Set of Category objects representing the default slots in the hotbar.
      */
     List<Category> getDefaultSlots();
+
+
+    /**
+     * Saves the hotbar data for all players to the database.
+     * @param destroy - If true, the hotbar data will be removed from memory after saving.
+     */
+    void saveHotbars(boolean destroy);
 }
