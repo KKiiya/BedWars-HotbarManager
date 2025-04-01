@@ -127,7 +127,7 @@
             <artifactId>BedWars1058</artifactId>
             <version>24.9</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/libs/BedWars1058-24.9.jar</systemPath>
+            <systemPath>${project.basedir}/libs/BedWars1058-25.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.andrei1058.bedwars</groupId>
