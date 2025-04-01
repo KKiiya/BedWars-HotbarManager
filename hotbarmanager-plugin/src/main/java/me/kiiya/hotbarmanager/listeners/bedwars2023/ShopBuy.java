@@ -18,10 +18,12 @@ import com.tomkeuper.bedwars.configuration.Sounds;
 import com.tomkeuper.bedwars.shop.ShopCache;
 import com.tomkeuper.bedwars.shop.main.CategoryContent;
 import me.kiiya.hotbarmanager.HotbarManager;
+import me.kiiya.hotbarmanager.api.events.HotbarItemSetEvent;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
 import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Utility;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -85,6 +87,13 @@ public class ShopBuy implements Listener {
                         debug("Item is the same category but doesn't have the same identifier");
                         continue;
                     }
+                }
+
+                HotbarItemSetEvent event = new HotbarItemSetEvent(p, cat, i);
+                Bukkit.getPluginManager().callEvent(event);
+                if (event.isCancelled()) {
+                    debug("Event was cancelled for slot " + i);
+                    return;
                 }
 
                 if (indexViewers.contains(p.getUniqueId()) && element != null) cache.upgradeCachedItem(cc, element.getSlot());
@@ -197,11 +206,12 @@ public class ShopBuy implements Listener {
                     p.updateInventory();
                 }
 
+                e.setCancelled(true);
+
                 debug("Removing money from player with currency " + currency + " and price " + price);
                 CategoryContent.takeMoney(p, currency, price);
-                p.updateInventory();
-                e.setCancelled(true);
                 Sounds.playSound(buySound, p);
+                p.updateInventory();
 
                 int finalPlayerMoney = CategoryContent.calculateMoney(p, currency);
                 int expectedPlayerMoney = totalPlayerMoney - price;
