@@ -46,9 +46,7 @@ public final class HotbarManager extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (support != Support.BEDWARS2023) {
-            me.kiiya.hotbarmanager.player.HotbarManager.getInstance().saveHotbars(true);
-        }
+        me.kiiya.hotbarmanager.player.HotbarManager.getInstance().saveHotbars(true, false);
     }
 
     private void loadSupport() {

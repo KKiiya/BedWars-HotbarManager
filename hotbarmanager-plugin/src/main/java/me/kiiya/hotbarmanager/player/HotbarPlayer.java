@@ -144,24 +144,42 @@ public class HotbarPlayer implements IHotbarPlayer {
         debug("Resetting Hotbar for " + player.getName() + " was successful.");
     }
 
+    @Deprecated
     public void saveHotbar() {
         debug("Saving Hotbar for " + player.getName());
-        Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
-            if (hotbar == null) {
-                debug("Hotbar is null, skipping save.");
-                return;
-            }
-            for (int i = 0; i < 9; i++) {
-                Category category = hotbar.get(i);
-                if (category != null) {
-                    debug("Saving slot " + i + " for " + player.getName() + " with value " + category.toString());
-                    db.setData(player, "slot" + i, category.toString());
-                } else {
-                    debug("Slot " + i + " for " + player.getName() + " is null, skipping save.");
-                }
-            }
-        });
+        Bukkit.getScheduler().runTask(HotbarManager.getInstance(), this::save);
         debug("Saving Hotbar for " + player.getName() + " was successful.");
+    }
+
+    @Override
+    public void saveHotbar(boolean destroy, boolean runTask) {
+        debug("Saving Hotbar for " + player.getName());
+        if (runTask) {
+            Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
+                save();
+                if (destroy) destroy(false);
+            });
+        } else {
+            save();
+            if (destroy) destroy(false);
+        }
+        debug("Saving Hotbar for " + player.getName() + " was successful.");
+    }
+
+    private void save() {
+        if (hotbar == null) {
+            debug("Hotbar is null, skipping save.");
+            return;
+        }
+        for (int i = 0; i < 9; i++) {
+            Category category = hotbar.get(i);
+            if (category != null) {
+                debug("Saving slot " + i + " for " + player.getName() + " with value " + category.toString());
+                db.setData(player, "slot" + i, category.toString());
+            } else {
+                debug("Slot " + i + " for " + player.getName() + " is null, skipping save.");
+            }
+        }
     }
 
     @Override

@@ -52,7 +52,15 @@ public interface IHotbarPlayer {
     /**
      * Save the hotbar of the player (this will save the hotbar in the database)
      */
+    @Deprecated
     void saveHotbar();
+
+    /**
+     * Save the hotbar of the player (this will save the hotbar in the database)
+     * @param destroy - whether to destroy the hotbar after saving it
+     * @param runTask - whether to run the task in a separate thread
+     */
+    void saveHotbar(boolean destroy, boolean runTask);
 
     /**
      * Destroy the hotbar player

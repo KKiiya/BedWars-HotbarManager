@@ -68,9 +68,18 @@ public class HotbarManager implements IHotbarManager, Listener {
     }
 
     @Override
+    @Deprecated
     public void saveHotbars(boolean destroy) {
         for (IHotbarPlayer hp : playersMap.values()) {
-            hp.saveHotbar();
+            hp.saveHotbar(destroy, true);
+            if (destroy) hp.destroy(false);
+        }
+    }
+
+    @Override
+    public void saveHotbars(boolean destroy, boolean runTask) {
+        for (IHotbarPlayer hp : playersMap.values()) {
+            hp.saveHotbar(destroy, runTask);
             if (destroy) hp.destroy(false);
         }
     }

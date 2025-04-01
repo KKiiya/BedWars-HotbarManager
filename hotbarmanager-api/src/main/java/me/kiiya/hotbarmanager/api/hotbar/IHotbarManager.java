@@ -42,4 +42,11 @@ public interface IHotbarManager {
      * @param destroy - If true, the hotbar data will be removed from memory after saving.
      */
     void saveHotbars(boolean destroy);
+
+    /**
+     * Saves the hotbar data for all players to the database.
+     * @param destroy - If true, the hotbar data will be removed from memory after saving.
+     * @param runTask - If true, the saving process will be executed in a separate thread.
+     */
+    void saveHotbars(boolean destroy, boolean runTask);
 }
