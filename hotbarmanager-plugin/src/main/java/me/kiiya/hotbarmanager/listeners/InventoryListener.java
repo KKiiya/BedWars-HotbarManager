@@ -29,18 +29,21 @@ public class InventoryListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
+        Inventory inv = e.getInventory();
         Inventory clickInv = e.getClickedInventory();
 
         if (p == null) return;
 
-        PlayerInventory inv = p.getInventory();
-        if (e.getAction() == InventoryAction.DROP_ALL_CURSOR || e.getAction() == InventoryAction.DROP_ONE_CURSOR
-                || e.getAction() == InventoryAction.DROP_ONE_SLOT || e.getAction() == InventoryAction.DROP_ALL_SLOT) {
+        PlayerInventory pInv = p.getInventory();
+
+        if (inv == null) return;
+        if (inv.getHolder() == null) return;
+        if (inv.getHolder() instanceof GUIHolder &&
+                (e.getAction() == InventoryAction.DROP_ALL_CURSOR || e.getAction() == InventoryAction.DROP_ONE_CURSOR
+                || e.getAction() == InventoryAction.DROP_ONE_SLOT || e.getAction() == InventoryAction.DROP_ALL_SLOT)) {
             e.setCancelled(true);
             return;
         }
-
-        if (e.getInventory() == null) return;
         if (clickInv == null) return;
         if (clickInv.getHolder() == null) return;
 
@@ -69,7 +72,7 @@ public class InventoryListener implements Listener {
             return;
         }
 
-        if (e.getInventory() != clickInv || clickInv == inv) {
+        if (e.getInventory() != clickInv || clickInv == pInv) {
             e.setCursor(new ItemStack(Material.AIR));
             e.setCancelled(true);
             return;
