@@ -6,8 +6,6 @@ import me.kiiya.hotbarmanager.api.hotbar.Category;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Arrays;
-
 import static me.kiiya.hotbarmanager.config.ConfigPaths.*;
 import static me.kiiya.hotbarmanager.utils.Utility.*;
 
