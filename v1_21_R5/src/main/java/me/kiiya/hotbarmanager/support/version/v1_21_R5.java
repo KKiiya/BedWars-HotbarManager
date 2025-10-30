@@ -29,5 +29,4 @@ public class v1_21_R5 extends VersionSupport {
     public boolean isPlayerHead(ItemStack item) {
         return item.getType() == Material.LEGACY_SKULL_ITEM && item.getDurability() == 3;
     }
-    
 }
