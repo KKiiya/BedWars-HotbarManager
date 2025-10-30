@@ -130,10 +130,10 @@ public class Utility {
     }
 
     public static String getForCurrentVersion(String v18, String v12, String v13) {
-        switch (Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3]) {
-            case "v1_8_R3":
+        switch (HotbarManager.getVersion()) {
+            case "1.8.8":
                 return v18;
-            case "v1_12_R1":
+            case "1.12.2":
                 return v12;
             default:
                 return v13;
