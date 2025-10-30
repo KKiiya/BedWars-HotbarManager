@@ -84,3 +84,7 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 .nb-gradle/
+
+# VS Code
+.vscode/
+.history/
