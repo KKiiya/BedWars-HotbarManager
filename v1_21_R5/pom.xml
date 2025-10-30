@@ -9,10 +9,10 @@
         <artifactId>BedWars-HotbarManager</artifactId>
         <version>1.5.3</version>
     </parent>
-    <artifactId>v1_18_R2</artifactId>
+    <artifactId>v1_21_R5</artifactId>
     <packaging>jar</packaging>
-
-    <name>v1_18_R2</name>
+    
+    <name>v1_21_R5</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -24,13 +24,23 @@
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>Jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
-            <version>1.18.2-R0.1-SNAPSHOT</version>
+            <version>1.21.8-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.saicone.rtag</groupId>
+            <artifactId>rtag-item</artifactId>
+            <version>1.5.13</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
