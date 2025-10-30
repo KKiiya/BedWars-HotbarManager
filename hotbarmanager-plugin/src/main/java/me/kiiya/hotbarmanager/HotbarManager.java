@@ -11,6 +11,8 @@ import me.kiiya.hotbarmanager.support.bedwars2023.BedWars2023;
 import me.kiiya.hotbarmanager.support.bedwars2023.BedWarsProxy2023;
 import me.kiiya.hotbarmanager.support.version.*;
 import me.kiiya.hotbarmanager.utils.Support;
+import me.kiiya.hotbarmanager.utils.Utility;
+
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
@@ -20,6 +22,7 @@ public final class HotbarManager extends JavaPlugin {
 
     public static boolean compassAddon = false;
 
+    public static String version;
     public static VersionSupport versionSupport;
     public static me.kiiya.hotbarmanager.api.HotbarManager api;
     public static com.andrei1058.bedwars.api.BedWars bw1058Api;
@@ -32,7 +35,10 @@ public final class HotbarManager extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        loadVersionSupport();
+        if (!loadVersionSupport()) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
         loadSupport();
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
@@ -56,43 +62,49 @@ public final class HotbarManager extends JavaPlugin {
         else if (Bukkit.getPluginManager().getPlugin("BWProxy2023") != null) new BedWarsProxy2023();
     }
 
-    private void loadVersionSupport() {
-        String version = getServer().getClass().getPackage().getName().split("\\.")[3].toLowerCase();
+    private boolean loadVersionSupport() {
+        version = Bukkit.getBukkitVersion().split("-")[0];
         switch (version) {
-            case "v1_8_r3":
+            case "1.8.8":
                 versionSupport = new v1_8_R3();
                 break;
-            case "v1_12_r1":
+            case "1.12.2":
                 versionSupport = new v1_12_R1();
                 break;
-            case "v1_16_r3":
+            case "1.16.5":
                 versionSupport = new v1_16_R3();
                 break;
-            case "v1_17_r1":
+            case "1.17.1":
                 versionSupport = new v1_17_R1();
                 break;
-            case "v1_18_r2":
+            case "1.18.2":
                 versionSupport = new v1_18_R2();
                 break;
-            case "v1_19_r3":
+            case "1.19.3":
                 versionSupport = new v1_19_R3();
                 break;
-            case "v1_20_r1":
+            case "1.20.1":
                 versionSupport = new v1_20_R1();
                 break;
-            case "v1_20_r2":
+            case "1.20.2":
                 versionSupport = new v1_20_R2();
                 break;
-            case "v1_20_r3":
+            case "1.20.3":
                 versionSupport = new v1_20_R3();
                 break;
-            case "v1_20_r4":
+            case "1.20.4":
                 versionSupport = new v1_20_R4();
                 break;
-            case "v1_21_r1":
+            case "1.21.1":
                 versionSupport = new v1_21_R1();
                 break;
+            case "1.21.8":
+                versionSupport = new v1_21_R5();
+                break;
+            default:
+                Utility.info("Unsupported server version: " + version + ". Disabling plugin.");
         }
+        return versionSupport != null;
     }
 
     public static IHotbarManager getManager() {
@@ -133,6 +145,10 @@ public final class HotbarManager extends JavaPlugin {
 
     public static com.andrei1058.bedwars.proxy.api.BedWars getBWProxyApi() {
         return com.andrei1058.bedwars.proxy.BedWarsProxy.getAPI();
+    }
+
+    public static String getVersion() {
+        return version;
     }
 
     public void setDB(Database db) {
