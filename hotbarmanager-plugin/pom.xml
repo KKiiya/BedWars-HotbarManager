@@ -111,7 +111,7 @@
         </dependency>
         <dependency>
             <groupId>me.kiiya</groupId>
-            <artifactId>v1_21_R5</artifactId>
+            <artifactId>RTag_Global</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

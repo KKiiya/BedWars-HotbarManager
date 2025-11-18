@@ -11,7 +11,6 @@ import me.kiiya.hotbarmanager.support.bedwars2023.BedWars2023;
 import me.kiiya.hotbarmanager.support.bedwars2023.BedWarsProxy2023;
 import me.kiiya.hotbarmanager.support.version.*;
 import me.kiiya.hotbarmanager.utils.Support;
-import me.kiiya.hotbarmanager.utils.Utility;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -98,11 +97,10 @@ public final class HotbarManager extends JavaPlugin {
             case "1.21.1":
                 versionSupport = new v1_21_R1();
                 break;
-            case "1.21.8":
-                versionSupport = new v1_21_R5();
-                break;
             default:
-                Utility.info("Unsupported server version: " + version + ". Disabling plugin.");
+                versionSupport = new GRTag();
+                Bukkit.getLogger().severe("[" + getDescription().getName() + "] No specific version support found for " + version + ", falling back to RTag.");
+                break;
         }
         return versionSupport != null;
     }

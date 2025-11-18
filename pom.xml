@@ -25,7 +25,7 @@
         <module>v1_20_R3</module>
         <module>v1_20_R4</module>
         <module>v1_21_R1</module>
-        <module>v1_21_R5</module>
+        <module>RTag_Global</module>
     </modules>
 
     <properties>

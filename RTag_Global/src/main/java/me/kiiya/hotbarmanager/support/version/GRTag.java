@@ -5,7 +5,7 @@ import me.kiiya.hotbarmanager.api.support.VersionSupport;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-public class v1_21_R5 extends VersionSupport {
+public class GRTag extends VersionSupport {
 
     @Override
     public ItemStack setItemTag(ItemStack item, String key, String value) {
