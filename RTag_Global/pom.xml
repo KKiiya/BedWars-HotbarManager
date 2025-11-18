@@ -9,7 +9,7 @@
         <artifactId>BedWars-HotbarManager</artifactId>
         <version>1.5.3</version>
     </parent>
-    <artifactId>v1_21_R5</artifactId>
+    <artifactId>RTag_Global</artifactId>
     <packaging>jar</packaging>
     
     <name>v1_21_R5</name>
