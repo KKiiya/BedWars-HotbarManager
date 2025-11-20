@@ -31,6 +31,24 @@ public interface IHotbarPlayer {
     void setSlotCategory(int slot, Category category, boolean callEvent);
 
     /**
+     * Set a category for a specified slot
+     *
+     * @param itemPath - the category you want the player to have
+     * @param slot - the slot you want the category to be in
+     */
+    @Deprecated
+    void setSlotCategory(int slot, String itemPath);
+
+    /**
+     * Set a category for a specified slot
+     *
+     * @param itemPath - the category you want the player to have
+     * @param slot - the slot you want the category to be in
+     * @param callEvent - whether to call the event
+     */
+    void setSlotCategory(int slot, String itemPath, boolean callEvent);
+
+    /**
      * Get the category in a specific slot
      *
      * @param slot - The slot you want to get (0-8)
@@ -39,10 +57,24 @@ public interface IHotbarPlayer {
     Category getSlotCategory(int slot);
 
     /**
+     * Get the category in a specific slot
+     *
+     * @param slot - The slot you want to get (0-8)
+     * @return - the category of the slot you are searching for
+     */
+    String getItemPath(int slot);
+
+    /**
      * Get the hotbar as a list
      * @return - a list with the categories ordered in a hotbar
      */
     List<Category> getHotbarAsList();
+
+    /**
+     * Get the hotbar as a string list. This is recommended to be used for per ITEM saving
+     * @return - a list with the categories ordered in a hotbar as strings
+     */
+    List<String> getHotgarAsStringList();
 
     /**
      * Reset the hotbar of the player

@@ -3,6 +3,7 @@ package me.kiiya.hotbarmanager.config;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.config.ConfigManager;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
+import me.kiiya.hotbarmanager.api.hotbar.SortType;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -15,6 +16,8 @@ public class MainConfig extends ConfigManager {
         YamlConfiguration yml = getYml();
         yml.options().header("BedWars-HotBarManager v" + HotbarManager.getInstance().getDescription().getVersion() + " By Kiiya.\nDiscord: https://discord.gg/n5yNavRvrP");
         yml.addDefault("debug", false);
+        yml.addDefault("sort-type", SortType.CATEGORY.toString());
+
         yml.addDefault(ITEM_TYPE, "BLAZE_POWDER");
         yml.addDefault(ITEM_POSITION, 54);
 

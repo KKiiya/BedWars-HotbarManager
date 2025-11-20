@@ -1,10 +1,5 @@
-package me.kiiya.hotbarmanager.listeners.bedwars1058;
+package me.kiiya.hotbarmanager.listeners.bedwars1058.item;
 
-import com.andrei1058.bedwars.shop.ShopManager;
-import com.andrei1058.bedwars.shop.quickbuy.PlayerQuickBuyCache;
-import com.andrei1058.bedwars.shop.quickbuy.QuickBuyElement;
-import com.andrei1058.bedwars.shop.main.ShopCategory;
-import com.andrei1058.bedwars.shop.main.ShopIndex;
 import com.andrei1058.bedwars.BedWars;
 import com.andrei1058.bedwars.api.arena.shop.IContentTier;
 import com.andrei1058.bedwars.api.arena.team.ITeam;
@@ -13,12 +8,15 @@ import com.andrei1058.bedwars.api.events.shop.ShopBuyEvent;
 import com.andrei1058.bedwars.api.server.VersionSupport;
 import com.andrei1058.bedwars.configuration.Sounds;
 import com.andrei1058.bedwars.shop.ShopCache;
+import com.andrei1058.bedwars.shop.ShopManager;
 import com.andrei1058.bedwars.shop.main.CategoryContent;
+import com.andrei1058.bedwars.shop.main.ShopCategory;
+import com.andrei1058.bedwars.shop.main.ShopIndex;
+import com.andrei1058.bedwars.shop.quickbuy.PlayerQuickBuyCache;
+import com.andrei1058.bedwars.shop.quickbuy.QuickBuyElement;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.events.HotbarItemSetEvent;
-import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
-import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -33,7 +31,7 @@ import java.util.*;
 
 import static me.kiiya.hotbarmanager.utils.Utility.debug;
 
-public class ShopBuy implements Listener {
+public class ShopBuyI implements Listener {
 
     private final Set<UUID> processing = Collections.synchronizedSet(new HashSet<>());
 
@@ -45,16 +43,15 @@ public class ShopBuy implements Listener {
         Player p = e.getBuyer();
         PlayerInventory inv = p.getInventory();
         IHotbarPlayer hp = HotbarManager.getAPI().getHotbarPlayer(p);
-        Category cat = HotbarUtils.getCategoryFromString(e.getCategoryContent().getIdentifier());
-        List<Category> hotbar = hp.getHotbarAsList();
+        String identifier = e.getCategoryContent().getIdentifier();
+        List<String> hotbar = hp.getHotgarAsStringList();
 
         // CHECKS
-        if (cat == null || cat == Category.NONE) return;
+        if (identifier == null || identifier.isEmpty()) return;
 
         // ITEM AND SHOP VARIABLES
         ITeam t = e.getArena().getTeam(p);
         CategoryContent cc = (CategoryContent) e.getCategoryContent();
-        String identifier = cc.getIdentifier();
         PlayerQuickBuyCache quickBuyCache = PlayerQuickBuyCache.getQuickBuyCache(p.getUniqueId());
         if (quickBuyCache == null) quickBuyCache = new PlayerQuickBuyCache(p);
         QuickBuyElement element = quickBuyCache.getElements().stream()
@@ -67,26 +64,26 @@ public class ShopBuy implements Listener {
         // SOUNDS
         String buySound = "shop-bought";
 
-        if (!hotbar.contains(cat)) return;
+        if (!hotbar.contains(identifier)) return;
         if (processing.contains(p.getUniqueId())) return;
 
         try {
             processing.add(p.getUniqueId());
             for (int i = 0; i < 9; i++) {
                 debug("Checking slot " + i);
-                Category currentCategory = hotbar.get(i);
+                String currentPath = hotbar.get(i);
                 ItemStack itemSlot = inv.getItem(i);
-                if (currentCategory != cat) continue;
+                if (!currentPath.equals(identifier)) continue;
 
                 if ((BedWars.nms.isTool(itemSlot) || itemSlot.getType() == Material.SHEARS) && itemSlot != null) {
                     debug("Item is upgradable");
-                    if (Utility.getItemCategory(itemSlot) == cat && !vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier)) {
+                    if (!vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier)) {
                         debug("Item is the same category but doesn't have the same identifier");
                         continue;
                     }
                 }
 
-                HotbarItemSetEvent event = new HotbarItemSetEvent(p, cat, i);
+                HotbarItemSetEvent event = new HotbarItemSetEvent(p, identifier, i);
                 Bukkit.getPluginManager().callEvent(event);
                 if (event.isCancelled()) {
                     debug("Event was cancelled for slot " + i);
@@ -115,7 +112,7 @@ public class ShopBuy implements Listener {
                 }
 
                 if (itemSlot != null && itemSlot.getType() != Material.AIR) {
-                    if (BedWars.nms.isSword(item) && currentCategory == Category.MELEE) {
+                    if (BedWars.nms.isSword(item)) {
                         debug("Item is a sword and the category is MELEE");
                         unbreakable(item);
                         for (TeamEnchant teamEnchant : t.getSwordsEnchantments()) {
@@ -153,7 +150,7 @@ public class ShopBuy implements Listener {
                             p.updateInventory();
                         }
                     } else {
-                        if (Utility.getItemCategory(itemSlot) == cat && (vs.getShopUpgradeIdentifier(itemSlot) == null || !vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier))) continue;
+                        if ((vs.getShopUpgradeIdentifier(itemSlot) == null || !vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier))) continue;
                         debug("Item is same category but different identifier or no identifier");
 
                         if (cc.isPermanent()) {

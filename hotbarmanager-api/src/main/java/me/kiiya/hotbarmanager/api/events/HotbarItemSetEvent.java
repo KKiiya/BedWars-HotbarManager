@@ -6,18 +6,31 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import javax.annotation.Nullable;
+
 public class HotbarItemSetEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
     private final Player player;
     private final Category category;
+    private final String itemPath;
     private final int slot;
     private boolean cancelled;
 
+    @Deprecated
     public HotbarItemSetEvent(Player player, Category category, int slot) {
         this.player = player;
         this.category = category;
+        this.itemPath = null;
+        this.slot = slot;
+        this.cancelled = false;
+    }
+
+    public HotbarItemSetEvent(Player player, String itemPath, int slot) {
+        this.player = player;
+        this.category = null;
+        this.itemPath = itemPath;
         this.slot = slot;
         this.cancelled = false;
     }
@@ -26,8 +39,13 @@ public class HotbarItemSetEvent extends Event implements Cancellable {
         return player;
     }
 
+    @Nullable
     public Category getCategory() {
         return category;
+    }
+
+    public String getItemPath() {
+        return itemPath;
     }
 
     public int getSlot() {

@@ -144,9 +144,9 @@
         <dependency>
             <groupId>com.tompkeuper</groupId>
             <artifactId>BedWars2023</artifactId>
-            <version>1.3.0</version>
+            <version>5.0.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/libs/BedWars-1.3.0.jar</systemPath>
+            <systemPath>${project.basedir}/libs/BedWars-5.0.0-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.tomkeuper.bedwars</groupId>

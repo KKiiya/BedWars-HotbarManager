@@ -11,6 +11,8 @@ import me.kiiya.hotbarmanager.database.providers.SQLite;
 import me.kiiya.hotbarmanager.listeners.InventoryListener;
 import me.kiiya.hotbarmanager.listeners.CustomItemSecurity;
 import me.kiiya.hotbarmanager.listeners.bedwars2023.*;
+import me.kiiya.hotbarmanager.listeners.bedwars2023.category.RespawnListenerC;
+import me.kiiya.hotbarmanager.listeners.bedwars2023.category.ShopBuyC;
 import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
@@ -98,10 +100,10 @@ public class BedWarsAddon extends Addon {
 
     private void loadListeners() {
         Utility.info("&eLoading listeners...");
-        Bukkit.getPluginManager().registerEvents(new ShopBuy(), getPlugin());
+        Bukkit.getPluginManager().registerEvents(new ShopBuyC(), getPlugin());
         Bukkit.getPluginManager().registerEvents(new ShopOpen(), getPlugin());
         Bukkit.getPluginManager().registerEvents(new PlayerKill(), getPlugin());
-        Bukkit.getPluginManager().registerEvents(new RespawnListener(), getPlugin());
+        Bukkit.getPluginManager().registerEvents(new RespawnListenerC(), getPlugin());
         Bukkit.getPluginManager().registerEvents(new InventoryListener(), getInstance());
 
         if (bw2023Api.getVersionSupport().getVersion() == 0) Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.Legacy(), getInstance());

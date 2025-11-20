@@ -16,7 +16,7 @@ import static me.kiiya.hotbarmanager.utils.Utility.debug;
 
 public class HotbarPlayer implements IHotbarPlayer {
 
-    private HashMap<Integer, Category> hotbar;
+    private HashMap<Integer, String> hotbar;
     private Player player;
     private Database db;
 
@@ -32,7 +32,7 @@ public class HotbarPlayer implements IHotbarPlayer {
             for (int i = 0; i < 9; i++) {
                 String category = data.get("slot" + i);
                 debug("Loading slot " + i + " for " + player.getName() + " with value " + category);
-                hotbar.put(i, Category.getFromString(category));
+                hotbar.put(i, category);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,7 +53,7 @@ public class HotbarPlayer implements IHotbarPlayer {
             for (int i = 0; i < 9; i++) {
                 String category = data.get("slot" + i);
                 debug("Loading slot " + i + " for " + player.getName() + " with value " + category);
-                hotbar.put(i, Category.getFromString(category));
+                hotbar.put(i, category);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,10 +73,10 @@ public class HotbarPlayer implements IHotbarPlayer {
 
     @Override
     public void setSlotCategory(int slot, Category newCategory, boolean callEvent) {
-        Category oldCategory = hotbar.get(slot);
+        Category oldCategory = Category.getFromString(hotbar.get(slot));
         if (oldCategory == newCategory) return;
 
-        debug("Setting slot " + slot + " for " + player.getName() + ". OLD: " + oldCategory.toString() + ", NEW: " + newCategory.toString());
+        debug("Setting slot " + slot + " for " + player.getName() + ". OLD: " + oldCategory + ", NEW: " + newCategory.toString());
         PlayerHotbarUpdateEvent event = new PlayerHotbarUpdateEvent(this, slot, oldCategory, newCategory);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
@@ -84,12 +84,53 @@ public class HotbarPlayer implements IHotbarPlayer {
             return;
         }
 
-        hotbar.put(slot, newCategory);
+        hotbar.put(slot, newCategory.toString());
+        debug("Setting slot " + slot + " for " + player.getName() + " was successful.");
+    }
+
+    @Override
+    public void setSlotCategory(int slot, String newItemPath) {
+        String oldCategory = hotbar.get(slot);
+        if (oldCategory.equalsIgnoreCase(newItemPath)) return;
+
+        debug("Setting slot " + slot + " for " + player.getName() + ". OLD: " + oldCategory + ", NEW: " + newItemPath);
+        PlayerHotbarUpdateEvent event = new PlayerHotbarUpdateEvent(this, slot, oldCategory, newItemPath, HotbarManager.getManager().getSortType());
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            debug("Setting slot " + slot + " for " + player.getName() + " was cancelled.");
+            return;
+        }
+
+        hotbar.put(slot, newItemPath);
+        debug("Setting slot " + slot + " for " + player.getName() + " was successful.");
+    }
+
+    @Override
+    public void setSlotCategory(int slot, String newItemPath, boolean callEvent) {
+        String oldCategory = hotbar.get(slot);
+        if (oldCategory.equalsIgnoreCase(newItemPath)) return;
+
+        debug("Setting slot " + slot + " for " + player.getName() + ". OLD: " + oldCategory + ", NEW: " + newItemPath);
+        if (callEvent) {
+            PlayerHotbarUpdateEvent event = new PlayerHotbarUpdateEvent(this, slot, oldCategory, newItemPath, HotbarManager.getManager().getSortType());
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                debug("Setting slot " + slot + " for " + player.getName() + " was cancelled.");
+                return;
+            }
+        }
+
+        hotbar.put(slot, newItemPath);
         debug("Setting slot " + slot + " for " + player.getName() + " was successful.");
     }
 
     @Override
     public Category getSlotCategory(int slot) {
+        return Category.getFromString(hotbar.get(slot));
+    }
+
+    @Override
+    public String getItemPath(int slot) {
         return hotbar.get(slot);
     }
 
@@ -98,6 +139,15 @@ public class HotbarPlayer implements IHotbarPlayer {
         List<Category> hotbar = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
             hotbar.add(getSlotCategory(i));
+        }
+        return Collections.unmodifiableList(hotbar);
+    }
+
+    @Override
+    public List<String> getHotgarAsStringList() {
+        List<String> hotbar = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            hotbar.add(this.hotbar.get(i));
         }
         return Collections.unmodifiableList(hotbar);
     }
@@ -117,27 +167,27 @@ public class HotbarPlayer implements IHotbarPlayer {
 
             if (HotbarManager.getSupport() == Support.BEDWARSPROXY || HotbarManager.getSupport() == Support.BEDWARSPROXY2023) {
                 if (HotbarManager.getMainConfig().getBoolean("enable-compass-support") && defaultSlots.get(i) == Category.COMPASS) {
-                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i).toString() + ", NEW: " + Category.COMPASS);
-                    hotbar.put(8, Category.COMPASS);
+                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i) + ", NEW: " + Category.COMPASS);
+                    hotbar.put(8, Category.COMPASS.toString());
                     continue;
                 }
                 else {
-                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i).toString() + ", NEW: " + Category.NONE);
-                    hotbar.put(i, Category.NONE);
+                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i) + ", NEW: " + Category.NONE);
+                    hotbar.put(i, Category.NONE.toString());
                 }
             } else {
                 if (HotbarManager.isCompassAddon() && HotbarManager.getMainConfig().getBoolean("enable-compass-support") && defaultSlots.get(i) == Category.COMPASS) {
-                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i).toString() + ", NEW: " + Category.COMPASS);
-                    hotbar.put(8, Category.COMPASS);
+                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i) + ", NEW: " + Category.COMPASS);
+                    hotbar.put(8, Category.COMPASS.toString());
                     continue;
                 }
                 else {
-                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i).toString() + ", NEW: " + defaultSlots.get(i).toString());
-                    hotbar.put(i, Category.NONE);
+                    debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i) + ", NEW: " + defaultSlots.get(i).toString());
+                    hotbar.put(i, Category.NONE.toString());
                 }
             }
-            debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i).toString() + ", NEW: " + defaultSlots.get(i).toString());
-            hotbar.put(i, defaultSlots.get(i));
+            debug("Resetting slot " + i + " for " + player.getName() + ". OLD: " + hotbar.get(i) + ", NEW: " + defaultSlots.get(i).toString());
+            hotbar.put(i, defaultSlots.get(i).toString());
         }
         debug("Resetting Hotbar for " + player.getName() + " was successful.");
     }
@@ -170,13 +220,9 @@ public class HotbarPlayer implements IHotbarPlayer {
             return;
         }
         for (int i = 0; i < 9; i++) {
-            Category category = hotbar.get(i);
-            if (category != null) {
-                debug("Saving slot " + i + " for " + player.getName() + " with value " + category.toString());
-                db.setData(player, "slot" + i, category.toString());
-            } else {
-                debug("Slot " + i + " for " + player.getName() + " is null, skipping save.");
-            }
+            Category category = Category.getFromString(hotbar.get(i));
+            debug("Saving slot " + i + " for " + player.getName() + " with value " + category.toString());
+            db.setData(player, "slot" + i, category.toString());
         }
     }
 

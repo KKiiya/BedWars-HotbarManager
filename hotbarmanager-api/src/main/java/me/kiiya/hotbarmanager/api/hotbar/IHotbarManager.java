@@ -9,6 +9,16 @@ import java.util.UUID;
 public interface IHotbarManager {
 
     /**
+     * Retrieves the sort type used for organizing hotbar items.
+     * The sort type defines whether the items will be sorted per category.
+     * {@link SortType} All weapons together, all tools together, etc. (CATEGORY)
+     * {@link SortType} You will be able to sort items individually. (ITEM)
+     *
+     * @return The SortType enum value representing the current sorting method for hotbar items.
+     */
+    SortType getSortType();
+
+    /**
      * Retrieves the hotbar player data for a specific OfflinePlayer.
      * This method returns the corresponding IHotbarPlayer instance which manages the player's hotbar setup,
      * even if the player is not currently online.

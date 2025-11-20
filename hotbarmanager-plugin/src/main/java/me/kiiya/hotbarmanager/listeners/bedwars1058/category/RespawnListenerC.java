@@ -1,9 +1,9 @@
-package me.kiiya.hotbarmanager.listeners.bedwars2023;
+package me.kiiya.hotbarmanager.listeners.bedwars1058.category;
 
-import com.tomkeuper.bedwars.BedWars;
-import com.tomkeuper.bedwars.api.arena.GameState;
-import com.tomkeuper.bedwars.api.events.gameplay.GameStateChangeEvent;
-import com.tomkeuper.bedwars.api.events.player.PlayerReSpawnEvent;
+import com.andrei1058.bedwars.BedWars;
+import com.andrei1058.bedwars.api.arena.GameState;
+import com.andrei1058.bedwars.api.events.gameplay.GameStateChangeEvent;
+import com.andrei1058.bedwars.api.events.player.PlayerReSpawnEvent;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class RespawnListener implements Listener {
+public class RespawnListenerC implements Listener {
     @EventHandler
     public void onRespawn(PlayerReSpawnEvent e) {
         Player ap = e.getPlayer();
@@ -125,6 +125,7 @@ public class RespawnListener implements Listener {
                     ItemStack tool1 = ap.getInventory().getItem(1);
                     ItemStack tool2 = ap.getInventory().getItem(2);
                     ItemStack tool3 = ap.getInventory().getItem(3);
+
                     int slot = 0;
                     if (tool1 != null && tool1.getType() != Material.AIR) {
                         for (Category cat : hotbar) {
@@ -136,30 +137,32 @@ public class RespawnListener implements Listener {
                             slot++;
                         }
                     }
+
+                    int slot1 = 0;
                     if (tool2 != null && tool2.getType() != Material.AIR) {
-                        slot = 0;
                         for (Category cat : hotbar) {
                             if (cat == Category.TOOLS) {
-                                if (ap.getInventory().getItem(slot) == null || ap.getInventory().getItem(slot).getType() == Material.AIR) {
+                                if (ap.getInventory().getItem(slot1) == null || ap.getInventory().getItem(slot1).getType() == Material.AIR) {
                                     ap.getInventory().setItem(2, new ItemStack(Material.AIR));
-                                    ap.getInventory().setItem(slot, tool2);
+                                    ap.getInventory().setItem(slot1, tool2);
                                 } else continue;
                                 break;
                             }
-                            slot++;
+                            slot1++;
                         }
                     }
+
+                    int slot2 = 0;
                     if (tool3 != null && tool3.getType() != Material.AIR) {
-                        slot = 0;
                         for (Category cat : hotbar) {
                             if (cat == Category.TOOLS) {
-                                if (ap.getInventory().getItem(slot) == null || ap.getInventory().getItem(slot).getType() == Material.AIR) {
+                                if (ap.getInventory().getItem(slot2) == null || ap.getInventory().getItem(slot2).getType() == Material.AIR) {
                                     ap.getInventory().setItem(3, new ItemStack(Material.AIR));
-                                    ap.getInventory().setItem(slot, tool3);
+                                    ap.getInventory().setItem(slot2, tool3);
                                 } else continue;
                                 break;
                             }
-                            slot++;
+                            slot2++;
                         }
                     }
                 }

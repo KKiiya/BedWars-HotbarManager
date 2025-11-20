@@ -10,8 +10,8 @@ import me.kiiya.hotbarmanager.database.providers.SQLite;
 import me.kiiya.hotbarmanager.listeners.InventoryListener;
 import me.kiiya.hotbarmanager.listeners.CustomItemSecurity;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.PlayerKill;
-import me.kiiya.hotbarmanager.listeners.bedwars1058.RespawnListener;
-import me.kiiya.hotbarmanager.listeners.bedwars1058.ShopBuy;
+import me.kiiya.hotbarmanager.listeners.bedwars1058.category.RespawnListenerC;
+import me.kiiya.hotbarmanager.listeners.bedwars1058.category.ShopBuyC;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.ShopOpen;
 import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Support;
@@ -74,10 +74,10 @@ public class BedWars1058 {
 
     private void loadListeners() {
         Utility.info("&eLoading listeners...");
-        Bukkit.getPluginManager().registerEvents(new ShopBuy(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new ShopBuyC(), getInstance());
         Bukkit.getPluginManager().registerEvents(new ShopOpen(), getInstance());
         Bukkit.getPluginManager().registerEvents(new PlayerKill(), getInstance());
-        Bukkit.getPluginManager().registerEvents(new RespawnListener(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new RespawnListenerC(), getInstance());
         Bukkit.getPluginManager().registerEvents(new InventoryListener(), getInstance());
 
         if (bw1058Api.getVersionSupport().getVersion() == 0) Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.Legacy(), getInstance());

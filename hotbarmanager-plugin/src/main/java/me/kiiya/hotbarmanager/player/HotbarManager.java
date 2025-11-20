@@ -3,6 +3,7 @@ package me.kiiya.hotbarmanager.player;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
+import me.kiiya.hotbarmanager.api.hotbar.SortType;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -23,11 +24,13 @@ public class HotbarManager implements IHotbarManager, Listener {
     private final HashMap<String, IHotbarPlayer> playersMap;
     private final List<Category> defaultSlots;
     private final MainConfig mainConfig;
+    private final SortType sortType;
 
     private HotbarManager() {
         this.playersMap = new HashMap<>();
         this.mainConfig = me.kiiya.hotbarmanager.HotbarManager.getMainConfig();
         this.defaultSlots = new ArrayList<>();
+        this.sortType = SortType.valueOf(mainConfig.getString("sort-type").toUpperCase());
         for (int i = 0; i < 9; i++) {
             defaultSlots.add(Category.getFromString(mainConfig.getString("default-slots."+i)));
         }
@@ -50,6 +53,11 @@ public class HotbarManager implements IHotbarManager, Listener {
         if (instance != null) throw new RuntimeException("Tried instancing HotbarManager class while already instanced");
         instance = new HotbarManager();
         return instance;
+    }
+
+    @Override
+    public SortType getSortType() {
+        return sortType;
     }
 
     @Override

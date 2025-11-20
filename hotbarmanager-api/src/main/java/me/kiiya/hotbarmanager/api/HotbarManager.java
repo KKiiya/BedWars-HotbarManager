@@ -1,11 +1,17 @@
 package me.kiiya.hotbarmanager.api;
 
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
+import me.kiiya.hotbarmanager.api.hotbar.SortType;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
 public interface HotbarManager {
+
+    /**
+     * Get the SortType for hotbars (per category or per item)
+     */
+    SortType getSortType();
 
     /**
      * Get the HotbarPlayer

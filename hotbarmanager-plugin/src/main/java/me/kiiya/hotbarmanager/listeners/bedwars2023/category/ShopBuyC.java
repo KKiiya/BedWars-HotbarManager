@@ -1,4 +1,4 @@
-package me.kiiya.hotbarmanager.listeners.bedwars2023;
+package me.kiiya.hotbarmanager.listeners.bedwars2023.category;
 
 import com.tomkeuper.bedwars.api.shop.IPlayerQuickBuyCache;
 import com.tomkeuper.bedwars.api.shop.IQuickBuyElement;
@@ -36,7 +36,7 @@ import java.util.*;
 
 import static me.kiiya.hotbarmanager.utils.Utility.debug;
 
-public class ShopBuy implements Listener {
+public class ShopBuyC implements Listener {
 
     private final Set<UUID> processing = Collections.synchronizedSet(new HashSet<>());
 
