@@ -2,9 +2,11 @@ package me.kiiya.hotbarmanager;
 
 import me.kiiya.hotbarmanager.api.database.Database;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarManager;
+import me.kiiya.hotbarmanager.api.menu.IShopCacheManager;
 import me.kiiya.hotbarmanager.api.support.VersionSupport;
 import me.kiiya.hotbarmanager.commands.MenuCommand;
 import me.kiiya.hotbarmanager.config.MainConfig;
+import me.kiiya.hotbarmanager.menu.helpers.CacheManager;
 import me.kiiya.hotbarmanager.support.bedwars1058.BedWars1058;
 import me.kiiya.hotbarmanager.support.bedwars1058.BedWarsProxy;
 import me.kiiya.hotbarmanager.support.bedwars2023.BedWars2023;
@@ -107,6 +109,10 @@ public final class HotbarManager extends JavaPlugin {
 
     public static IHotbarManager getManager() {
         return manager;
+    }
+
+    public static IShopCacheManager getCacheManager(String group) {
+        return CacheManager.getInstance(group);
     }
 
     public static MainConfig getMainConfig() {

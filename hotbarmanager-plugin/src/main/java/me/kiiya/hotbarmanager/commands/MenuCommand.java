@@ -1,7 +1,10 @@
 package me.kiiya.hotbarmanager.commands;
 
 import me.kiiya.hotbarmanager.HotbarManager;
+import me.kiiya.hotbarmanager.api.hotbar.Category;
+import me.kiiya.hotbarmanager.api.hotbar.SortType;
 import me.kiiya.hotbarmanager.menu.HotbarManagerMenu;
+import me.kiiya.hotbarmanager.menu.ShopInventoryManager;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,7 +28,23 @@ public class MenuCommand implements CommandExecutor {
                 return false;
             }
 
-            new HotbarManagerMenu(p);
+            SortType sortType = HotbarManager.getManager().getSortType();
+            if (sortType == SortType.CATEGORY) {
+                new HotbarManagerMenu(p);
+            } else {
+                switch (HotbarManager.getSupport()) {
+                    case BEDWARSPROXY:
+                    case BEDWARS1058:
+                    case BEDWARSPROXY2023:
+                        new ShopInventoryManager(p, "default");
+                        break;
+                    case BEDWARS2023:
+                        boolean isPlaying = HotbarManager.getBW2023Api().getArenaUtil().isPlaying(p);
+                        String group = isPlaying ? HotbarManager.getBW2023Api().getArenaUtil().getArenaByPlayer(p).getGroup() : "default";
+                        new ShopInventoryManager(p, group);
+                        break;
+                }
+            }
         } else if (args.length == 1) {
             if (args[0].equalsIgnoreCase("reload")) {
                 if (!p.hasPermission("hotbarmanager.reload")) {

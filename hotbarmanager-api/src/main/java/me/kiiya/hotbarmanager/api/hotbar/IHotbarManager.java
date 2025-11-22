@@ -3,7 +3,6 @@ package me.kiiya.hotbarmanager.api.hotbar;
 import org.bukkit.OfflinePlayer;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public interface IHotbarManager {

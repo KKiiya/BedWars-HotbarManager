@@ -1,7 +1,9 @@
 package me.kiiya.hotbarmanager.api;
 
+import me.kiiya.hotbarmanager.api.hotbar.IHotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
 import me.kiiya.hotbarmanager.api.hotbar.SortType;
+import me.kiiya.hotbarmanager.api.menu.IShopCacheManager;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -18,6 +20,7 @@ public interface HotbarManager {
      * @param player - the player
      * @return - the HotbarPlayer
      */
+    @Deprecated
     IHotbarPlayer getHotbarPlayer(Player player);
 
     /**
@@ -25,7 +28,21 @@ public interface HotbarManager {
      * @param uuid - the uuid of the player
      * @return - the HotbarPlayer
      */
+    @Deprecated
     IHotbarPlayer getHotbarPlayer(UUID uuid);
+
+    /**
+     * Get the HotbarManager
+     * @return - the HotbarManager
+     */
+    IHotbarManager getHotbarManager();
+
+    /**
+     * Get the CacheManager
+     *
+     * @return - the CacheManager
+     */
+    IShopCacheManager getCacheManager(String group);
 
     /**
      * Get the MenuUtil

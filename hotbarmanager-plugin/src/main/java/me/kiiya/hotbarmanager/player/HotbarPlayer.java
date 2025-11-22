@@ -220,9 +220,9 @@ public class HotbarPlayer implements IHotbarPlayer {
             return;
         }
         for (int i = 0; i < 9; i++) {
-            Category category = Category.getFromString(hotbar.get(i));
-            debug("Saving slot " + i + " for " + player.getName() + " with value " + category.toString());
-            db.setData(player, "slot" + i, category.toString());
+            String category = hotbar.get(i);
+            debug("Saving slot " + i + " for " + player.getName() + " with value " + category);
+            db.setData(player, "slot" + i, category);
         }
     }
 

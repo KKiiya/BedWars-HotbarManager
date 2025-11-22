@@ -1,10 +1,14 @@
 package me.kiiya.hotbarmanager.support.bedwars1058;
 
 import me.kiiya.hotbarmanager.HotbarManager;
+import me.kiiya.hotbarmanager.api.config.ConfigManager;
+import me.kiiya.hotbarmanager.api.hotbar.SortType;
+import me.kiiya.hotbarmanager.api.menu.IShopCacheManager;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.config.proxy.ProxyMessagesData;
 import me.kiiya.hotbarmanager.database.providers.MySQL;
 import me.kiiya.hotbarmanager.listeners.InventoryListener;
+import me.kiiya.hotbarmanager.menu.helpers.CacheManager;
 import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
@@ -25,6 +29,11 @@ public class BedWarsProxy {
         connectDatabase();
         loadConfig();
         HotbarManager.manager = me.kiiya.hotbarmanager.player.HotbarManager.init();
+        if (manager.getSortType() == SortType.ITEM) {
+            IShopCacheManager cacheManager = new CacheManager("default", HotbarManager.getVersionSupport());
+            ConfigManager configManager = new ConfigManager(HotbarManager.getInstance(), "shop.yml", Bukkit.getWorldContainer().getPath() + "/plugins/BedWarsProxy/Addons/HotbarManager");
+            cacheManager.loadFromConfig(configManager.getYml().getConfigurationSection(""));
+        }
         loadMessages();
         loadCommands();
         loadListeners();

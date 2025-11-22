@@ -41,6 +41,12 @@ public class ProxyMessagesData {
         yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_LORE, Collections.singletonList("&7To Quick Buy."));
         yml.addDefault(INVENTORY_ITEMS_RESET_NAME, "&cReset to Default");
         yml.addDefault(INVENTORY_ITEMS_RESET_LORE, Arrays.asList("&7Reset your hotbar to the", "&7default."));
+        yml.addDefault(INVENTORY_CURRENT_PAGE_ITEM_NAME, "&aCurrent Page: &e{page}");
+        yml.addDefault(INVENTORY_CURRENT_PAGE_ITEM_LORE, Collections.singletonList("&7Shows the current page you are on."));
+        yml.addDefault(INVENTORY_NEXT_PAGE_ITEM_NAME, "&aNext Page: &e{page}");
+        yml.addDefault(INVENTORY_NEXT_PAGE_ITEM_LORE, Collections.singletonList("&7Click to go to the next page."));
+        yml.addDefault(INVENTORY_PREVIOUS_PAGE_ITEM_NAME, "&aPrevious Page: &e{page}");
+        yml.addDefault(INVENTORY_PREVIOUS_PAGE_ITEM_LORE, Collections.singletonList("&7Click to go to the previous page."));
         yml.addDefault(MEANING_BLOCKS, "&7Blocks");
         yml.addDefault(MEANING_MELEE, "&7Melee");
         yml.addDefault(MEANING_TOOLS, "&7Tools");

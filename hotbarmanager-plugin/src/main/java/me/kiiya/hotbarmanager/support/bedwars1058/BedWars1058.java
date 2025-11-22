@@ -1,8 +1,9 @@
 package me.kiiya.hotbarmanager.support.bedwars1058;
 
 import com.andrei1058.bedwars.api.BedWars;
-import com.andrei1058.bedwars.api.configuration.ConfigManager;
 import me.kiiya.hotbarmanager.HotbarManager;
+import me.kiiya.hotbarmanager.api.hotbar.SortType;
+import me.kiiya.hotbarmanager.api.menu.IShopCacheManager;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.config.bedwars1058.MessagesData;
 import me.kiiya.hotbarmanager.database.providers.MySQL;
@@ -13,10 +14,14 @@ import me.kiiya.hotbarmanager.listeners.bedwars1058.PlayerKill;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.category.RespawnListenerC;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.category.ShopBuyC;
 import me.kiiya.hotbarmanager.listeners.bedwars1058.ShopOpen;
+import me.kiiya.hotbarmanager.listeners.bedwars1058.item.RespawnListenerI;
+import me.kiiya.hotbarmanager.listeners.bedwars1058.item.ShopBuyI;
+import me.kiiya.hotbarmanager.menu.helpers.CacheManager;
 import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 
@@ -39,6 +44,10 @@ public class BedWars1058 {
         connectDatabase();
         loadConfig();
         HotbarManager.manager = me.kiiya.hotbarmanager.player.HotbarManager.init();
+        if (manager.getSortType() == SortType.ITEM) {
+            IShopCacheManager cacheManager = new CacheManager("default", HotbarManager.getVersionSupport());
+            cacheManager.loadFromConfig(bw1058Api.getConfigs().getShopConfig().getYml().getConfigurationSection(""));
+        }
         loadMessages();
         loadCommands();
         loadListeners();
@@ -46,7 +55,7 @@ public class BedWars1058 {
 
     private void connectDatabase() {
         Utility.info("&eConnecting to database...");
-        ConfigManager config = HotbarManager.getBW1058Api().getConfigs().getMainConfig();
+        YamlConfiguration config = HotbarManager.getBW1058Api().getConfigs().getMainConfig().getYml();
         if (config.getBoolean("database.enable")) HotbarManager.getInstance().setDB(new MySQL());
         else HotbarManager.getInstance().setDB(new SQLite());
 
@@ -74,11 +83,19 @@ public class BedWars1058 {
 
     private void loadListeners() {
         Utility.info("&eLoading listeners...");
-        Bukkit.getPluginManager().registerEvents(new ShopBuyC(), getInstance());
         Bukkit.getPluginManager().registerEvents(new ShopOpen(), getInstance());
         Bukkit.getPluginManager().registerEvents(new PlayerKill(), getInstance());
-        Bukkit.getPluginManager().registerEvents(new RespawnListenerC(), getInstance());
         Bukkit.getPluginManager().registerEvents(new InventoryListener(), getInstance());
+        switch (manager.getSortType()) {
+            case CATEGORY:
+                Bukkit.getPluginManager().registerEvents(new ShopBuyC(), getInstance());
+                Bukkit.getPluginManager().registerEvents(new RespawnListenerC(), getInstance());
+                break;
+            case ITEM:
+                Bukkit.getPluginManager().registerEvents(new ShopBuyI(), getInstance());
+                Bukkit.getPluginManager().registerEvents(new RespawnListenerI(), getInstance());
+                break;
+        }
 
         if (bw1058Api.getVersionSupport().getVersion() == 0) Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.Legacy(), getInstance());
         else Bukkit.getPluginManager().registerEvents(new CustomItemSecurity.New(), getInstance());

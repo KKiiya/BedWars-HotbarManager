@@ -5,6 +5,7 @@ import com.andrei1058.bedwars.shop.quickbuy.PlayerQuickBuyCache;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
+import me.kiiya.hotbarmanager.api.menu.GUIHolder;
 import me.kiiya.hotbarmanager.api.support.VersionSupport;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.utils.HotbarUtils;
@@ -136,24 +137,20 @@ public class HotbarManagerMenu implements GUIHolder {
                 break;
             case "back":
                 boolean isProxy = HotbarManager.getSupport() == Support.BEDWARSPROXY || HotbarManager.getSupport() == Support.BEDWARSPROXY2023;
-                if (isProxy) p.getPlayer().closeInventory();
-                else {
+                if (isProxy) {
+                    if (HotbarManager.getMainConfig().getString(BACK_COMMAND).equalsIgnoreCase("close")) player.closeInventory();
+                    else player.performCommand(HotbarManager.getMainConfig().getString(BACK_COMMAND));
+                } else {
                     boolean isPlaying = false;
-                    if (HotbarManager.getSupport() == Support.BEDWARS1058) {
-                        isPlaying = HotbarManager.getBW1058Api().getArenaUtil().isPlaying(p.getPlayer());
-                    } else if (HotbarManager.getSupport() == Support.BEDWARS2023) {
-                        isPlaying = HotbarManager.bw2023Api.getArenaUtil().isPlaying(p.getPlayer());
-                    }
+                    if (HotbarManager.getSupport() == Support.BEDWARS1058) isPlaying = HotbarManager.getBW1058Api().getArenaUtil().isPlaying(player);
+                    else if (HotbarManager.getSupport() == Support.BEDWARS2023) isPlaying = HotbarManager.bw2023Api.getArenaUtil().isPlaying(player);
 
                     if (isPlaying) {
-                        if (HotbarManager.getSupport() == Support.BEDWARS1058) {
-                            ShopManager.shop.open(p.getPlayer(), PlayerQuickBuyCache.getQuickBuyCache(p.getPlayer().getUniqueId()), false);
-                        } else {
-                            com.tomkeuper.bedwars.shop.ShopManager.shop.open(p.getPlayer(), com.tomkeuper.bedwars.shop.quickbuy.PlayerQuickBuyCache.getInstance().getQuickBuyCache(p.getPlayer().getUniqueId()), false);
-                        }
+                        if (HotbarManager.getSupport() == Support.BEDWARS1058) ShopManager.shop.open(player, PlayerQuickBuyCache.getQuickBuyCache(player.getUniqueId()), false);
+                        else com.tomkeuper.bedwars.shop.ShopManager.shop.open(player, com.tomkeuper.bedwars.shop.quickbuy.PlayerQuickBuyCache.getInstance().getQuickBuyCache(player.getUniqueId()), false);
                     } else {
-                        if (HotbarManager.getMainConfig().getString(BACK_COMMAND).equalsIgnoreCase("close")) p.getPlayer().closeInventory();
-                        else p.getPlayer().performCommand(HotbarManager.getMainConfig().getString(BACK_COMMAND));
+                        if (HotbarManager.getMainConfig().getString(BACK_COMMAND).equalsIgnoreCase("close")) player.closeInventory();
+                        else player.performCommand(HotbarManager.getMainConfig().getString(BACK_COMMAND));
                     }
                 }
                 break;
@@ -179,7 +176,6 @@ public class HotbarManagerMenu implements GUIHolder {
 
     private void addContents() {
         IHotbarPlayer p = HotbarManager.getAPI().getHotbarPlayer(player);
-
 
         // ---------------------------- UTILS ITEMS ---------------------------- //
 

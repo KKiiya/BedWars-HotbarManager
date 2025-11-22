@@ -40,6 +40,12 @@ public class MessagesData {
                     yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_LORE, Collections.singletonList("&7Para Compra Rápida."));
                     yml.addDefault(INVENTORY_ITEMS_RESET_NAME, "&cVoltar ao Padrão");
                     yml.addDefault(INVENTORY_ITEMS_RESET_LORE, Arrays.asList("&7Voltar sua hotbar ao", "&7padrão."));
+                    yml.addDefault(INVENTORY_CURRENT_PAGE_ITEM_NAME, "&aPágina Atual: &e{page}");
+                    yml.addDefault(INVENTORY_CURRENT_PAGE_ITEM_LORE, Collections.singletonList("&7Mostra a página que você está."));
+                    yml.addDefault(INVENTORY_NEXT_PAGE_ITEM_NAME, "&aPróxima Página: &e{page}");
+                    yml.addDefault(INVENTORY_NEXT_PAGE_ITEM_LORE, Collections.singletonList("&7Clique para ir para a próxima página."));
+                    yml.addDefault(INVENTORY_PREVIOUS_PAGE_ITEM_NAME, "&aPágina Anterior: &e{page}");
+                    yml.addDefault(INVENTORY_PREVIOUS_PAGE_ITEM_LORE, Collections.singletonList("&7Clique para ir para a página anterior."));
                     yml.addDefault(MEANING_BLOCKS, "&7Blocos");
                     yml.addDefault(MEANING_MELEE, "&7Combate");
                     yml.addDefault(MEANING_TOOLS, "&7Ferramentas");
@@ -72,6 +78,12 @@ public class MessagesData {
                     yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_LORE, Collections.singletonList("&7To Quick Buy."));
                     yml.addDefault(INVENTORY_ITEMS_RESET_NAME, "&cReset to Default");
                     yml.addDefault(INVENTORY_ITEMS_RESET_LORE, Arrays.asList("&7Reset your hotbar to the", "&7default."));
+                    yml.addDefault(INVENTORY_CURRENT_PAGE_ITEM_NAME, "&aCurrent Page: &e{page}");
+                    yml.addDefault(INVENTORY_CURRENT_PAGE_ITEM_LORE, Collections.singletonList("&7Shows the current page you are on."));
+                    yml.addDefault(INVENTORY_NEXT_PAGE_ITEM_NAME, "&aNext Page: &e{page}");
+                    yml.addDefault(INVENTORY_NEXT_PAGE_ITEM_LORE, Collections.singletonList("&7Click to go to the next page."));
+                    yml.addDefault(INVENTORY_PREVIOUS_PAGE_ITEM_NAME, "&aPrevious Page: &e{page}");
+                    yml.addDefault(INVENTORY_PREVIOUS_PAGE_ITEM_LORE, Collections.singletonList("&7Click to go to the previous page."));
                     yml.addDefault(MEANING_BLOCKS, "&7Blocks");
                     yml.addDefault(MEANING_MELEE, "&7Melee");
                     yml.addDefault(MEANING_TOOLS, "&7Tools");

@@ -1,8 +1,11 @@
 package me.kiiya.hotbarmanager;
 
+
 import me.kiiya.hotbarmanager.api.HotbarManager;
+import me.kiiya.hotbarmanager.api.hotbar.IHotbarManager;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
 import me.kiiya.hotbarmanager.api.hotbar.SortType;
+import me.kiiya.hotbarmanager.api.menu.IShopCacheManager;
 import me.kiiya.hotbarmanager.menu.HotbarManagerMenu;
 import org.bukkit.entity.Player;
 
@@ -24,6 +27,17 @@ public class API implements HotbarManager {
     public IHotbarPlayer getHotbarPlayer(UUID uuid) {
         return me.kiiya.hotbarmanager.HotbarManager.getManager().getHotbarPlayer(uuid);
     }
+
+    @Override
+    public IHotbarManager getHotbarManager() {
+        return me.kiiya.hotbarmanager.HotbarManager.getManager();
+    }
+
+    @Override
+    public IShopCacheManager getCacheManager(String group) {
+        return me.kiiya.hotbarmanager.HotbarManager.getCacheManager(group);
+    }
+
 
     @Override
     public HotbarManager.MenuUtil getMenuUtil() {

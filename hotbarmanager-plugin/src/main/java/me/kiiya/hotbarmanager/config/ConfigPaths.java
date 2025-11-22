@@ -102,6 +102,18 @@ public class ConfigPaths {
     public static final String INVENTORY_ITEMS_BACK_LOBBY_LORE = PATH + "inventory.items.back.lobby.lore";
     public static final String INVENTORY_ITEMS_RESET_NAME = PATH + "inventory.items.hotbar-reset.name";
     public static final String INVENTORY_ITEMS_RESET_LORE = PATH + "inventory.items.hotbar-reset.lore";
+
+    // FOR PER-ITEM SORTING INVENTORY
+    public static final String INVENTORY_CURRENT_PAGE_ITEM = PATH + "inventory.per-item.current-page";
+    public static final String INVENTORY_CURRENT_PAGE_ITEM_NAME = PATH + INVENTORY_CURRENT_PAGE_ITEM + ".name";
+    public static final String INVENTORY_CURRENT_PAGE_ITEM_LORE = PATH + INVENTORY_CURRENT_PAGE_ITEM + ".lore";
+    public static final String INVENTORY_NEXT_PAGE_ITEM = PATH + "inventory.per-item.next-page";
+    public static final String INVENTORY_NEXT_PAGE_ITEM_NAME = PATH + INVENTORY_NEXT_PAGE_ITEM + ".name";
+    public static final String INVENTORY_NEXT_PAGE_ITEM_LORE = PATH + INVENTORY_NEXT_PAGE_ITEM + ".lore";
+    public static final String INVENTORY_PREVIOUS_PAGE_ITEM = PATH + "inventory.per-item.previous-page";
+    public static final String INVENTORY_PREVIOUS_PAGE_ITEM_NAME = PATH + INVENTORY_PREVIOUS_PAGE_ITEM + ".name";
+    public static final String INVENTORY_PREVIOUS_PAGE_ITEM_LORE = PATH + INVENTORY_PREVIOUS_PAGE_ITEM + ".lore";
+
     public static final String MEANING_BLOCKS = PATH + "meanings.blocks";
     public static final String MEANING_MELEE = PATH + "meanings.melee";
     public static final String MEANING_TOOLS = PATH + "meanings.tools";

@@ -20,6 +20,7 @@ import com.tomkeuper.bedwars.shop.quickbuy.PlayerQuickBuyCache;
 import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.events.HotbarItemSetEvent;
 import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
+import me.kiiya.hotbarmanager.utils.HotbarUtils;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -46,6 +47,8 @@ public class ShopBuyI implements Listener {
         Player p = e.getBuyer();
         PlayerInventory inv = p.getInventory();
         IHotbarPlayer hp = HotbarManager.getAPI().getHotbarPlayer(p);
+        String category = HotbarUtils.getCategoryFromString(e.getCategoryContent().getIdentifier()).toString().toLowerCase();
+        String itemId = category + "." + e.getCategoryContent().getIdentifier().split("\\.")[2];
         String identifier = e.getCategoryContent().getIdentifier();
         List<String> hotbar = hp.getHotgarAsStringList();
 
@@ -67,7 +70,7 @@ public class ShopBuyI implements Listener {
         // SOUNDS
         String buySound = "shop-bought";
 
-        if (!hotbar.contains(identifier)) return;
+        if (!hotbar.contains(itemId)) return;
         if (processing.contains(p.getUniqueId())) return;
 
         try {
@@ -76,17 +79,20 @@ public class ShopBuyI implements Listener {
                 debug("Checking slot " + i);
                 String currentPath = hotbar.get(i);
                 ItemStack itemSlot = inv.getItem(i);
-                if (!currentPath.equals(identifier)) continue;
+                String slotIdentifier = itemSlot != null ? vs.getShopUpgradeIdentifier(itemSlot) : null;
+                if (!currentPath.equals(itemId)) continue;
 
                 if (cc.isUpgradable() && itemSlot != null) {
                     debug("Item is upgradable");
-                    if (!vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier)) {
-                        debug("Item is the same category but doesn't have the same identifier");
+                    debug("Current identifier: " + identifier);
+                    debug("Item slot identifier: " + slotIdentifier);
+                    if (slotIdentifier != null && !slotIdentifier.isEmpty() && !slotIdentifier.equals(identifier)) {
+                        debug("Item in slot has different identifier, skipping this slot...");
                         continue;
                     }
                 }
 
-                HotbarItemSetEvent event = new HotbarItemSetEvent(p, identifier, i);
+                HotbarItemSetEvent event = new HotbarItemSetEvent(p, itemId, i);
                 Bukkit.getPluginManager().callEvent(event);
                 if (event.isCancelled()) {
                     debug("Event was cancelled for slot " + i);
@@ -139,7 +145,7 @@ public class ShopBuyI implements Listener {
                             inv.addItem(item);
                             p.updateInventory();
                         }
-                    } else if (vs.getShopUpgradeIdentifier(itemSlot) != null && vs.getShopUpgradeIdentifier(itemSlot).equals(identifier)) {
+                    } else if (slotIdentifier != null && slotIdentifier.equals(identifier)) {
                         debug("Item has the same identifier, replacing...");
                         inv.setItem(i, vs.setShopUpgradeIdentifier(item, identifier));
                         p.updateInventory();
@@ -153,7 +159,6 @@ public class ShopBuyI implements Listener {
                             p.updateInventory();
                         }
                     } else {
-                        if ((vs.getShopUpgradeIdentifier(itemSlot) == null || !vs.getShopUpgradeIdentifier(itemSlot).equalsIgnoreCase(identifier))) continue;
                         debug("Item is same category but different identifier or no identifier");
 
                         if (cc.isPermanent()) {
