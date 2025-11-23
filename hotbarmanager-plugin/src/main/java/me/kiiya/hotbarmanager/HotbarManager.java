@@ -6,6 +6,7 @@ import me.kiiya.hotbarmanager.api.menu.IShopCacheManager;
 import me.kiiya.hotbarmanager.api.support.VersionSupport;
 import me.kiiya.hotbarmanager.commands.MenuCommand;
 import me.kiiya.hotbarmanager.config.MainConfig;
+import me.kiiya.hotbarmanager.listeners.JoinListener;
 import me.kiiya.hotbarmanager.menu.helpers.CacheManager;
 import me.kiiya.hotbarmanager.support.bedwars1058.BedWars1058;
 import me.kiiya.hotbarmanager.support.bedwars1058.BedWarsProxy;
@@ -32,10 +33,12 @@ public final class HotbarManager extends JavaPlugin {
     public static Support support;
     public static IHotbarManager manager;
     public static boolean debug = false;
+    public static boolean isLoaded = false;
     private Database db;
 
     @Override
     public void onEnable() {
+        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
         if (!loadVersionSupport()) {
             Bukkit.getPluginManager().disablePlugin(this);
             return;

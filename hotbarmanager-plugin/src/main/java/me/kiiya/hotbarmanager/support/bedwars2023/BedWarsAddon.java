@@ -96,6 +96,7 @@ public class BedWarsAddon extends Addon {
         loadMessages();
         loadCommands();
         loadListeners();
+        isLoaded = true;
     }
 
     @Override

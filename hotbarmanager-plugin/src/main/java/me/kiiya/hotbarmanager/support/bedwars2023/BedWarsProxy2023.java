@@ -57,6 +57,7 @@ public class BedWarsProxy2023 {
         loadMessages();
         loadCommands();
         loadListeners();
+        isLoaded = true;
     }
 
     private void connectDatabase() {

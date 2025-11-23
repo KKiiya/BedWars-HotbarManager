@@ -51,6 +51,7 @@ public class BedWars1058 {
         loadMessages();
         loadCommands();
         loadListeners();
+        isLoaded = true;
     }
 
     private void connectDatabase() {

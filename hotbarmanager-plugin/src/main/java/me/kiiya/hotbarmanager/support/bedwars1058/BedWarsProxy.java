@@ -37,6 +37,7 @@ public class BedWarsProxy {
         loadMessages();
         loadCommands();
         loadListeners();
+        isLoaded = true;
     }
 
     private void connectDatabase() {
