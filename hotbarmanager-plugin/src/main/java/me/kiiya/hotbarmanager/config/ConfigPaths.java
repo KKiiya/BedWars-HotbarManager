@@ -104,6 +104,7 @@ public class ConfigPaths {
     public static final String INVENTORY_ITEMS_RESET_LORE = PATH + "inventory.items.hotbar-reset.lore";
 
     // FOR PER-ITEM SORTING INVENTORY
+    public static final String INVENTORY_COLOR_CODE = PATH + "inventory.per-item.color-code";
     public static final String INVENTORY_CURRENT_PAGE_ITEM = PATH + "inventory.per-item.current-page";
     public static final String INVENTORY_CURRENT_PAGE_ITEM_NAME = PATH + INVENTORY_CURRENT_PAGE_ITEM + ".name";
     public static final String INVENTORY_CURRENT_PAGE_ITEM_LORE = PATH + INVENTORY_CURRENT_PAGE_ITEM + ".lore";

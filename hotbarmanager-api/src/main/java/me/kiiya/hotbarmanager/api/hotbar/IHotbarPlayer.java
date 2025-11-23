@@ -106,4 +106,12 @@ public interface IHotbarPlayer {
      * @param save - whether to save the hotbar before destroying it
      */
     void destroy(boolean save);
+
+    /**
+     * Destroy the hotbar player
+     *
+     * @param save - whether to save the hotbar before destroying it
+     * @param isServerShutdown - whether the server is shutting down
+     */
+    void destroy(boolean save, boolean isServerShutdown);
 }

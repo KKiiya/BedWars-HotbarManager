@@ -199,6 +199,18 @@ public class HotbarPlayer implements IHotbarPlayer {
         debug("Saving Hotbar for " + player.getName() + " was successful.");
     }
 
+    private void save() {
+        if (hotbar == null) {
+            debug("Hotbar is null, skipping save.");
+            return;
+        }
+        for (int i = 0; i < 9; i++) {
+            String category = hotbar.get(i);
+            debug("Saving slot " + i + " for " + player.getName() + " with value " + category);
+            db.setData(player, "slot" + i, category);
+        }
+    }
+
     @Override
     public void saveHotbar(boolean destroy, boolean runTask) {
         debug("Saving Hotbar for " + player.getName());
@@ -212,18 +224,6 @@ public class HotbarPlayer implements IHotbarPlayer {
             if (destroy) destroy(false);
         }
         debug("Saving Hotbar for " + player.getName() + " was successful.");
-    }
-
-    private void save() {
-        if (hotbar == null) {
-            debug("Hotbar is null, skipping save.");
-            return;
-        }
-        for (int i = 0; i < 9; i++) {
-            String category = hotbar.get(i);
-            debug("Saving slot " + i + " for " + player.getName() + " with value " + category);
-            db.setData(player, "slot" + i, category);
-        }
     }
 
     @Override
@@ -243,11 +243,25 @@ public class HotbarPlayer implements IHotbarPlayer {
     public void destroy(boolean save) {
         debug("Destroying HotbarPlayer for " + player.getName());
         if (save) saveHotbar();
-        Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> {
+        Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
             hotbar = null;
             player = null;
             db = null;
-        }, 10L);
+        });
+        me.kiiya.hotbarmanager.player.HotbarManager.getPrivateInstance().getPlayersMap().remove(player.getUniqueId().toString());
+    }
+
+    @Override
+    public void destroy(boolean save, boolean isServerStop) {
+        debug("Destroying HotbarPlayer for " + player.getName());
+        if (save) saveHotbar();
+        if (!isServerStop) {
+            Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
+                hotbar = null;
+                player = null;
+                db = null;
+            });
+        }
         me.kiiya.hotbarmanager.player.HotbarManager.getPrivateInstance().getPlayersMap().remove(player.getUniqueId().toString());
     }
 }

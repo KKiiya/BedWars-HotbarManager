@@ -5,7 +5,6 @@ import me.kiiya.hotbarmanager.HotbarManager;
 import me.kiiya.hotbarmanager.api.config.ConfigManager;
 import me.kiiya.hotbarmanager.api.database.Database;
 import me.kiiya.hotbarmanager.api.hotbar.SortType;
-import me.kiiya.hotbarmanager.api.menu.IShopCacheManager;
 import me.kiiya.hotbarmanager.config.MainConfig;
 import me.kiiya.hotbarmanager.config.bedwars2023.MessagesData;
 import me.kiiya.hotbarmanager.database.providers.MySQL;
@@ -101,8 +100,7 @@ public class BedWarsAddon extends Addon {
 
     @Override
     public void unload() {
-        me.kiiya.hotbarmanager.player.HotbarManager.getInstance().saveHotbars(true, false);
-        Bukkit.getPluginManager().disablePlugin(getPlugin());
+        Bukkit.getPluginManager().disablePlugin(HotbarManager.getInstance());
     }
 
     private void connectDatabase() {

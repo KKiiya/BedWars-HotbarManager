@@ -58,4 +58,13 @@ public interface IHotbarManager {
      * @param runTask - If true, the saving process will be executed in a separate thread.
      */
     void saveHotbars(boolean destroy, boolean runTask);
+
+    /**
+     * Saves the hotbar data for all players to the database.
+     *
+     * @param destroy - If true, the hotbar data will be removed from memory after saving.
+     * @param runTask - If true, the saving process will be executed in a separate thread.
+     * @param isServerShutdown - If true, indicates that the server is shutting down, allowing for any necessary shutdown-specific handling.
+     */
+    void saveHotbars(boolean destroy, boolean runTask, boolean isServerShutdown);
 }

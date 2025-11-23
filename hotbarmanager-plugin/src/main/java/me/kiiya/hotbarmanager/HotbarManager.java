@@ -53,7 +53,7 @@ public final class HotbarManager extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        me.kiiya.hotbarmanager.player.HotbarManager.getInstance().saveHotbars(true, false);
+        me.kiiya.hotbarmanager.player.HotbarManager.getInstance().saveHotbars(true, false, true);
     }
 
     private void loadSupport() {

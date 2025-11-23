@@ -41,6 +41,7 @@ public class ProxyMessagesData {
         yml.addDefault(INVENTORY_ITEMS_BACK_QUICK_BUY_LORE, Collections.singletonList("&7To Quick Buy."));
         yml.addDefault(INVENTORY_ITEMS_RESET_NAME, "&cReset to Default");
         yml.addDefault(INVENTORY_ITEMS_RESET_LORE, Arrays.asList("&7Reset your hotbar to the", "&7default."));
+        yml.addDefault(INVENTORY_COLOR_CODE, "&a");
         yml.addDefault(INVENTORY_CURRENT_PAGE_ITEM_NAME, "&aCurrent Page: &e{page}");
         yml.addDefault(INVENTORY_CURRENT_PAGE_ITEM_LORE, Collections.singletonList("&7Shows the current page you are on."));
         yml.addDefault(INVENTORY_NEXT_PAGE_ITEM_NAME, "&aNext Page: &e{page}");

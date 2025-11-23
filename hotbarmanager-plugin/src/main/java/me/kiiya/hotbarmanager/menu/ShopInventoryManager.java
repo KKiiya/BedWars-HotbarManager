@@ -8,9 +8,7 @@ import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
 import me.kiiya.hotbarmanager.api.menu.*;
 import me.kiiya.hotbarmanager.api.menu.GUIHolder;
 import me.kiiya.hotbarmanager.api.support.VersionSupport;
-import me.kiiya.hotbarmanager.config.ConfigPaths;
 import me.kiiya.hotbarmanager.config.MainConfig;
-import me.kiiya.hotbarmanager.menu.helpers.CacheManager;
 import me.kiiya.hotbarmanager.utils.Support;
 import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Bukkit;
@@ -26,15 +24,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.stream.Collectors;
 
 import static me.kiiya.hotbarmanager.config.ConfigPaths.*;
-import static me.kiiya.hotbarmanager.config.ConfigPaths.SEPARATOR_DATA;
-import static me.kiiya.hotbarmanager.config.ConfigPaths.SEPARATOR_LORE;
-import static me.kiiya.hotbarmanager.config.ConfigPaths.SEPARATOR_NAME;
 
 public class ShopInventoryManager implements GUIHolder {
     private final Player player;
     private final IHotbarPlayer hp;
-    private IShopMenu shopMenu;
-    private IShopCacheManager cacheManager;
+    private final IShopMenu shopMenu;
+    private final IShopCacheManager cacheManager;
     private final String group;
     private IPage currentPage;
     private Inventory inventory;
@@ -54,7 +49,7 @@ public class ShopInventoryManager implements GUIHolder {
         this.currentPage = shopMenu.getFirstPage();
 
         createInventory();
-        populateInventory();
+        populateInventory(true);
         player.openInventory(inventory);
     }
 
@@ -68,9 +63,10 @@ public class ShopInventoryManager implements GUIHolder {
         inventory = Bukkit.createInventory(this, 54, title);
     }
 
-    private void populateInventory() {
+    private void populateInventory(boolean isFirstTime) {
         // Clear inventory
         inventory.clear();
+        if (!isFirstTime) createInventory();
 
         // Add items from current
         MainConfig mc = HotbarManager.getMainConfig();
@@ -90,10 +86,19 @@ public class ShopInventoryManager implements GUIHolder {
 
             // Apply language-specific name and lore
             String namePath = "shop-items-messages." + cachedItem.getCategoryKey() + ".content-item-" + cachedItem.getItemKey() + "-name";
-            String lorePath = "shop-items-messages." + cachedItem.getCategoryKey() + ".content-item-" + cachedItem.getItemKey() + "-lore";
 
-            meta.setDisplayName(Utility.getMsg(player, namePath));
-            meta.setLore(Utility.getListMsg(player, lorePath));
+            meta.setDisplayName(cleanTierPlaceholders(
+                    Utility.getMsg(player, namePath)
+                    .replace("%bw_color%", Utility.getMsg(player, INVENTORY_COLOR_CODE))
+                    .replace("{color}", Utility.getMsg(player, INVENTORY_COLOR_CODE))
+                    )
+            );
+            meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_LORE)
+                    .stream().map(s -> s
+                            .replace("{category}", cleanPlaceholders(Utility.getMsg(player, namePath))
+                            )
+                    ).collect(Collectors.toList())
+            );
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS);
             displayItem.setItemMeta(meta);
 
@@ -105,9 +110,9 @@ public class ShopInventoryManager implements GUIHolder {
         if (currentPage.hasPreviousPage()) {
             ItemStack prevButton = new ItemStack(Material.ARROW);
             ItemMeta meta = prevButton.getItemMeta();
-            meta.setDisplayName(Utility.getMsg(player, ConfigPaths.INVENTORY_PREVIOUS_PAGE_ITEM_NAME)
+            meta.setDisplayName(Utility.getMsg(player, INVENTORY_PREVIOUS_PAGE_ITEM_NAME)
                     .replace("{page}", String.valueOf(currentPage.getPreviousPage().getPageNumber()+1)));
-            meta.setLore(Utility.getListMsg(player, ConfigPaths.INVENTORY_PREVIOUS_PAGE_ITEM_LORE));
+            meta.setLore(Utility.getListMsg(player, INVENTORY_PREVIOUS_PAGE_ITEM_LORE));
             prevButton.setItemMeta(meta);
             inventory.setItem(48, vs.setItemTag(prevButton, "hbm", "prev-page"));
         }
@@ -115,9 +120,9 @@ public class ShopInventoryManager implements GUIHolder {
         if (currentPage.hasNextPage()) {
             ItemStack nextButton = new ItemStack(Material.ARROW);
             ItemMeta meta = nextButton.getItemMeta();
-            meta.setDisplayName(Utility.getMsg(player, ConfigPaths.INVENTORY_NEXT_PAGE_ITEM_NAME)
+            meta.setDisplayName(Utility.getMsg(player, INVENTORY_NEXT_PAGE_ITEM_NAME)
                     .replace("{page}", String.valueOf(currentPage.getNextPage().getPageNumber()+1)));
-            meta.setLore(Utility.getListMsg(player, ConfigPaths.INVENTORY_NEXT_PAGE_ITEM_LORE));
+            meta.setLore(Utility.getListMsg(player, INVENTORY_NEXT_PAGE_ITEM_LORE));
             nextButton.setItemMeta(meta);
             inventory.setItem(50, vs.setItemTag(nextButton, "hbm", "next-page"));
         }
@@ -125,10 +130,10 @@ public class ShopInventoryManager implements GUIHolder {
         // Add page indicator
         ItemStack pageInfo = new ItemStack(Material.PAPER);
         ItemMeta meta = pageInfo.getItemMeta();
-        meta.setDisplayName(Utility.getMsg(player, ConfigPaths.INVENTORY_CURRENT_PAGE_ITEM_NAME)
+        meta.setDisplayName(Utility.getMsg(player, INVENTORY_CURRENT_PAGE_ITEM_NAME)
                 .replace("{page}", String.valueOf(currentPage.getPageNumber()+1))
                 .replace("{total-pages}", String.valueOf(shopMenu.getTotalPages()+1)));
-        meta.setLore(Utility.getListMsg(player, ConfigPaths.INVENTORY_CURRENT_PAGE_ITEM_LORE).stream()
+        meta.setLore(Utility.getListMsg(player, INVENTORY_CURRENT_PAGE_ITEM_LORE).stream()
                 .map(line -> line
                         .replace("{page}", String.valueOf(currentPage.getPageNumber()+1))
                         .replace("{total-pages}", String.valueOf(shopMenu.getTotalPages()+1)))
@@ -166,6 +171,9 @@ public class ShopInventoryManager implements GUIHolder {
 
         // Add hotbar contents
         addHotbarContents();
+        if (!isFirstTime) {
+            player.openInventory(inventory);
+        }
     }
 
     @Override
@@ -203,13 +211,13 @@ public class ShopInventoryManager implements GUIHolder {
             case "prev-page":
                 if (currentPage.hasPreviousPage()) {
                     currentPage = currentPage.getPreviousPage();
-                    populateInventory();
+                    populateInventory(false);
                 }
                 break;
             case "next-page":
                 if (currentPage.hasNextPage()) {
                     currentPage = currentPage.getNextPage();
-                    populateInventory();
+                    populateInventory(false);
                 }
                 break;
             case "back":
@@ -250,24 +258,30 @@ public class ShopInventoryManager implements GUIHolder {
     }
 
     private void addHotbarContents() {
+        boolean usePlaceholderNone = HotbarManager.getMainConfig().getBoolean(PLACEHOLDER_NONE_ENABLED);
+        ItemStack placeholder = new ItemStack(Material.AIR);
+        if (usePlaceholderNone) {
+            placeholder = new ItemStack(Material.valueOf(HotbarManager.getMainConfig().getString(PLACEHOLDER_NONE_MATERIAL)));
+            ItemMeta meta = placeholder.getItemMeta();
+            meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_PLACEHOLDER_LORE));
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS);
+            placeholder.setItemMeta(meta);
+            placeholder.setDurability((short) HotbarManager.getMainConfig().getInt(PLACEHOLDER_NONE_DATA));
+        }
+
         for (int slot = 0; slot < 9; slot++) {
             String itemPath = hp.getItemPath(slot); // Format: "category.item" (e.g., "blocks.wool")
 
             if (itemPath == null || itemPath.isEmpty() || itemPath.equalsIgnoreCase("none") || Category.getFromString(itemPath) != Category.NONE) {
                 // Handle empty/none slots
-                if (HotbarManager.getMainConfig().getBoolean(PLACEHOLDER_NONE_ENABLED)) {
-                    ItemStack placeholder = new ItemStack(Material.valueOf(HotbarManager.getMainConfig().getString(PLACEHOLDER_NONE_MATERIAL)));
+                if (usePlaceholderNone) {
                     ItemMeta meta = placeholder.getItemMeta();
-                    meta.setDisplayName(Utility.getMsg(player, ConfigPaths.INVENTORY_ITEMS_PLACEHOLDER_NAME)
+                    meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_PLACEHOLDER_NAME)
                             .replace("{slot}", String.valueOf(slot + 1)));
-                    meta.setLore(Utility.getListMsg(player, ConfigPaths.INVENTORY_ITEMS_PLACEHOLDER_LORE));
-                    meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS);
                     placeholder.setItemMeta(meta);
-                    placeholder.setDurability((short) HotbarManager.getMainConfig().getInt(ConfigPaths.PLACEHOLDER_NONE_DATA));
-                    inventory.setItem(slot, vs.setItemTag(placeholder, "hbm", "placeholder-none"));
-                } else {
-                    inventory.setItem(slot, new ItemStack(Material.AIR));
+                    inventory.setItem(slot, vs.setItemTag(placeholder.clone(), "hbm", "placeholder-none"));
                 }
+                else inventory.setItem(slot, new ItemStack(Material.AIR));
                 continue;
             }
 
@@ -310,19 +324,38 @@ public class ShopInventoryManager implements GUIHolder {
             ItemStack itemToAdd = shopItem.getBaseItem().clone();
 
             // Apply language-specific name and lore
-            String namePath = "shop-items-messages." + shopItem.getCategoryKey() + ".content-item-" + shopItem.getItemKey() + "-name";
-            String lorePath = "shop-items-messages." + shopItem.getCategoryKey() + ".content-item-" + shopItem.getItemKey() + "-lore";
-
             ItemMeta meta = itemToAdd.getItemMeta();
-            if (meta != null) {
-                meta.setDisplayName(Utility.getMsg(player, namePath));
-                meta.setLore(Utility.getListMsg(player, lorePath));
-                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS);
-                itemToAdd.setItemMeta(meta);
-            }
+            String namePath = "shop-items-messages." + shopItem.getCategoryKey() + ".content-item-" + shopItem.getItemKey() + "-name";
 
+            meta.setDisplayName(cleanTierPlaceholders(
+                    Utility.getMsg(player, namePath)
+                            .replace("%bw_color%", Utility.getMsg(player, INVENTORY_COLOR_CODE))
+                            .replace("{color}", Utility.getMsg(player, INVENTORY_COLOR_CODE))
+                    )
+            );
+            meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE)
+                    .stream().map(s -> s
+                            .replace("{category}", cleanPlaceholders(Utility.getMsg(player, namePath)))
+                    ).collect(Collectors.toList())
+            );
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS);
+            itemToAdd.setItemMeta(meta);
             // Add to player inventory at the slot
             inventory.setItem(slot, itemToAdd);
         }
+    }
+
+    private String cleanTierPlaceholders(String input) {
+        if (input == null) return null;
+        return input.replaceAll("(?i)\\s*(%bw_tier%|\\{tier\\})\\s*", "")
+                .replaceAll("\\s{2,}", " ")
+                .trim();
+    }
+
+    private String cleanPlaceholders(String input) {
+        if (input == null) return null;
+        return input.replaceAll("(?i)\\s*(%bw_tier%|\\{tier\\}|%bw_color%|\\{color\\})\\s*", "")
+                .replaceAll("\\s{2,}", " ")
+                .trim();
     }
 }
