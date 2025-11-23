@@ -191,7 +191,7 @@ public class ShopInventoryManager implements GUIHolder {
                 return;
             }
 
-            if (slot >= 0 && slot <= 9) {
+            if (slot >= 0 && slot < 9) {
                 hp.setSlotCategory(slot, cursorTag, true);
                 player.setItemOnCursor(new ItemStack(Material.AIR));
                 addHotbarContents();
