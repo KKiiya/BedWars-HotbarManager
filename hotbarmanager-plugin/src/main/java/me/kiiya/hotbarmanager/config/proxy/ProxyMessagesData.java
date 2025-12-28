@@ -12,6 +12,7 @@ import static me.kiiya.hotbarmanager.config.ConfigPaths.*;
 public class ProxyMessagesData {
     YamlConfiguration yml;
     File file;
+
     public ProxyMessagesData() {
         setupMessages();
     }

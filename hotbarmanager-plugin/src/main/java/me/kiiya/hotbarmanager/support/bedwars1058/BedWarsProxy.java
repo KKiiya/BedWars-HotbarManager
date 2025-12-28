@@ -31,7 +31,7 @@ public class BedWarsProxy {
         HotbarManager.manager = me.kiiya.hotbarmanager.player.HotbarManager.init();
         if (manager.getSortType() == SortType.ITEM) {
             IShopCacheManager cacheManager = new CacheManager("default", HotbarManager.getVersionSupport());
-            ConfigManager configManager = new ConfigManager(HotbarManager.getInstance(), "shop.yml", Bukkit.getWorldContainer().getPath() + "/plugins/BedWarsProxy/Addons/HotbarManager");
+            ConfigManager configManager = new ConfigManager(HotbarManager.getInstance(), "shop", Bukkit.getWorldContainer().getPath() + "/plugins/BedWarsProxy/");
             cacheManager.loadFromConfig(configManager.getYml().getConfigurationSection(""));
         }
         loadMessages();

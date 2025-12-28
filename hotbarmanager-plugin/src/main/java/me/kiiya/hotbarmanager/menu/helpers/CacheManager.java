@@ -5,6 +5,7 @@ import me.kiiya.hotbarmanager.api.menu.IPage;
 import me.kiiya.hotbarmanager.api.menu.IShopCacheManager;
 import me.kiiya.hotbarmanager.api.menu.IShopMenu;
 import me.kiiya.hotbarmanager.api.support.VersionSupport;
+import me.kiiya.hotbarmanager.utils.Utility;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +28,7 @@ public class CacheManager implements IShopCacheManager {
     @Override
     public void loadFromConfig(ConfigurationSection shopConfig) {
         Menu menu = new Menu();
+        Utility.debug("Loading shop cache for group: " + group);
 
         // Iterate through all categories
         for (String categoryKey : shopConfig.getKeys(false)) {
@@ -56,13 +58,11 @@ public class CacheManager implements IShopCacheManager {
             // Create ONE page for this category (not multiple pages)
             if (!allItems.isEmpty()) {
                 Page page = new Page(menu, category, menu.getPages().size());
-                for (CachedShopItem item : allItems) {
-                    page.addItem(item);
-                }
+                for (CachedShopItem item : allItems) page.addItem(item);
                 menu.addPage(page);
             }
         }
-
+        Utility.debug("Finished loading shop cache for group: " + group);
         this.mainMenu = menu;
     }
 

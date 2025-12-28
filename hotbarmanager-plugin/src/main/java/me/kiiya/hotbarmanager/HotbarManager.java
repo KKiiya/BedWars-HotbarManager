@@ -45,13 +45,14 @@ public final class HotbarManager extends JavaPlugin {
         }
         loadSupport();
 
-        Bukkit.getScheduler().runTaskLater(this, () -> {
-            new Metrics(this, 20334);
-            api = new API();
+        new Metrics(this, 20334);
+        api = new API();
 
-            Bukkit.getServicesManager().register(me.kiiya.hotbarmanager.api.HotbarManager.class, api, this, ServicePriority.Normal);
+        Bukkit.getServicesManager().register(me.kiiya.hotbarmanager.api.HotbarManager.class, api, this, ServicePriority.Normal);
+
+        Bukkit.getScheduler().runTask(this, () -> {
             getServer().getPluginCommand("hbm").setExecutor(new MenuCommand());
-        }, 40L);
+        });
     }
 
     @Override

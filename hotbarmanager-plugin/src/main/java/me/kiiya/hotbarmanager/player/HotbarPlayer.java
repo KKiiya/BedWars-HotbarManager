@@ -194,12 +194,11 @@ public class HotbarPlayer implements IHotbarPlayer {
 
     @Deprecated
     public void saveHotbar() {
-        debug("Saving Hotbar for " + player.getName());
-        Bukkit.getScheduler().runTask(HotbarManager.getInstance(), this::save);
-        debug("Saving Hotbar for " + player.getName() + " was successful.");
+        save();
     }
 
     private void save() {
+        debug("Saving Hotbar for " + player.getName());
         if (hotbar == null) {
             debug("Hotbar is null, skipping save.");
             return;
@@ -209,11 +208,11 @@ public class HotbarPlayer implements IHotbarPlayer {
             debug("Saving slot " + i + " for " + player.getName() + " with value " + category);
             db.setData(player, "slot" + i, category);
         }
+        debug("Saving Hotbar for " + player.getName() + " was successful.");
     }
 
     @Override
     public void saveHotbar(boolean destroy, boolean runTask) {
-        debug("Saving Hotbar for " + player.getName());
         if (runTask) {
             Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
                 save();
@@ -223,14 +222,13 @@ public class HotbarPlayer implements IHotbarPlayer {
             save();
             if (destroy) destroy(false);
         }
-        debug("Saving Hotbar for " + player.getName() + " was successful.");
     }
 
     @Override
     @Deprecated
     public void destroy() {
         debug("Destroying HotbarPlayer for " + player.getName());
-        saveHotbar();
+        save();
         Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> {
             hotbar = null;
             player = null;
@@ -242,7 +240,7 @@ public class HotbarPlayer implements IHotbarPlayer {
     @Override
     public void destroy(boolean save) {
         debug("Destroying HotbarPlayer for " + player.getName());
-        if (save) saveHotbar();
+        if (save) save();
         Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
             hotbar = null;
             player = null;
@@ -254,7 +252,7 @@ public class HotbarPlayer implements IHotbarPlayer {
     @Override
     public void destroy(boolean save, boolean isServerStop) {
         debug("Destroying HotbarPlayer for " + player.getName());
-        if (save) saveHotbar();
+        if (save) save();
         if (!isServerStop) {
             Bukkit.getScheduler().runTask(HotbarManager.getInstance(), () -> {
                 hotbar = null;
@@ -262,6 +260,6 @@ public class HotbarPlayer implements IHotbarPlayer {
                 db = null;
             });
         }
-        me.kiiya.hotbarmanager.player.HotbarManager.getPrivateInstance().getPlayersMap().remove(player.getUniqueId().toString());
+        if (!isServerStop) me.kiiya.hotbarmanager.player.HotbarManager.getPrivateInstance().getPlayersMap().remove(player.getUniqueId().toString());
     }
 }

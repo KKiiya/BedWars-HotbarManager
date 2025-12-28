@@ -29,9 +29,8 @@ public class MenuCommand implements CommandExecutor {
             }
 
             SortType sortType = HotbarManager.getManager().getSortType();
-            if (sortType == SortType.CATEGORY) {
-                new HotbarManagerMenu(p);
-            } else {
+            if (sortType == SortType.CATEGORY) new HotbarManagerMenu(p);
+            else {
                 switch (HotbarManager.getSupport()) {
                     case BEDWARSPROXY:
                     case BEDWARS1058:

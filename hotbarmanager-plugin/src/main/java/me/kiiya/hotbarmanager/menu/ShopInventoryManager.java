@@ -36,6 +36,7 @@ public class ShopInventoryManager implements GUIHolder {
     private final VersionSupport vs;
 
     public ShopInventoryManager(Player player, String group) {
+        Utility.debug("Opening shop inventory for player " + player.getName() + " in group " + group);
         this.player = player;
         this.group = group;
         this.vs = HotbarManager.getVersionSupport();
@@ -44,9 +45,17 @@ public class ShopInventoryManager implements GUIHolder {
         // Get cached menu from API
         this.cacheManager = HotbarManager.getCacheManager(group) == null ? HotbarManager.getCacheManager("default") : HotbarManager.getCacheManager(group);
         this.shopMenu = cacheManager.getMainMenu();
+        if (this.cacheManager == null) {
+            Utility.debug("No shop cache manager found for group " + group + ", and no default cache available. Cannot open shop inventory.");
+            return;
+        }
 
         // Start at first page
         this.currentPage = shopMenu.getFirstPage();
+        if (this.currentPage == null) {
+            Utility.debug("No pages found in shop menu for group " + group + ". Cannot open shop inventory.");
+            return;
+        }
 
         createInventory();
         populateInventory(true);

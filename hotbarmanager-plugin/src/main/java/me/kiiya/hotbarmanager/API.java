@@ -7,6 +7,7 @@ import me.kiiya.hotbarmanager.api.hotbar.IHotbarPlayer;
 import me.kiiya.hotbarmanager.api.hotbar.SortType;
 import me.kiiya.hotbarmanager.api.menu.IShopCacheManager;
 import me.kiiya.hotbarmanager.menu.HotbarManagerMenu;
+import me.kiiya.hotbarmanager.menu.ShopInventoryManager;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -47,6 +48,16 @@ public class API implements HotbarManager {
     public static class MenuUtil implements HotbarManager.MenuUtil {
         public void openHotbarMenu(Player player) {
             new HotbarManagerMenu(player);
+        }
+
+        @Override
+        public void openPerItemMenu(Player player) {
+            new ShopInventoryManager(player, "default");
+        }
+
+        @Override
+        public void openPerItemMenu(Player player, String group) {
+            new ShopInventoryManager(player, group);
         }
     }
 }

@@ -1,7 +1,7 @@
 package me.kiiya.hotbarmanager.support.bedwars2023;
 
-import com.tomkeuper.bedwars.api.configuration.ConfigManager;
 import me.kiiya.hotbarmanager.HotbarManager;
+import me.kiiya.hotbarmanager.api.config.ConfigManager;
 import me.kiiya.hotbarmanager.api.hotbar.SortType;
 import me.kiiya.hotbarmanager.api.menu.IShopCacheManager;
 import me.kiiya.hotbarmanager.config.MainConfig;
@@ -33,11 +33,7 @@ public class BedWarsProxy2023 {
         loadConfig();
         HotbarManager.manager = me.kiiya.hotbarmanager.player.HotbarManager.init();
         if (manager.getSortType() == SortType.ITEM) {
-            File shopsFolder = new File("/plugins/BedWarsProxy/Shops");
-            File defaultShopFile = new File(shopsFolder, "default-shop.yml");
-            ConfigManager defaultShop = new ConfigManager(HotbarManager.getInstance(), "default-shop.yml", shopsFolder.getPath());
-            IShopCacheManager cs = new CacheManager("default", HotbarManager.getVersionSupport());
-            cs.loadFromConfig(defaultShop.getYml().getConfigurationSection(""));
+            File shopsFolder = new File(Bukkit.getWorldContainer().getPath() + "/plugins/BWProxy2023/Shops/");
 
             if (!shopsFolder.exists() || shopsFolder.listFiles() == null) {
                 Utility.info("No shops found in /plugins/BedWars2023/Shops! Hotbar Manager requires shops to be sorted by item. Disabling plugin...");
@@ -46,11 +42,12 @@ public class BedWarsProxy2023 {
             }
             for (File shopFile : Objects.requireNonNull(shopsFolder.listFiles())) {
                 String fileName = shopFile.getName().toLowerCase();
+                Utility.debug("Found shop file: " + fileName);
                 if (!fileName.endsWith(".yml")) continue;
                 if (!fileName.contains("-shop")) continue;
-                if (shopFile.equals(defaultShopFile)) continue;
-                ConfigManager shopConfig = new ConfigManager(HotbarManager.getInstance(), fileName, shopsFolder.getPath());
-                IShopCacheManager shopCache = new CacheManager(fileName.replace("-shop.yml", ""), HotbarManager.getVersionSupport());
+                String formattedFileName = fileName.replace(".yml", "");
+                ConfigManager shopConfig = new ConfigManager(HotbarManager.getInstance(), formattedFileName, shopsFolder.getPath());
+                IShopCacheManager shopCache = new CacheManager(formattedFileName.replace("-shop", ""), HotbarManager.getVersionSupport());
                 shopCache.loadFromConfig(shopConfig.getYml().getConfigurationSection(""));
             }
         }

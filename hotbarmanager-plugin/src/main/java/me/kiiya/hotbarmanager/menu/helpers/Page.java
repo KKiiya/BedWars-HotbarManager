@@ -4,6 +4,7 @@ import me.kiiya.hotbarmanager.api.hotbar.Category;
 import me.kiiya.hotbarmanager.api.menu.IShopItem;
 import me.kiiya.hotbarmanager.api.menu.IShopMenu;
 import me.kiiya.hotbarmanager.api.menu.IPage;
+import me.kiiya.hotbarmanager.utils.Utility;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,10 +19,12 @@ public class Page implements IPage {
     private Page nextPage;
 
     public Page(Menu parent, Category category, int pageNumber) {
+        Utility.debug("Creating page " + pageNumber + " for category " + category);
         this.parent = parent;
         this.category = category;
         this.pageNumber = pageNumber;
         this.items = new ArrayList<>();
+        Utility.debug("Page created: " + this);
     }
 
     @Override
@@ -57,4 +60,13 @@ public class Page implements IPage {
 
     @Override
     public boolean hasNextPage() { return nextPage != null; }
+
+    @Override
+    public String toString() {
+        return "Page{" +
+                "category=" + category +
+                ", pageNumber=" + pageNumber +
+                ", items=" + items.size() +
+                '}';
+    }
 }

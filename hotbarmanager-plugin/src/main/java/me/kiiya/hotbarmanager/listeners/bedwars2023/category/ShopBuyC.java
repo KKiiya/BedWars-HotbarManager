@@ -47,7 +47,7 @@ public class ShopBuyC implements Listener {
         // MAIN VARIABLES
         Player p = e.getBuyer();
         PlayerInventory inv = p.getInventory();
-        IHotbarPlayer hp = HotbarManager.getAPI().getHotbarPlayer(p);
+        IHotbarPlayer hp = HotbarManager.getAPI().getHotbarManager().getHotbarPlayer(p);
         Category cat = HotbarUtils.getCategoryFromString(e.getCategoryContent().getIdentifier());
         List<Category> hotbar = hp.getHotbarAsList();
 
@@ -89,7 +89,7 @@ public class ShopBuyC implements Listener {
                     }
                 }
 
-                HotbarItemSetEvent event = new HotbarItemSetEvent(p, cat, i);
+                HotbarItemSetEvent event = new HotbarItemSetEvent(p, cat.toString(), i);
                 Bukkit.getPluginManager().callEvent(event);
                 if (event.isCancelled()) {
                     debug("Event was cancelled for slot " + i);

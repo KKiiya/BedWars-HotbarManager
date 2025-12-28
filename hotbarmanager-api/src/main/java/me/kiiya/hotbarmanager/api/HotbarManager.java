@@ -56,5 +56,18 @@ public interface HotbarManager {
          * @param player - the player
          */
         void openHotbarMenu(Player player);
+
+        /**
+         * Open the per item hotbar manager menu for the default category
+         * @param player - the player
+         */
+        void openPerItemMenu(Player player);
+
+        /**
+         * Open the per item hotbar manager menu for a specific group
+         * @param player - the player
+         * @param group - the group name
+         */
+        void openPerItemMenu(Player player, String group);
     }
 }
