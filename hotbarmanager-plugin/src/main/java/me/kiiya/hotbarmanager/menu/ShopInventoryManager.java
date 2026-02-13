@@ -178,6 +178,31 @@ public class ShopInventoryManager implements GUIHolder {
         reset.setItemMeta(reset_meta);
         inventory.setItem(53, vs.setItemTag(reset, "hbm", "reset"));
 
+        // Add compass item (for ITEM mode support)
+        boolean showCompass = false;
+        switch (HotbarManager.getSupport()) {
+            case BEDWARS1058:
+            case BEDWARS2023:
+                showCompass = HotbarManager.isCompassAddon() && mc.getBoolean("enable-compass-support");
+                break;
+            case BEDWARSPROXY:
+            case BEDWARSPROXY2023:
+                showCompass = mc.getBoolean("enable-compass-support");
+                break;
+        }
+        
+        if (showCompass) {
+            ItemStack compass = new ItemStack(Material.valueOf(mc.getString(CATEGORY_COMPASS_MATERIAL)));
+            compass.setDurability((short) mc.getInt(CATEGORY_COMPASS_DATA));
+            if (vs.isPlayerHead(compass)) compass = Utility.getSkull(mc.getString(CATEGORY_COMPASS_SKULL_URL));
+            ItemMeta compass_meta = compass.getItemMeta();
+            compass_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_COMPASS_NAME));
+            compass_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_COMPASS_LORE));
+            compass_meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            compass.setItemMeta(compass_meta);
+            inventory.setItem(52, vs.setItemTag(compass, "hbm", "compass"));
+        }
+
         // Add hotbar contents
         addHotbarContents();
         if (!isFirstTime) {
@@ -252,6 +277,19 @@ public class ShopInventoryManager implements GUIHolder {
                 hp.resetHotbar();
                 addHotbarContents();
                 break;
+            case "compass":
+                // Allow compass to be dragged to hotbar
+                player.setItemOnCursor(vs.setItemTag(clicked.clone(), "hbm", tag));
+                break;
+            case "compass-slot":
+                // Allow compass in hotbar to be removed/clicked
+                if (slot >= 0 && slot < 9) {
+                    hp.setSlotCategory(slot, "none", true);
+                    addHotbarContents();
+                } else {
+                    player.setItemOnCursor(vs.setItemTag(clicked.clone(), "hbm", "compass"));
+                }
+                break;
             default:
                 if (slot >= 0 && slot <= 9) {
                     hp.setSlotCategory(slot, "none", true);
@@ -279,7 +317,26 @@ public class ShopInventoryManager implements GUIHolder {
         }
 
         for (int slot = 0; slot < 9; slot++) {
-            String itemPath = hp.getItemPath(slot); // Format: "category.item" (e.g., "blocks.wool")
+            String itemPath = hp.getItemPath(slot); // Format: "category.item" (e.g., "blocks.wool") or "compass"
+
+            // Handle compass special case (not a shop item)
+            if (itemPath != null && itemPath.equalsIgnoreCase("compass")) {
+                MainConfig mc = HotbarManager.getMainConfig();
+                ItemStack compass = new ItemStack(Material.valueOf(mc.getString(CATEGORY_COMPASS_MATERIAL)));
+                compass.setDurability((short) mc.getInt(CATEGORY_COMPASS_DATA));
+                if (vs.isPlayerHead(compass)) compass = Utility.getSkull(mc.getString(CATEGORY_COMPASS_SKULL_URL));
+                ItemMeta compass_meta = compass.getItemMeta();
+                compass_meta.setDisplayName(Utility.getMsg(player, INVENTORY_ITEMS_COMPASS_NAME));
+                compass_meta.setLore(Utility.getListMsg(player, INVENTORY_ITEMS_USED_LORE)
+                        .stream().map(s -> s.replace("{category}", Utility.getMsg(player, MEANING_COMPASS)))
+                        .collect(Collectors.toList()));
+                compass_meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                compass.setItemMeta(compass_meta);
+                // Add NBT tag so compass can be clicked/removed from hotbar
+                compass = vs.setItemTag(compass, "hbm", "compass-slot");
+                inventory.setItem(slot, compass);
+                continue;
+            }
 
             if (itemPath == null || itemPath.isEmpty() || itemPath.equalsIgnoreCase("none") || Category.getFromString(itemPath) != Category.NONE) {
                 // Handle empty/none slots

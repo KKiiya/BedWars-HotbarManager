@@ -32,6 +32,28 @@ public class RespawnListenerI implements Listener {
         debug("Expected hotbar order: " + hotbar);
 
         Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> {
+            // --- COMPASS HANDLING (Special case) ---
+            ItemStack compass = ap.getInventory().getItem(8);
+            boolean compassInHotbar = hotbar.contains("compass");
+            debug("Compass check: " + (compass != null ? compass.getType() : "null") + ", in hotbar: " + compassInHotbar);
+            
+            if (compass != null && compass.getType() != Material.AIR) {
+                // Always clear slot 8 first to prevent duplication
+                ap.getInventory().setItem(8, new ItemStack(Material.AIR));
+                
+                if (compassInHotbar) {
+                    // Compass is configured in hotbar, will be placed later in correct slot
+                    debug("Compass will be placed in configured slot");
+                } else {
+                    // Compass NOT in hotbar config - move to inventory (exclusion)
+                    if (HotbarManager.isCompassAddon()) {
+                        debug("Compass excluded from hotbar, moving to inventory slot 17");
+                        ap.getInventory().setItem(17, compass);
+                        compass = null; // Prevent placing in hotbar later
+                    }
+                }
+            }
+
             debug("--- Phase 1: Scanning ALL inventory slots ---");
             HashMap<String, ItemStack> foundItems = new HashMap<>();
             List<ItemStack> itemsToAddBack = new ArrayList<>();
@@ -62,7 +84,8 @@ public class RespawnListenerI implements Listener {
                     debug("  -> Item belongs in hotbar, storing it");
                     foundItems.put(itemPath, item);
                 } else {
-                    debug("  -> Item NOT in expected hotbar, ignoring");
+                    debug("  -> Item NOT in expected hotbar, adding back...");
+                    itemsToAddBack.add(item);
                 }
             }
 
@@ -81,6 +104,17 @@ public class RespawnListenerI implements Listener {
             // Place items in their correct positions
             for (int i = 0; i < hotbar.size(); i++) {
                 String expectedPath = hotbar.get(i);
+
+                // Special handling for compass
+                if (expectedPath.equalsIgnoreCase("compass")) {
+                    if (compass != null && compass.getType() != Material.AIR) {
+                        debug("Placing compass in slot " + i);
+                        ap.getInventory().setItem(i, compass);
+                    } else {
+                        debug("Slot " + i + " expects compass but compass not found");
+                    }
+                    continue;
+                }
 
                 if (expectedPath.equalsIgnoreCase("none") || expectedPath.equalsIgnoreCase("MELEE")) {
                     debug("Slot " + i + " expects '" + expectedPath + "', skipping");
@@ -125,6 +159,28 @@ public class RespawnListenerI implements Listener {
             debug("Expected hotbar order: " + hotbar);
 
             Bukkit.getScheduler().runTaskLater(HotbarManager.getInstance(), () -> {
+                // --- COMPASS HANDLING (Special case) ---
+                ItemStack compass = ap.getInventory().getItem(8);
+                boolean compassInHotbar = hotbar.contains("compass");
+                debug("Compass check: " + (compass != null ? compass.getType() : "null") + ", in hotbar: " + compassInHotbar);
+                
+                if (compass != null && compass.getType() != Material.AIR) {
+                    // Always clear slot 8 first to prevent duplication
+                    ap.getInventory().setItem(8, new ItemStack(Material.AIR));
+                    
+                    if (compassInHotbar) {
+                        // Compass is configured in hotbar, will be placed later in correct slot
+                        debug("Compass will be placed in configured slot");
+                    } else {
+                        // Compass NOT in hotbar config - move to inventory (exclusion)
+                        if (HotbarManager.isCompassAddon()) {
+                            debug("Compass excluded from hotbar, moving to inventory slot 17");
+                            ap.getInventory().setItem(17, compass);
+                            compass = null; // Prevent placing in hotbar later
+                        }
+                    }
+                }
+
                 debug("--- Phase 1: Scanning ALL inventory slots ---");
                 HashMap<String, ItemStack> foundItems = new HashMap<>();
                 List<ItemStack> itemsToAddBack = new ArrayList<>();
@@ -155,7 +211,8 @@ public class RespawnListenerI implements Listener {
                         debug("  -> Item belongs in hotbar, storing it");
                         foundItems.put(itemPath, item);
                     } else {
-                        debug("  -> Item NOT in expected hotbar, ignoring");
+                        debug("  -> Item NOT in expected hotbar, will add back");
+                        itemsToAddBack.add(item);
                     }
                 }
 
@@ -174,6 +231,17 @@ public class RespawnListenerI implements Listener {
                 // Place items in their correct positions
                 for (int i = 0; i < hotbar.size(); i++) {
                     String expectedPath = hotbar.get(i);
+
+                    // Special handling for compass
+                    if (expectedPath.equalsIgnoreCase("compass")) {
+                        if (compass != null && compass.getType() != Material.AIR) {
+                            debug("Placing compass in slot " + i);
+                            ap.getInventory().setItem(i, compass);
+                        } else {
+                            debug("Slot " + i + " expects compass but compass not found");
+                        }
+                        continue;
+                    }
 
                     if (expectedPath.equalsIgnoreCase("none") || expectedPath.equalsIgnoreCase("MELEE")) {
                         debug("Slot " + i + " expects '" + expectedPath + "', skipping");
